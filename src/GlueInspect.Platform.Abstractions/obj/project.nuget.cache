@@ -1,0 +1,11 @@
+{
+  "version": 2,
+  "dgSpecHash": "1t7TUwimjuE=",
+  "success": true,
+  "projectFilePath": "E:\\posen_project\\点胶检测\\上位机程序\\WpfApp2\\Platform\\src\\GlueInspect.Platform.Abstractions\\GlueInspect.Platform.Abstractions.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\liangyuhang\\.nuget\\packages\\microsoft.netcore.platforms\\1.1.0\\microsoft.netcore.platforms.1.1.0.nupkg.sha512",
+    "C:\\Users\\liangyuhang\\.nuget\\packages\\netstandard.library\\2.0.3\\netstandard.library.2.0.3.nupkg.sha512"
+  ],
+  "logs": []
+}

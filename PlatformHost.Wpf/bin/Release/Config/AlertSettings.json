@@ -1,0 +1,30 @@
+{
+  "IsEnabled": false,
+  "StatisticsCycle": 100,
+  "MinSampleSize": 50,
+  "EnableIOOutput": false,
+  "DefaultProfileId": "9b3aaa2e063e42db9697bd66f11e71d0",
+  "StrategyProfiles": [
+    {
+      "Id": "9b3aaa2e063e42db9697bd66f11e71d0",
+      "Name": "默认策略组合",
+      "EnableCountAnalysis": true,
+      "OutOfRangeThreshold": 10,
+      "EnableProcessCapabilityAnalysis": false,
+      "CAThreshold": 0.2,
+      "CPThreshold": 1.33,
+      "CPKThreshold": 1.33,
+      "EnableConsecutiveNGAnalysis": false,
+      "ConsecutiveNGThreshold": 3
+    }
+  ],
+  "ItemProfileBindings": {},
+  "EnableCountAnalysis": true,
+  "OutOfRangeThreshold": 10,
+  "EnableProcessCapabilityAnalysis": false,
+  "CAThreshold": 0.2,
+  "CPThreshold": 1.33,
+  "CPKThreshold": 1.33,
+  "EnableConsecutiveNGAnalysis": false,
+  "ConsecutiveNGThreshold": 3
+}

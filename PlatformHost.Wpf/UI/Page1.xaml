@@ -1,0 +1,632 @@
+﻿<Page x:Class="WpfApp2.UI.Page1"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:local="clr-namespace:WpfApp2.UI"
+      xmlns:Release="clr-namespace:VMControls.WPF.Release"
+      xmlns:ScottPlot="clr-namespace:ScottPlot.WPF;assembly=ScottPlot.WPF"
+      mc:Ignorable="d" 
+      d:DesignHeight="1024" d:DesignWidth="1920"
+      Title="Page1">
+    <Grid>
+        <Grid Margin="10">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="1000" />
+            </Grid.RowDefinitions>
+
+            <Grid Grid.Row="0" Background="#FF020223" Height="50">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="500" />
+                    <ColumnDefinition Width="480" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+
+                <!-- 左侧：Logo和项目信息 -->
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Grid.Column="0">
+                    <!--<Image Source="E:\WpfTest\WpfApp2\posen_monitor.ico" Height="30" Margin="15,0,15,0"/>-->
+
+                    <!-- 左侧：LOT和模板信息卡片 -->
+                    <StackPanel Orientation="Horizontal" Grid.Column="0" HorizontalAlignment="Left" VerticalAlignment="Center">
+                        <!-- LOT信息卡片 - 蓝色主题，剪贴板图标 -->
+                        <Border Background="#FF3498DB" BorderThickness="1" BorderBrush="#FF2980B9" 
+                                Width="200" Height="40" Margin="8,0" CornerRadius="6" Cursor="Hand">
+                            <Border.Effect>
+                                <DropShadowEffect Color="Black" Direction="315" ShadowDepth="2" Opacity="0.3"/>
+                            </Border.Effect>
+                            <Button Background="Transparent" BorderThickness="0" Click="LOT_MouseDown" Padding="0">
+                                <Button.Style>
+                                    <Style TargetType="Button">
+                                        <Style.Triggers>
+                                            <Trigger Property="IsMouseOver" Value="True">
+                                                <Setter Property="Background" Value="#FF5DADE2"/>
+                                            </Trigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Button.Style>
+                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="12,0">
+                                    <TextBlock Text="📋" FontSize="14" Foreground="White" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                    <TextBlock Text="LOT:" FontSize="14" Foreground="Black" Opacity="0.9" VerticalAlignment="Center" Margin="0,0,5,0"/>
+                                    <TextBlock x:Name="LOT" FontSize="14" Text="未加载" Foreground="Black" VerticalAlignment="Center"
+                                               FontWeight="Bold"/>
+                                </StackPanel>
+                            </Button>
+                        </Border>
+
+                        <!-- 模板信息卡片 - 橙色主题，目标图标 -->
+                        <Border Background="#FFF39C12" BorderThickness="1" BorderBrush="#FFD68910" 
+                                Width="250" Height="40" Margin="8,0" CornerRadius="6" Cursor="Hand">
+                            <Border.Effect>
+                                <DropShadowEffect Color="Black" Direction="315" ShadowDepth="2" Opacity="0.3"/>
+                            </Border.Effect>
+                            <Button Background="Transparent" BorderThickness="0" Click="ConfigButton_Click" Padding="0">
+                                <Button.Style>
+                                    <Style TargetType="Button">
+                                        <Style.Triggers>
+                                            <Trigger Property="IsMouseOver" Value="True">
+                                                <Setter Property="Background" Value="#FFF5B041"/>
+                                            </Trigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Button.Style>
+                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="12,0">
+                                    <TextBlock Text="🎯" FontSize="14" Margin="0,0,8,0" VerticalAlignment="Center"/>
+                                    <TextBlock Text="模板:" FontSize="14" FontWeight="Medium" Foreground="Black" Opacity="0.9" VerticalAlignment="Center" Margin="0,0,5,0"/>
+                                    <TextBlock x:Name="TemplateNameText" Text="{Binding CurrentTemplateName}" 
+                                               FontSize="14" FontWeight="Bold" Foreground="Black" VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </Button>
+                        </Border>
+                    </StackPanel>
+                </StackPanel>
+
+                <!-- 中间：图片检测卡片 - 重新设计 -->
+                <Border Grid.Column="1" CornerRadius="8" 
+                        x:Name="ImageTestCard" HorizontalAlignment="Center" VerticalAlignment="Center"
+                        Background="#FF2C3E50" BorderThickness="0" Height="50" MaxWidth="610" Margin="10,0,0,0">
+
+                    <StackPanel Orientation="Horizontal" Margin="8" HorizontalAlignment="Left">
+                        <!-- 连续检测到第一组按钮 -->
+                        <Border Background="#FF9B59B6" CornerRadius="4" Margin="2" x:Name="FirstImageButtonBorder" Visibility="Collapsed">
+                            <Button x:Name="FirstImageButton" Content="|◀" 
+                                    Click="FirstImageButton_Click"
+                                    Background="Transparent" Foreground="White" FontSize="14" FontWeight="Bold"
+                                    Width="35" Height="32" BorderThickness="0" ToolTip="连续检测到第一组" Cursor="Hand"/>
+                        </Border>
+
+                        <!-- 上一组按钮 -->
+                        <Border Background="#FF1ABC9C" CornerRadius="4" Margin="2" x:Name="PreviousImageButtonBorder" Visibility="Collapsed">
+                            <Button x:Name="PreviousImageButton" Content="◀ 上一组" 
+                                    Click="PreviousImageButton_Click"
+                                    Background="Transparent" Foreground="White" FontSize="12" FontWeight="Medium"
+                                    Width="55" Height="32" BorderThickness="0" Cursor="Hand"/>
+                        </Border>
+
+                        <!-- 中间主按钮 - 重新设计 -->
+                        <Border Background="#FF27AE60" CornerRadius="6" Margin="2" BorderThickness="0">
+                            <Border.Effect>
+                                <DropShadowEffect Color="Black" Direction="315" ShadowDepth="1" Opacity="0.3"/>
+                            </Border.Effect>
+                            <Button x:Name="MainImageTestButton" Background="Transparent" BorderThickness="0" 
+                                    Click="MainImageTestButton_Click" Width="110" Height="35" Cursor="Hand">
+                                <Button.Style>
+                                    <Style TargetType="Button">
+                                        <Style.Triggers>
+                                            <Trigger Property="IsMouseOver" Value="True">
+                                                <Setter Property="Background" Value="#FF2ECC71"/>
+                                            </Trigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Button.Style>
+                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                    <TextBlock Text="🖼️" FontSize="12" Margin="0,0,4,0" VerticalAlignment="Center"/>
+                                    <TextBlock Text="图片检测" FontSize="12" FontWeight="Medium" Foreground="White" VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </Button>
+                        </Border>
+
+                        <!-- 暂停/恢复按钮 -->
+                        <Border Background="#FFF39C12" CornerRadius="4" Margin="2" x:Name="PauseResumeButtonBorder" Visibility="Collapsed">
+                            <Button x:Name="PauseResumeButton" Content="⏸️"
+                                    Click="PauseResumeButton_Click"
+                                    Background="Transparent" Foreground="White" FontSize="16" FontWeight="Medium"
+                                    Width="35" Height="32" BorderThickness="0" ToolTip="暂停/恢复检测" Cursor="Hand"/>
+                        </Border>
+
+                        <!-- 记录按钮 (测试模式专用) -->
+                        <Border Background="#FF17A2B8" CornerRadius="4" Margin="2" x:Name="MarkButtonBorder" Visibility="Collapsed">
+                            <Button x:Name="MarkButton" Content="📝记录" 
+                                    Click="MarkButton_Click"
+                                    Background="Transparent" Foreground="White" FontSize="12" FontWeight="Medium"
+                                    Width="60" Height="32" BorderThickness="0" ToolTip="标记当前图片" Cursor="Hand"/>
+                        </Border>
+
+                        <!-- 下一组按钮 -->
+                        <Border Background="#FF1ABC9C" CornerRadius="4" Margin="2" x:Name="NextImageButtonBorder" Visibility="Collapsed">
+                            <Button x:Name="NextImageButton" Content="下一组 ▶" 
+                                    Click="NextImageButton_Click"
+                                    Background="Transparent" Foreground="White" FontSize="12" FontWeight="Medium"
+                                    Width="55" Height="32" BorderThickness="0" Cursor="Hand"/>
+                        </Border>
+
+                        <!-- 连续检测到最后一组按钮 -->
+                        <Border Background="#FF9B59B6" CornerRadius="4" Margin="2" x:Name="LastImageButtonBorder" Visibility="Collapsed">
+                            <Button x:Name="LastImageButton" Content="▶|" 
+                                    Click="LastImageButton_Click"
+                                    Background="Transparent" Foreground="White" FontSize="14" FontWeight="Bold"
+                                    Width="35" Height="32" BorderThickness="0" ToolTip="连续检测到最后一组" Cursor="Hand"/>
+                        </Border>
+                    </StackPanel>
+                </Border>
+
+                <!-- 右侧：功能按钮组 + 帮助按钮 -->
+                <StackPanel Orientation="Horizontal" Grid.Column="2" HorizontalAlignment="Right" VerticalAlignment="Center">
+                    
+
+                    <!-- 数据清空按钮 - 使用红色主题，清理图标 -->
+                    <Border Background="#FFE74C3C" BorderThickness="1" BorderBrush="#FFC0392B" 
+                            Width="80" Height="40" Margin="8,0" CornerRadius="6">
+                        <Border.Effect>
+                            <DropShadowEffect Color="Black" Direction="315" ShadowDepth="2" Opacity="0.3"/>
+                        </Border.Effect>
+                        <Button Grid.Column="1" Click="ClearButton_Click" Padding="8" Background="Transparent" 
+                                BorderThickness="0" Cursor="Hand">
+                            <Button.Style>
+                                <Style TargetType="Button">
+                                    <Style.Triggers>
+                                        <Trigger Property="IsMouseOver" Value="True">
+                                            <Setter Property="Background" Value="#FFEC7063"/>
+                                        </Trigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Button.Style>
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                <TextBlock Text="🗑️" FontSize="14" Margin="0,0,8,0" VerticalAlignment="Center"/>
+                                <TextBlock Text="清空" VerticalAlignment="Center" FontSize="14" FontWeight="Medium" Foreground="White"/>
+                            </StackPanel>
+                        </Button>
+                    </Border>
+                    <!-- 查看图片按钮 - 使用绿色主题，文件夹图标 -->
+                    <Border Background="#FF27AE60" BorderThickness="1" BorderBrush="#FF1E8449" 
+                            Width="80" Height="40" Margin="8,0" CornerRadius="6">
+                        <Border.Effect>
+                            <DropShadowEffect Color="Black" Direction="315" ShadowDepth="2" Opacity="0.3"/>
+                        </Border.Effect>
+                        <Button Grid.Column="1" Click="Button_Click_1" Padding="8" Background="Transparent" 
+                                BorderThickness="0" Cursor="Hand">
+                            <Button.Style>
+                                <Style TargetType="Button">
+                                    <Style.Triggers>
+                                        <Trigger Property="IsMouseOver" Value="True">
+                                            <Setter Property="Background" Value="#FF2ECC71"/>
+                                        </Trigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Button.Style>
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                <TextBlock Text="📁" FontSize="14" Margin="0,0,8,0" VerticalAlignment="Center"/>
+                                <TextBlock Text="文件" VerticalAlignment="Center" FontSize="14" FontWeight="Medium" Foreground="White"/>
+                            </StackPanel>
+                        </Button>
+                    </Border>
+
+                    <!-- 数据分析按钮 - 使用深紫色主题，图表图标 -->
+                    <Border Background="#FF8E44AD" BorderThickness="1" BorderBrush="#FF7D3C98" 
+                            Width="80" Height="40" Margin="8,0" CornerRadius="6">
+                        <Border.Effect>
+                            <DropShadowEffect Color="Black" Direction="315" ShadowDepth="2" Opacity="0.3"/>
+                        </Border.Effect>
+                        <Button x:Name="DataAnalysisButton" Click="DataAnalysisButton_Click" Padding="8" 
+                                Background="Transparent" BorderThickness="0" Cursor="Hand">
+                            <Button.Style>
+                                <Style TargetType="Button">
+                                    <Style.Triggers>
+                                        <Trigger Property="IsMouseOver" Value="True">
+                                            <Setter Property="Background" Value="#FFA569BD"/>
+                                        </Trigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Button.Style>
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                <TextBlock Text="📊" FontSize="14" Margin="0,0,8,0" VerticalAlignment="Center"/>
+                                <TextBlock Text="统计" VerticalAlignment="Center" FontSize="14" FontWeight="Medium" Foreground="White"/>
+                            </StackPanel>
+                        </Button>
+                    </Border>
+
+                    <!-- 存图模式卡片 - 使用深色主题，磁盘图标 -->
+                    <Border Background="#FF17A2B8" BorderThickness="1" BorderBrush="#FF138496" 
+                            Width="140" Height="40" Margin="8,0" CornerRadius="6">
+                        <Border.Effect>
+                            <DropShadowEffect Color="Black" Direction="315" ShadowDepth="2" Opacity="0.3"/>
+                        </Border.Effect>
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="8,0">
+                            <TextBlock Text="💾" FontSize="14" Margin="0,0,8,0" VerticalAlignment="Center"/>
+                            <StackPanel Orientation="Vertical" VerticalAlignment="Center">
+                                <TextBlock Text="存图模式" FontSize="12" FontWeight="Medium" Foreground="White" 
+                                           HorizontalAlignment="Center" Margin="0,0,0,2"/>
+                                <!-- Toggle Switch 控件 -->
+                                <ToggleButton x:Name="ImageSaveModeToggle" Width="70" Height="20" 
+                                              Click="ImageSaveModeToggle_Click" Cursor="Hand">
+                                    <ToggleButton.Style>
+                                        <Style TargetType="ToggleButton">
+                                            <Setter Property="Template">
+                                                <Setter.Value>
+                                                    <ControlTemplate TargetType="ToggleButton">
+                                                        <Border x:Name="SwitchBorder" Background="#FFDC3545" 
+                                                                CornerRadius="10" Width="70" Height="20">
+                                                            <Grid>
+                                                                <!-- 开关滑块 -->
+                                                                <Ellipse x:Name="SwitchThumb" Fill="White" 
+                                                                         Width="16" Height="16" 
+                                                                         HorizontalAlignment="Left" Margin="2,0,0,0"/>
+                                                                <!-- 文字标签 -->
+                                                                <TextBlock x:Name="SwitchText" Text="仅存NG" 
+                                                                           FontSize="9" Foreground="White" 
+                                                                           HorizontalAlignment="Center" 
+                                                                           VerticalAlignment="Center"/>
+                                                            </Grid>
+                                                        </Border>
+                                                        <ControlTemplate.Triggers>
+                                                            <Trigger Property="IsChecked" Value="True">
+                                                                <Setter TargetName="SwitchBorder" Property="Background" Value="#FF28A745"/>
+                                                                <Setter TargetName="SwitchThumb" Property="HorizontalAlignment" Value="Right"/>
+                                                                <Setter TargetName="SwitchThumb" Property="Margin" Value="0,0,2,0"/>
+                                                                <Setter TargetName="SwitchText" Property="Text" Value="存所有"/>
+                                                            </Trigger>
+                                                            <Trigger Property="IsMouseOver" Value="True">
+                                                                <Setter TargetName="SwitchBorder" Property="Opacity" Value="0.8"/>
+                                                            </Trigger>
+                                                        </ControlTemplate.Triggers>
+                                                    </ControlTemplate>
+                                                </Setter.Value>
+                                            </Setter>
+                                        </Style>
+                                    </ToggleButton.Style>
+                                </ToggleButton>
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- 错误复位按钮 - 使用醒目红色主题，警告图标 -->
+                    <Border Background="#FFDC3545" BorderThickness="1" BorderBrush="#FFC82333" 
+                            Width="110" Height="40" Margin="8,0" CornerRadius="6">
+                        <Border.Effect>
+                            <DropShadowEffect Color="Black" Direction="315" ShadowDepth="3" Opacity="0.4"/>
+                        </Border.Effect>
+                        <Button x:Name="ErrorResetButton" Click="ErrorResetButton_Click" Padding="8" 
+                                Background="Transparent" BorderThickness="0" Cursor="Hand">
+                            <Button.Style>
+                                <Style TargetType="Button">
+                                    <Style.Triggers>
+                                        <Trigger Property="IsMouseOver" Value="True">
+                                            <Setter Property="Background" Value="#FFE85D75"/>
+                                        </Trigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Button.Style>
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                <TextBlock Text="⚠️" FontSize="14" Margin="0,0,8,0" VerticalAlignment="Center"/>
+                                <TextBlock Text="错误复位" VerticalAlignment="Center" FontSize="14" FontWeight="Bold" Foreground="White"/>
+                            </StackPanel>
+                        </Button>
+                    </Border>
+
+                    <!-- 相机配置按钮 - 使用蓝紫色主题，相机图标 -->
+                    <Border Background="#FF6C5CE7" BorderThickness="1" BorderBrush="#FF5A4FCF" 
+                            Width="40" Height="40" Margin="8,0" CornerRadius="6">
+                        <Border.Effect>
+                            <DropShadowEffect Color="Black" Direction="315" ShadowDepth="2" Opacity="0.3"/>
+                        </Border.Effect>
+                        <Button x:Name="CameraConfigButton" Click="CameraConfigButton_Click" Padding="8" 
+                                Background="Transparent" BorderThickness="0" Cursor="Hand">
+                            <Button.Style>
+                                <Style TargetType="Button">
+                                    <Style.Triggers>
+                                        <Trigger Property="IsMouseOver" Value="True">
+                                            <Setter Property="Background" Value="#FF7F7CE8"/>
+                                        </Trigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Button.Style>
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                <TextBlock Text="📷" FontSize="14" Margin="0,0,8,0" VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Button>
+                    </Border>
+
+                    <!-- 颜色配置按钮 - 使用青色主题，调色板图标，小按钮样式 -->
+                    <Border Background="#FF17A2B8" BorderThickness="1" BorderBrush="#FF138496" 
+                            Width="40" Height="40" Margin="8,0,0,0" CornerRadius="6">
+                        <Border.Effect>
+                            <DropShadowEffect Color="Black" Direction="315" ShadowDepth="2" Opacity="0.3"/>
+                        </Border.Effect>
+                        <Button x:Name="ColorConfigButton" Click="ColorConfigButton_Click" Padding="8" 
+                                Background="Transparent" BorderThickness="0" Cursor="Hand">
+                            <Button.Style>
+                                <Style TargetType="Button">
+                                    <Style.Triggers>
+                                        <Trigger Property="IsMouseOver" Value="True">
+                                            <Setter Property="Background" Value="#FF20C0DB"/>
+                                        </Trigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Button.Style>
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                <TextBlock Text="🎨" FontSize="14" Margin="0,0,6,0" VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Button>
+                    </Border>
+
+                    <!-- 硬件配置按钮 - 使用黄色主题，设置图标 -->
+                    <Border Background="#FF084D64" BorderThickness="1" BorderBrush="#FFF39C12" 
+                           Width="40" Height="40" Margin="8,0" CornerRadius="6">
+                        <Border.Effect>
+                            <DropShadowEffect Color="Black" Direction="315" ShadowDepth="2" Opacity="0.3"/>
+                        </Border.Effect>
+                        <Button x:Name="HardwareConfigButton" Click="HardwareConfigButton_Click" Padding="8" 
+                               Background="Transparent" BorderThickness="0" Cursor="Hand">
+                            <Button.Style>
+                                <Style TargetType="Button">
+                                    <Style.Triggers>
+                                        <Trigger Property="IsMouseOver" Value="True">
+                                            <Setter Property="Background" Value="#FFF5B041"/>
+                                        </Trigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Button.Style>
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                <TextBlock Text="⚙️" FontSize="14" Margin="0,0,8,0" VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Button>
+                    </Border>
+
+                    <!-- 显示log按钮 - 使用灰色主题，日志图标 -->
+                    <Border Background="#FF95A5A6" BorderThickness="1" BorderBrush="#FF7F8C8D" 
+                            Width="40" Height="40" Margin="8,0" CornerRadius="6">
+                        <Border.Effect>
+                            <DropShadowEffect Color="Black" Direction="315" ShadowDepth="2" Opacity="0.3"/>
+                        </Border.Effect>
+                        <Button x:Name="ShowLogButton" Click="ShowLogButton_Click" Padding="8" Background="Transparent" 
+                                BorderThickness="0" Cursor="Hand">
+                            <Button.Style>
+                                <Style TargetType="Button">
+                                    <Style.Triggers>
+                                        <Trigger Property="IsMouseOver" Value="True">
+                                            <Setter Property="Background" Value="#FFBDC3C7"/>
+                                        </Trigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Button.Style>
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                <TextBlock Text="📄" FontSize="14" Margin="0,0,8,0" VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Button>
+                    </Border>
+
+                    <!-- 帮助按钮 - 使用灰色主题，帮助图标 -->
+                    <Border Background="#FF95A5A6" BorderThickness="1" BorderBrush="#FF7F8C8D" 
+                            Width="40" Height="40" Margin="8,0,0,0" CornerRadius="6">
+                        <Border.Effect>
+                            <DropShadowEffect Color="Black" Direction="315" ShadowDepth="2" Opacity="0.3"/>
+                        </Border.Effect>
+                        <Button x:Name="HelpButton" Click="HelpButton_Click" Padding="8" Background="Transparent" 
+                                BorderThickness="0" Cursor="Hand">
+                            <Button.Style>
+                                <Style TargetType="Button">
+                                    <Style.Triggers>
+                                        <Trigger Property="IsMouseOver" Value="True">
+                                            <Setter Property="Background" Value="#FFBDC3C7"/>
+                                        </Trigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Button.Style>
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                <TextBlock Text="❓" FontSize="14" Margin="0,0,6,0" VerticalAlignment="Center"/>
+                                <!--<TextBlock Text="帮助" VerticalAlignment="Center" FontSize="14" FontWeight="Medium" Foreground="White"/>-->
+                            </StackPanel>
+                        </Button>
+                    </Border>
+                </StackPanel>
+            </Grid>
+
+            <Grid Grid.Row="1" >
+                <Grid.ColumnDefinitions>
+                    <!-- 第1列：2x2格子布局（原1,2列合并） -->
+                    <ColumnDefinition Width="1250" />
+                    <!-- 第2列：数据表格（原第3列） -->
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+
+                <!-- 第1列：2x2格子布局 -->
+                <Grid Grid.Column="0">
+                    <Grid.RowDefinitions>
+                        <!-- 上行：两个VM渲染框 -->
+                        <RowDefinition Height="500" />
+                        <!-- 下行：3D渲染框 + 数据分析区域 -->
+                        <RowDefinition Height="500" />
+                    </Grid.RowDefinitions>
+
+                    <!-- 上行：两个相同大小的VM渲染框 -->
+                    <Grid Grid.Row="0">
+                        <Grid.ColumnDefinitions>
+                            <!-- 左上：大VM渲染界面 -->
+                            <ColumnDefinition Width="625" />
+                            <!-- 右上：小VM界面 -->
+                            <ColumnDefinition Width="625" />
+                        </Grid.ColumnDefinitions>
+
+                        <!-- 左上：大VM渲染界面 -->
+                        <Grid Grid.Column="0">
+                            <StackPanel Margin="3">
+                                <Release:VmRenderControl x:Name="render1" Height="494"/>
+                            </StackPanel>
+                        </Grid>
+
+                        <!-- 右上：小VM界面 -->
+                        <Grid Grid.Column="1">
+                            <StackPanel Margin="3">
+                                <Release:VmRenderControl x:Name="coating" Height="494"/>
+                            </StackPanel>
+                        </Grid>
+                    </Grid>
+
+                    <!-- 下行：3D渲染框 + 数据分析区域 -->
+                    <Grid Grid.Row="1">
+                        <Grid.ColumnDefinitions>
+                            <!-- 左下：3D渲染框 -->
+                            <ColumnDefinition Width="625" />
+                            <!-- 右下：数据分析区域 -->
+                            <ColumnDefinition Width="625" />
+                        </Grid.ColumnDefinitions>
+
+                        <!-- 左下：3D界面 -->
+                        <Grid Grid.Column="0" x:Name="Grid3DContainer">
+                            <WindowsFormsHost x:Name="_3DViewHost" HorizontalAlignment="Stretch" Height="494" Width="619" Margin="3"/>
+                        </Grid>
+
+                        <!-- 右下：数据分析区域（原第2列内容） -->
+                        <Grid Grid.Column="1">
+                            <Grid.RowDefinitions>
+                                <!-- ScottPlot图表区域 - 压缩高度 -->
+                                <RowDefinition Height="300" />
+                                <!-- 统计数据显示区域 -->
+                                <RowDefinition Height="194" />
+                                <!-- Log区域保持隐藏 -->
+                            </Grid.RowDefinitions>
+
+                            <!-- ScottPlot图表 - 压缩后的空间 -->
+                            <ScottPlot:WpfPlot Grid.Row="0" x:Name="WpfPlot1" Margin="3" />
+
+                            <StackPanel Grid.Row="1" Orientation="Vertical" Margin="6">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock FontSize="24" Text="Total:" Foreground="White" VerticalAlignment="Center"/>
+                                    <TextBlock x:Name="Total_num" FontSize="22" Text="0" Foreground="White" VerticalAlignment="Center" Margin="8,0,0,0"/>
+                                    <TextBlock FontSize="24" Text="OK:" Foreground="Green" VerticalAlignment="Center" Margin="20,0,0,0"/>
+                                    <TextBlock x:Name="OK_num" FontSize="22" Text="0" Foreground="White" VerticalAlignment="Center" Margin="8,0,0,0"/>
+                                    <TextBlock FontSize="24" Text="NG:" Foreground="Red" VerticalAlignment="Center" Margin="20,0,0,0"/>
+                                    <TextBlock x:Name="NG_num" FontSize="22" Text="0" Foreground="White" VerticalAlignment="Center" Margin="8,0,0,0"/>
+                                </StackPanel>
+                                <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
+                                    <TextBlock FontSize="28" Text="良率：" Foreground="Green" VerticalAlignment="Center"/>
+                                    <TextBlock x:Name="yieldRate" FontSize="28" Text="100.00%" Foreground="White" VerticalAlignment="Center"/>
+                                    <TextBlock x:Name="OK_OR_NG" FontSize="60" Text="OK" Foreground="White" Background="Green" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="30,10,0,0" />
+                                    <!-- 类型显示移动到这里 -->
+                                    <TextBlock FontSize="28" Text="类型：" Foreground="Orange" VerticalAlignment="Center" Margin="30,0,0,0"/>
+                                    <TextBlock x:Name="DefectType" FontSize="28" Text="--" Foreground="White" VerticalAlignment="Center" 
+                                               TextWrapping="Wrap" MaxWidth="200" Margin="5,0,0,0"/>
+                                </StackPanel>
+                            </StackPanel>
+
+                            <!-- Log区域 - 保持隐藏 -->
+                            <ListView x:Name="listViewLog" Background="#F0F0F0" FontSize="16" Foreground="black" 
+                                      ScrollViewer.HorizontalScrollBarVisibility="Auto" ScrollViewer.VerticalScrollBarVisibility="Auto"
+                                      Visibility="Collapsed">
+                                <ListView.Resources>
+                                    <Style TargetType="GridViewColumnHeader">
+                                        <Setter Property="FontSize" Value="10"/>
+                                    </Style>
+                                </ListView.Resources>
+                                <ListView.View>
+                                    <GridView>
+                                        <GridViewColumn Header="时间戳" Width="200" DisplayMemberBinding="{Binding TimeStamp}" />
+                                        <GridViewColumn Header="消息"  DisplayMemberBinding="{Binding Message}" />
+                                    </GridView>
+                                </ListView.View>
+                            </ListView>
+                        </Grid>
+                    </Grid>
+                </Grid>
+
+                <!-- 第2列：数据表格（原第3列） -->
+                <Grid Grid.Column="1">
+                    <Grid.RowDefinitions>
+                        <!-- 第一行：数据表格 -->
+                        <RowDefinition Height="900" />
+                        <!-- 第二行：切换按钮 -->
+                        <RowDefinition Height="50" />
+                    </Grid.RowDefinitions>
+                    
+                    <!-- 第一行：数据表格 -->
+                    <DataGrid Grid.Row="0" x:Name="DataGrid1" AutoGenerateColumns="False" CanUserAddRows="False" CanUserDeleteRows="False" CanUserReorderColumns="False" CanUserResizeColumns="False" CanUserResizeRows="False" CanUserSortColumns="False" IsReadOnly="True" SelectionMode="Single" SelectionUnit="Cell" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" Margin="3">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="NO." Binding="{Binding RowNumber}" Width="60"/>
+                            <DataGridTextColumn Header="项目" Binding="{Binding Name}" Width="*" />
+                            <DataGridTextColumn Header="数值" Binding="{Binding Value}" Width="100"/>
+                            <DataGridTextColumn Header="Min" Binding="{Binding LowerLimit}" Width="80"/>
+                            <DataGridTextColumn Header="Max" Binding="{Binding UpperLimit}" Width="80"/>
+                        </DataGrid.Columns>
+                        <DataGrid.Resources>
+                            <Style TargetType="DataGridColumnHeader">
+                                <Setter Property="FontSize" Value="24"/>
+                                <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                            </Style>
+                            <Style TargetType="DataGridCell">
+                                <Setter Property="FontSize" Value="16"/>
+                            </Style>
+                        </DataGrid.Resources>
+                    </DataGrid>
+                    
+                    <!-- 第二行：显示模式切换按钮 -->
+                    <Border Grid.Row="1" Background="#FF2C3E50" CornerRadius="8" Margin="3" Height="44">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            
+                            <!-- 左侧状态指示 -->
+                            <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center" Margin="15,0">
+                                <TextBlock Text="📊" FontSize="16" Margin="0,0,8,0" VerticalAlignment="Center"/>
+                                <TextBlock x:Name="DisplayModeStatus" Text="显示模式：显示所有项" FontSize="14" 
+                                           FontWeight="Medium" Foreground="White" VerticalAlignment="Center"/>
+                            </StackPanel>
+                            
+                            <!-- 右侧切换按钮 -->
+                            <ToggleButton Grid.Column="1" x:Name="DisplayModeToggle" Width="120" Height="32" 
+                                          Margin="10,0,15,0" Cursor="Hand" Click="DisplayModeToggle_Click">
+                                <ToggleButton.Style>
+                                    <Style TargetType="ToggleButton">
+                                        <Setter Property="Template">
+                                            <Setter.Value>
+                                                <ControlTemplate TargetType="ToggleButton">
+                                                    <Border x:Name="SwitchBorder" Background="#FF3498DB" 
+                                                            CornerRadius="16" Width="120" Height="32" BorderThickness="2" BorderBrush="#FF2980B9">
+                                                        <Grid>
+                                                            <!-- 切换滑块 -->
+                                                            <Ellipse x:Name="SwitchThumb" Fill="White" 
+                                                                     Width="24" Height="24" 
+                                                                     HorizontalAlignment="Left" Margin="4,0,0,0"/>
+                                                            <!-- 文字标签 -->
+                                                            <TextBlock x:Name="SwitchText" Text="显示所有项" 
+                                                                       FontSize="12" FontWeight="Medium" Foreground="White" 
+                                                                       HorizontalAlignment="Center" 
+                                                                       VerticalAlignment="Center"/>
+                                                        </Grid>
+                                                    </Border>
+                                                    <ControlTemplate.Triggers>
+                                                        <Trigger Property="IsChecked" Value="True">
+                                                            <Setter TargetName="SwitchBorder" Property="Background" Value="#FFFF9800"/>
+                                                            <Setter TargetName="SwitchBorder" Property="BorderBrush" Value="#FFF57C00"/>
+                                                            <Setter TargetName="SwitchThumb" Property="HorizontalAlignment" Value="Right"/>
+                                                            <Setter TargetName="SwitchThumb" Property="Margin" Value="0,0,4,0"/>
+                                                            <Setter TargetName="SwitchText" Property="Text" Value="显示关注项"/>
+                                                        </Trigger>
+                                                        <Trigger Property="IsMouseOver" Value="True">
+                                                            <Setter TargetName="SwitchBorder" Property="Opacity" Value="0.9"/>
+                                                        </Trigger>
+                                                    </ControlTemplate.Triggers>
+                                                </ControlTemplate>
+                                            </Setter.Value>
+                                        </Setter>
+                                    </Style>
+                                </ToggleButton.Style>
+                            </ToggleButton>
+                        </Grid>
+                    </Border>
+                </Grid>
+            </Grid>
+        </Grid>
+    </Grid>
+</Page>

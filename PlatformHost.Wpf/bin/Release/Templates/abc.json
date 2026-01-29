@@ -1,0 +1,118 @@
+{
+  "SampleType": 0,
+  "CoatingType": 1,
+  "InputParameters": {
+    "PkgEnhance": {
+      "PKG增益": "20"
+    },
+    "PkgMatching": {
+      "PKG匹配阈值": "0.8",
+      "匹配模板路径": ""
+    },
+    "PkgAngleMeasure": {
+      "PKG边缘阈值": "60"
+    },
+    "PkgEdgeSize": {
+      "C值使用PAD基准": "False",
+      "PAD_ROI高": "50",
+      "PKG_PAD距离": "100",
+      "PKG基准边（左，下）ROI高度(pix)": "50",
+      "PKG对边（右，上）ROI高度(pix)": "30",
+      "PKG左内边缘中心X(pix)": "300",
+      "PKG左ROI宽度(pix)": "50",
+      "PKG下内边缘中心Y(pix)": "300",
+      "PKG下ROI宽度(pix)": "50",
+      "PKG长边(mm)": "2.5",
+      "PKG短边(mm)": "1.6"
+    },
+    "PKGSeparation": {
+      "PKG二值化阈值": "128",
+      "PKG腐蚀强度": "10"
+    },
+    "ChipPositionSize": {
+      "晶片增益": "0",
+      "自动寻BLK": "False",
+      "胶点边同时增益": "True",
+      "BLK边缘阈值": "30",
+      "AI搜索框高度": "15",
+      "BLK基准边（左，下）ROI高度(pix)": "50",
+      "BLK对边（右，上）ROI高度(pix)": "30",
+      "BLK左ROI宽度(pix)": "50",
+      "BLK下边缘中心X(pix)": "300",
+      "BLK下ROI宽度(pix)": "50",
+      "晶片长(um)": "600",
+      "晶片宽(um)": "500",
+      "BLK-PKG_距离(um)": "100",
+      "晶片尺寸公差(±um)": "16",
+      "BLK-PKG_Y公差(±um)": "30",
+      "BLK-PKG_X公差(±um)": "30",
+      "BLK-PKG_角度公差(±°)": "1.5",
+      "PAD-BLK_距离下限(um)": "100",
+      "PAD-BLK_距离上限(um)": "200",
+      "C值补偿(um)": "0"
+    },
+    "CoatingChipEnhance": {
+      "启用镀膜检测": "True",
+      "镀膜BLK增益": "10",
+      "镀膜BLK边缘阈值": "30"
+    },
+    "CoatingGeometrySize": {
+      "镀膜对比度": "300",
+      "镀膜滤波强度": "5",
+      "镀膜边缘阈值": "30",
+      "镀膜设定长度": "1000",
+      "镀膜设定宽度": "600",
+      "镀膜设定中心X": "600",
+      "镀膜边界ROI高": "100",
+      "镀膜G1端偏移": "0",
+      "镀膜G1端ROI宽": "50",
+      "镀膜G2端ROI宽": "50",
+      "镀膜长宽公差": "100",
+      "镀膜XY公差": "100",
+      "镀膜角度公差": "3.5"
+    },
+    "MainDefect": {
+      "主振瑕疵面积阈值": "100"
+    },
+    "TemplateName": {
+      "模板名称": "abc",
+      "备注": ""
+    }
+  },
+  "CameraParams": {
+    "FlyingExposureTime": 8,
+    "FlyingDelayTime": 0,
+    "Fixed1ExposureIntensity": 255,
+    "Fixed1ExposureTime": 20,
+    "Fixed2ExposureIntensity": 255,
+    "Fixed2ExposureTime": 20,
+    "Fixed1CoaxialTime": 100,
+    "Fixed2CoaxialTime": 100,
+    "Enable45DegreeLight": false,
+    "Enable0DegreeLight": false,
+    "LidImageSelection": 2,
+    "CoatingImageSelection": 3
+  },
+  "Detection3DParams": {
+    "Enable3DDetection": false,
+    "ProjectName": "",
+    "ProjectFolder": "D:\\KEYENCE\\LJ Navigator\\Program",
+    "HeightImagePath": "E:\\posen_project\\点胶检测\\上位机程序\\WpfApp2\\MESA检测\\RawImage",
+    "ReCompile": false
+  },
+  "ColorParams": {
+    "UseCustomColorRange": false,
+    "ColorRangeMin": 0.0,
+    "ColorRangeMax": 2.5,
+    "MeshTransparent": 0.5,
+    "BlendWeight": 0.5,
+    "DisplayColorBar": true,
+    "DisplayGrid": true,
+    "DisplayAxis": true
+  },
+  "TemplateName": "abc",
+  "AlgorithmEngineId": "OpenCV",
+  "Remark": "",
+  "CreatedTime": "2026-01-30T01:26:43.9571225+08:00",
+  "LastModifiedTime": "2026-01-30T01:29:04.8427572+08:00"
+}

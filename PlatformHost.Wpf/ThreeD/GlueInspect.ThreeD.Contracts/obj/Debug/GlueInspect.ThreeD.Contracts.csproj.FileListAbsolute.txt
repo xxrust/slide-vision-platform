@@ -1,0 +1,6 @@
+E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\PlatformHost.Wpf\ThreeD\GlueInspect.ThreeD.Contracts\bin\Debug\GlueInspect.ThreeD.Contracts.dll
+E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\PlatformHost.Wpf\ThreeD\GlueInspect.ThreeD.Contracts\bin\Debug\GlueInspect.ThreeD.Contracts.pdb
+E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\PlatformHost.Wpf\ThreeD\GlueInspect.ThreeD.Contracts\obj\Debug\GlueInspect.ThreeD.Contracts.csproj.AssemblyReference.cache
+E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\PlatformHost.Wpf\ThreeD\GlueInspect.ThreeD.Contracts\obj\Debug\GlueInspect.ThreeD.Contracts.csproj.CoreCompileInputs.cache
+E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\PlatformHost.Wpf\ThreeD\GlueInspect.ThreeD.Contracts\obj\Debug\GlueInspect.ThreeD.Contracts.dll
+E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\PlatformHost.Wpf\ThreeD\GlueInspect.ThreeD.Contracts\obj\Debug\GlueInspect.ThreeD.Contracts.pdb

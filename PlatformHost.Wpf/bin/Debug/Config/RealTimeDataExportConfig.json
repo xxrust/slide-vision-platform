@@ -1,0 +1,42 @@
+{
+  "Mode": "Default",
+  "ActiveTemplateName": "自定义模板1",
+  "Templates": [
+    {
+      "Name": "自定义模板1",
+      "Columns": [
+        {
+          "Kind": "Meta",
+          "MetaField": "ImageNumber",
+          "ItemName": null,
+          "ItemField": null
+        },
+        {
+          "Kind": "Meta",
+          "MetaField": "Timestamp",
+          "ItemName": null,
+          "ItemField": null
+        },
+        {
+          "Kind": "Meta",
+          "MetaField": "LotNumber",
+          "ItemName": null,
+          "ItemField": null
+        },
+        {
+          "Kind": "Meta",
+          "MetaField": "DefectType",
+          "ItemName": null,
+          "ItemField": null
+        },
+        {
+          "Kind": "Meta",
+          "MetaField": "Result",
+          "ItemName": null,
+          "ItemField": null
+        }
+      ]
+    }
+  ]
+}
+

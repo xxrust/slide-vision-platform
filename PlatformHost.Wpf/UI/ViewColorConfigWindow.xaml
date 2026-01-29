@@ -1,0 +1,201 @@
+<Window x:Class="WpfApp2.UI.ViewColorConfigWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d"
+        Title="基恩士视图颜色配置"
+        Height="823" Width="520"
+        WindowStartupLocation="CenterOwner"
+        ResizeMode="NoResize"
+        Background="#FF2C3E50">
+
+    <Grid Margin="15">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- 标题 -->
+        <TextBlock Grid.Row="0" Text="🎨 3D视图颜色配置"
+                   FontSize="20" FontWeight="Bold" Foreground="White"
+                   HorizontalAlignment="Center" Margin="0,0,0,20"/>
+
+        <!-- 统一颜色配置区域 -->
+        <GroupBox Grid.Row="1" Header="颜色范围配置 (2D &amp; 3D 同步)" Margin="0,0,0,15"
+                  Foreground="White" FontSize="16" FontWeight="Bold">
+            <GroupBox.HeaderTemplate>
+                <DataTemplate>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="🌈" FontSize="16" Margin="0,0,8,0" VerticalAlignment="Center"/>
+                        <TextBlock Text="{Binding}" FontSize="16" FontWeight="Bold" Foreground="White" VerticalAlignment="Center"/>
+                    </StackPanel>
+                </DataTemplate>
+            </GroupBox.HeaderTemplate>
+            <StackPanel Margin="15">
+                <!-- 自定义颜色范围开关 -->
+                <CheckBox x:Name="UseCustomColorRange" Content="使用自定义颜色范围 (2D &amp; 3D 同步应用)" 
+                          Foreground="White" FontSize="14" Margin="0,0,0,15"
+                          Checked="UseCustomColorRange_Changed" Unchecked="UseCustomColorRange_Changed"/>
+                
+                <!-- 颜色范围设置 -->
+                <Grid x:Name="RangeSettings" IsEnabled="False" Margin="0,0,0,0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <!-- 最小值设置 -->
+                    <StackPanel Grid.Row="0" Orientation="Vertical" Margin="0,10">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="80"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Text="最小值 (mm)" 
+                                       Foreground="White" FontSize="14" VerticalAlignment="Center"/>
+                            <TextBlock Grid.Column="1" x:Name="ColorRangeMinValue" Text="0.000" 
+                                       Foreground="Yellow" FontSize="14" FontWeight="Bold" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                            <TextBox Grid.Column="2" x:Name="ColorRangeMinInput" Text="0.000" 
+                                     FontSize="12" Padding="5,2" VerticalAlignment="Center"
+                                     KeyDown="ColorRangeMinInput_KeyDown" LostFocus="ColorRangeMinInput_LostFocus"/>
+                        </Grid>
+                        <Slider x:Name="ColorRangeMinSlider" Minimum="-1.5" Maximum="1.5" Value="-1.5"
+                                TickFrequency="0.001" IsSnapToTickEnabled="False" Margin="0,5,0,0"
+                                ValueChanged="ColorRangeMinSlider_ValueChanged"
+                                PreviewMouseUp="ColorRangeSlider_MouseUp"/>
+                    </StackPanel>
+
+                    <!-- 最大值设置 -->
+                    <StackPanel Grid.Row="1" Orientation="Vertical" Margin="0,10">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="80"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Text="最大值 (mm)" 
+                                       Foreground="White" FontSize="14" VerticalAlignment="Center"/>
+                            <TextBlock Grid.Column="1" x:Name="ColorRangeMaxValue" Text="2.500" 
+                                       Foreground="Yellow" FontSize="14" FontWeight="Bold" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                            <TextBox Grid.Column="2" x:Name="ColorRangeMaxInput" Text="2.500" 
+                                     FontSize="12" Padding="5,2" VerticalAlignment="Center"
+                                     KeyDown="ColorRangeMaxInput_KeyDown" LostFocus="ColorRangeMaxInput_LostFocus"/>
+                        </Grid>
+                        <Slider x:Name="ColorRangeMaxSlider" Minimum="-1.5" Maximum="1.5" Value="1.5"
+                                TickFrequency="0.001" IsSnapToTickEnabled="False" Margin="0,5,0,0"
+                                ValueChanged="ColorRangeMaxSlider_ValueChanged"
+                                PreviewMouseUp="ColorRangeSlider_MouseUp"/>
+                    </StackPanel>
+
+                    <!-- 范围显示 -->
+                    <Border Grid.Row="2" Background="#FF34495E" BorderBrush="#FF5A6C7D" BorderThickness="1" 
+                            Margin="0,15,0,10" Padding="10">
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                            <TextBlock Text="当前范围: [" Foreground="White" FontSize="12"/>
+                            <TextBlock x:Name="CurrentRangeDisplay" Text="0.000, 2.500" 
+                                       Foreground="Lime" FontSize="12" FontWeight="Bold"/>
+                            <TextBlock Text="] mm" Foreground="White" FontSize="12"/>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- 自动应用提示 -->
+                    <TextBlock Grid.Row="3" Text="💡 拖动滑块松开后将自动应用到当前检测结果" 
+                               Foreground="Orange" FontSize="11" TextAlignment="Center" 
+                               Margin="0,5,0,0" FontStyle="Italic"/>
+                </Grid>
+            </StackPanel>
+        </GroupBox>
+
+        <!-- 3D显示选项 -->
+        <GroupBox Grid.Row="2" Header="3D显示选项" Margin="0,0,0,15"
+                  Foreground="White" FontSize="16" FontWeight="Bold">
+            <GroupBox.HeaderTemplate>
+                <DataTemplate>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="🧊" FontSize="16" Margin="0,0,8,0" VerticalAlignment="Center"/>
+                        <TextBlock Text="{Binding}" FontSize="16" FontWeight="Bold" Foreground="White" VerticalAlignment="Center"/>
+                    </StackPanel>
+                </DataTemplate>
+            </GroupBox.HeaderTemplate>
+            <StackPanel Margin="15">
+                <!-- 网格透明度 -->
+                <StackPanel Orientation="Vertical" Margin="0,5">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" Text="网格透明度" 
+                                   Foreground="White" FontSize="14" VerticalAlignment="Center"/>
+                        <TextBlock Grid.Column="1" x:Name="MeshTransparentValue" Text="0.5" 
+                                   Foreground="Cyan" FontSize="14" FontWeight="Bold" VerticalAlignment="Center"/>
+                    </Grid>
+                    <Slider x:Name="MeshTransparentSlider" Minimum="0" Maximum="1" Value="0.5" 
+                            TickFrequency="0.1" IsSnapToTickEnabled="True" Margin="0,5,0,0"
+                            ValueChanged="MeshTransparentSlider_ValueChanged"
+                            PreviewMouseUp="DisplayOption_MouseUp"/>
+                </StackPanel>
+
+                <!-- 混合权重 -->
+                <StackPanel Orientation="Vertical" Margin="0,10,0,5">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" Text="混合权重" 
+                                   Foreground="White" FontSize="14" VerticalAlignment="Center"/>
+                        <TextBlock Grid.Column="1" x:Name="BlendWeightValue" Text="0.5" 
+                                   Foreground="Cyan" FontSize="14" FontWeight="Bold" VerticalAlignment="Center"/>
+                    </Grid>
+                    <Slider x:Name="BlendWeightSlider" Minimum="0" Maximum="1" Value="0.5" 
+                            TickFrequency="0.1" IsSnapToTickEnabled="True" Margin="0,5,0,0"
+                            ValueChanged="BlendWeightSlider_ValueChanged"
+                            PreviewMouseUp="DisplayOption_MouseUp"/>
+                </StackPanel>
+
+                <!-- 显示选项复选框 -->
+                <CheckBox x:Name="DisplayColorBar" Content="显示颜色条" 
+                          Foreground="White" FontSize="14" Margin="0,10,0,5" IsChecked="True"
+                          Checked="DisplayOption_Changed" Unchecked="DisplayOption_Changed"/>
+                
+                <CheckBox x:Name="DisplayGrid" Content="显示网格" 
+                          Foreground="White" FontSize="14" Margin="0,5" IsChecked="True"
+                          Checked="DisplayOption_Changed" Unchecked="DisplayOption_Changed"/>
+                
+                <CheckBox x:Name="DisplayAxis" Content="显示坐标轴" 
+                          Foreground="White" FontSize="14" Margin="0,5,0,10" IsChecked="True"
+                          Checked="DisplayOption_Changed" Unchecked="DisplayOption_Changed"/>
+            </StackPanel>
+        </GroupBox>
+
+        <!-- 说明信息 -->
+        <GroupBox Grid.Row="3" Header="配置说明" Margin="0,0,0,0"
+                  Foreground="White" FontSize="16" FontWeight="Bold">
+            <GroupBox.HeaderTemplate>
+                <DataTemplate>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="ℹ️" FontSize="16" Margin="0,0,8,0" VerticalAlignment="Center"/>
+                        <TextBlock Text="{Binding}" FontSize="16" FontWeight="Bold" Foreground="White" VerticalAlignment="Center"/>
+                    </StackPanel>
+                </DataTemplate>
+            </GroupBox.HeaderTemplate>
+            <StackPanel Margin="10">
+                <TextBlock Text="• 2D与3D视图使用相同的颜色范围设置，无需分别配置" 
+                           Foreground="White" FontSize="12" Margin="0,5"/>
+                <TextBlock Text="• 拖动滑块松开后自动应用配置，无需手动确认" 
+                           Foreground="White" FontSize="12" Margin="0,5"/>
+                <TextBlock Text="• 配置将自动保存到当前模板，下次加载模板时恢复" 
+                           Foreground="White" FontSize="12" Margin="0,5"/>
+                <TextBlock Text="• 颜色范围滑块支持0.001mm精度，适合高精度检测需求" 
+                           Foreground="White" FontSize="12" Margin="0,5"/>
+            </StackPanel>
+        </GroupBox>
+    </Grid>
+</Window> 

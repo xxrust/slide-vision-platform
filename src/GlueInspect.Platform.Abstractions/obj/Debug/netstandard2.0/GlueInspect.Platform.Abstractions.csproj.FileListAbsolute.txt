@@ -1,0 +1,11 @@
+E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\src\GlueInspect.Platform.Abstractions\bin\Debug\netstandard2.0\GlueInspect.Platform.Abstractions.deps.json
+E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\src\GlueInspect.Platform.Abstractions\bin\Debug\netstandard2.0\GlueInspect.Platform.Abstractions.dll
+E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\src\GlueInspect.Platform.Abstractions\bin\Debug\netstandard2.0\GlueInspect.Platform.Abstractions.pdb
+E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\src\GlueInspect.Platform.Abstractions\obj\Debug\netstandard2.0\GlueInspect.Platform.Abstractions.csproj.AssemblyReference.cache
+E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\src\GlueInspect.Platform.Abstractions\obj\Debug\netstandard2.0\GlueInspect.Platform.Abstractions.GeneratedMSBuildEditorConfig.editorconfig
+E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\src\GlueInspect.Platform.Abstractions\obj\Debug\netstandard2.0\GlueInspect.Platform.Abstractions.AssemblyInfoInputs.cache
+E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\src\GlueInspect.Platform.Abstractions\obj\Debug\netstandard2.0\GlueInspect.Platform.Abstractions.AssemblyInfo.cs
+E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\src\GlueInspect.Platform.Abstractions\obj\Debug\netstandard2.0\GlueInspect.Platform.Abstractions.csproj.CoreCompileInputs.cache
+E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\src\GlueInspect.Platform.Abstractions\obj\Debug\netstandard2.0\GlueInspect.Platform.Abstractions.sourcelink.json
+E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\src\GlueInspect.Platform.Abstractions\obj\Debug\netstandard2.0\GlueInspect.Platform.Abstractions.dll
+E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\src\GlueInspect.Platform.Abstractions\obj\Debug\netstandard2.0\GlueInspect.Platform.Abstractions.pdb

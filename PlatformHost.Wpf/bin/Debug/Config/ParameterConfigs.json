@@ -1,0 +1,146 @@
+{
+  "PKG设定宽度": {
+    "Title": "PKG设定宽度",
+    "Description": "设置PKG（封装）的标准宽度值。此参数影响封装尺寸检测的基准，过小会导致误判为尺寸不足，过大会漏检尺寸异常。建议根据产品规格书设置，通常精度要求在±0.01mm以内。",
+    "ImagePath": "pkg_width_setting.png",
+    "Unit": "mm",
+    "MinValue": 0.1,
+    "MaxValue": 50.0
+  },
+  "PKG设定高度": {
+    "Title": "PKG设定高度", 
+    "Description": "设置PKG封装的标准高度值。此参数用于垂直方向的尺寸测量基准。设置过严格会增加误判率，设置过宽松会降低检测精度。建议结合实际产品尺寸和工艺公差来设定。",
+    "ImagePath": "pkg_height_setting.png",
+    "Unit": "mm",
+    "MinValue": 0.1,
+    "MaxValue": 50.0
+  },
+  "PKG宽度公差": {
+    "Title": "PKG宽度公差",
+    "Description": "PKG宽度测量的允许偏差范围。此参数决定了宽度检测的严格程度，公差过小会导致良品误判为不良，公差过大会漏检不良品。建议根据产品质量要求和工艺能力设置，一般为设定值的±2-5%。",
+    "ImagePath": "pkg_width_tolerance.png", 
+    "Unit": "mm",
+    "MinValue": 0.001,
+    "MaxValue": 5.0
+  },
+  "PKG高度公差": {
+    "Title": "PKG高度公差",
+    "Description": "PKG高度测量的允许偏差范围。控制垂直方向的尺寸检测精度，需要根据封装工艺的稳定性来设定。过严会增加误判，过松会降低质量管控效果。",
+    "ImagePath": "pkg_height_tolerance.png",
+    "Unit": "mm", 
+    "MinValue": 0.001,
+    "MaxValue": 5.0
+  },
+  "晶片设定宽度": {
+    "Title": "晶片设定宽度",
+    "Description": "设置芯片（Die）的标准宽度值。此参数是芯片尺寸检测的基准，影响芯片贴装位置和尺寸的判定。设置时需要考虑芯片切割精度和贴装工艺精度，通常要求精度在μm级别。",
+    "ImagePath": "chip_width_setting.png",
+    "Unit": "μm",
+    "MinValue": 10.0,
+    "MaxValue": 20000.0
+  },
+  "晶片设定高度": {
+    "Title": "晶片设定高度",
+    "Description": "设置芯片的标准高度值。用于垂直方向的芯片尺寸检测基准。此参数直接影响芯片尺寸合格率的判定，需要根据芯片规格和切割工艺精度来设定。",
+    "ImagePath": "chip_height_setting.png", 
+    "Unit": "μm",
+    "MinValue": 10.0,
+    "MaxValue": 20000.0
+  },
+  "晶片宽度公差": {
+    "Title": "晶片宽度公差",
+    "Description": "芯片宽度测量的允许偏差范围。此参数需要考虑芯片切割工艺精度和测量系统精度。设置过严会导致良品误判，设置过松会漏检异常芯片。建议根据芯片供应商规格和内部质量标准设定。",
+    "ImagePath": "chip_width_tolerance.png",
+    "Unit": "μm", 
+    "MinValue": 0.1,
+    "MaxValue": 1000.0
+  },
+  "晶片高度公差": {
+    "Title": "晶片高度公差",
+    "Description": "芯片高度测量的允许偏差范围。控制芯片垂直方向尺寸的检测精度，需要综合考虑切割工艺能力和测量精度。适当的公差设置可以有效控制产品质量。",
+    "ImagePath": "chip_height_tolerance.png",
+    "Unit": "μm",
+    "MinValue": 0.1,
+    "MaxValue": 1000.0
+  },
+  "胶点设定直径": {
+    "Title": "胶点设定直径",
+    "Description": "设置胶点的标准直径值。此参数是胶点尺寸检测的基准，直接影响点胶质量的判定。胶点过小可能导致粘接强度不足，过大会造成材料浪费或影响其他器件。建议根据工艺要求和粘接强度需求设定。",
+    "ImagePath": "glue_point_diameter.png",
+    "Unit": "μm",
+    "MinValue": 10.0,
+    "MaxValue": 5000.0
+  },
+  "胶点直径公差": {
+    "Title": "胶点直径公差",
+    "Description": "胶点直径测量的允许偏差范围。此参数控制胶点尺寸的一致性要求，影响点胶工艺的稳定性评估。公差设置需要平衡质量控制和生产效率，过严会增加重工率，过松会影响产品可靠性。",
+    "ImagePath": "glue_point_tolerance.png", 
+    "Unit": "μm",
+    "MinValue": 1.0,
+    "MaxValue": 500.0
+  },
+  "胶点设定高度": {
+    "Title": "胶点设定高度",
+    "Description": "设置胶点的标准高度值。胶点高度影响粘接效果和固化性能，过低可能导致粘接强度不足，过高会影响后续工艺。此参数需要根据胶水特性和工艺要求进行优化设定。",
+    "ImagePath": "glue_point_height.png",
+    "Unit": "μm", 
+    "MinValue": 1.0,
+    "MaxValue": 1000.0
+  },
+  "胶点高度公差": {
+    "Title": "胶点高度公差",
+    "Description": "胶点高度测量的允许偏差范围。控制胶点垂直方向的尺寸一致性，影响胶水固化后的性能稳定性。合理的公差设置有助于保证产品质量和工艺重现性。",
+    "ImagePath": "glue_point_height_tolerance.png",
+    "Unit": "μm",
+    "MinValue": 0.5,
+    "MaxValue": 100.0
+  },
+  "检测区域X坐标": {
+    "Title": "检测区域X坐标",
+    "Description": "设置检测区域的水平位置坐标。此参数定义了图像处理的感兴趣区域（ROI），影响检测算法的执行范围。正确设置可以提高检测效率和精度，避免背景干扰。",
+    "ImagePath": "detection_area_x.png",
+    "Unit": "pixel",
+    "MinValue": 0,
+    "MaxValue": 4096
+  },
+  "检测区域Y坐标": {
+    "Title": "检测区域Y坐标", 
+    "Description": "设置检测区域的垂直位置坐标。与X坐标配合定义完整的检测区域，影响算法处理的图像范围。合理设置可以排除无关区域，提高检测的准确性和处理速度。",
+    "ImagePath": "detection_area_y.png",
+    "Unit": "pixel",
+    "MinValue": 0,
+    "MaxValue": 4096
+  },
+  "检测区域宽度": {
+    "Title": "检测区域宽度",
+    "Description": "设置检测区域的水平范围大小。此参数决定了检测窗口的宽度，需要确保包含完整的检测目标，同时避免包含过多干扰信息。设置过小会漏检，过大会降低处理效率。",
+    "ImagePath": "detection_area_width.png", 
+    "Unit": "pixel",
+    "MinValue": 10,
+    "MaxValue": 4096
+  },
+  "检测区域高度": {
+    "Title": "检测区域高度",
+    "Description": "设置检测区域的垂直范围大小。与宽度参数配合定义完整的检测窗口，影响算法的处理范围。适当的高度设置可以包含完整目标的同时避免背景噪声干扰。",
+    "ImagePath": "detection_area_height.png",
+    "Unit": "pixel", 
+    "MinValue": 10,
+    "MaxValue": 4096
+  },
+  "阈值设定": {
+    "Title": "图像阈值设定",
+    "Description": "设置图像二值化的阈值参数。此参数决定了图像分割的效果，影响目标识别的准确性。阈值过低会产生过多噪点，过高会丢失目标信息。建议根据图像对比度和光照条件调整。",
+    "ImagePath": "threshold_setting.png",
+    "Unit": "",
+    "MinValue": 0,
+    "MaxValue": 255
+  },
+  "模糊半径": {
+    "Title": "图像模糊半径",
+    "Description": "设置图像预处理的模糊滤波半径。此参数用于消除图像噪声和平滑处理，影响后续检测算法的效果。半径过小降噪效果不明显，过大会模糊目标边缘，影响检测精度。",
+    "ImagePath": "blur_radius.png",
+    "Unit": "pixel",
+    "MinValue": 0,
+    "MaxValue": 20
+  }
+} 

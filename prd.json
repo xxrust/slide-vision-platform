@@ -1,0 +1,80 @@
+﻿{
+  "title": "平台与项目去耦（以点胶项目为基座）",
+  "goal": "先复用点胶完整项目作为基座，抽离项目绑定内容，再与通用接口耦合；不新增功能页面。",
+  "scope": [
+    "复用点胶项目的系统框架",
+    "抽离项目绑定内容为项目包 + 插件接口",
+    "用 OpenCV/ONNX 示例插件验证链路完整"
+  ],
+  "non_goals": [
+    "新增低代码式算法下拉选择",
+    "新增业务功能页面",
+    "修改点胶项目本体"
+  ],
+  "principles": [
+    "复用优先：保留点胶项目已验证流程与界面结构",
+    "去耦优先：先剥离项目绑定内容，再接入统一接口",
+    "最少改动：只改绑定层，不新增功能"
+  ],
+  "decoupling_scope": {
+    "project_bound_content": [
+      "样品类型/步骤/参数（点胶专有）",
+      "VM/算法调用方式",
+      "结果字段（点胶专有指标名）"
+    ],
+    "generic_interfaces": [
+      "IAlgorithmPlugin / IAlgorithmSession",
+      "AlgorithmInput（图像路径/字节 + 参数）",
+      "AlgorithmResult（Success/Message/Metrics/Tags）"
+    ],
+    "project_package": [
+      "输入源配置",
+      "参数模板",
+      "算法绑定（插件ID）",
+      "输出指标映射"
+    ]
+  },
+  "reusable_assets": [
+    "点胶项目 UI 页面结构与操作流程",
+    "图像选择与路径校验逻辑",
+    "数据分析页与图表逻辑",
+    "日志与导出机制",
+    "配置与历史数据结构"
+  ],
+  "pages": [
+    "沿用点胶项目页面结构（不新增页面）",
+    "图像选择/路径校验流程页",
+    "数据分析与统计图表页",
+    "日志与导出相关页"
+  ],
+  "data_persistence": {
+    "strategy": "延用点胶项目的数据记录方式",
+    "notes": "新增 Result/Metrics 通用落库映射（若已有持久化则直接复用）"
+  },
+  "acceptance": [
+    "UI 与流程与点胶项目一致（没有新功能/新页面）",
+    "算法调用完全走接口（不再直接绑定项目算法）",
+    "项目绑定内容全部从代码移至项目包",
+    "OpenCV / ONNX 示例可运行并输出 Metrics",
+    "结果仍可进入分析与统计流程"
+  ],
+  "milestones": [
+    "复用点胶 UI/流程作为平台基座",
+    "抽离项目绑定内容并形成项目包",
+    "替换算法调用为插件接口",
+    "使用 OpenCV/ONNX 示例验证完整性"
+  ],
+  "key_paths": {
+    "base_project_root": "E:\\posen_project\\点胶检测\\上位机程序\\WpfApp2",
+    "platform_root": "E:\\posen_project\\点胶检测\\上位机程序\\WpfApp2\\Platform",
+    "verified_plugin_dlls": [
+      "E:\\posen_project\\点胶检测\\上位机程序\\WpfApp2\\Platform\\plugins\\GlueInspect.Algorithm.OpenCv\\bin\\Debug\\netstandard2.0\\GlueInspect.Algorithm.OpenCv.dll",
+      "E:\\posen_project\\点胶检测\\上位机程序\\WpfApp2\\Platform\\plugins\\GlueInspect.Algorithm.Onnx\\bin\\Debug\\netstandard2.0\\GlueInspect.Algorithm.Onnx.dll"
+    ],
+    "verified_sample_host": "E:\\posen_project\\点胶检测\\上位机程序\\WpfApp2\\Platform\\samples\\GlueInspect.Platform.SampleHost",
+    "verified_sample_assets": [
+      "E:\\posen_project\\点胶检测\\上位机程序\\WpfApp2\\Platform\\samples\\assets\\test.pgm",
+      "E:\\posen_project\\点胶检测\\上位机程序\\WpfApp2\\Platform\\samples\\assets\\identity.onnx"
+    ]
+  }
+}

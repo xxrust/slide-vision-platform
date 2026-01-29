@@ -1,0 +1,10 @@
+E:\posen_project\点胶检测\上位机程序\WpfApp2\ThreeD\CodeMeterCheck\bin\x64\Release\CodeMeterCheck.exe
+E:\posen_project\点胶检测\上位机程序\WpfApp2\ThreeD\CodeMeterCheck\bin\x64\Release\CodeMeterCheck.pdb
+E:\posen_project\点胶检测\上位机程序\WpfApp2\ThreeD\CodeMeterCheck\bin\x64\Release\LjDev3dView.dll
+E:\posen_project\点胶检测\上位机程序\WpfApp2\ThreeD\CodeMeterCheck\bin\x64\Release\LjDevCommon.dll
+E:\posen_project\点胶检测\上位机程序\WpfApp2\ThreeD\CodeMeterCheck\bin\x64\Release\LjDevMeasure.dll
+E:\posen_project\点胶检测\上位机程序\WpfApp2\ThreeD\CodeMeterCheck\obj\x64\Release\CodeMeterCheck.csproj.AssemblyReference.cache
+E:\posen_project\点胶检测\上位机程序\WpfApp2\ThreeD\CodeMeterCheck\obj\x64\Release\CodeMeterCheck.csproj.CoreCompileInputs.cache
+E:\posen_project\点胶检测\上位机程序\WpfApp2\ThreeD\CodeMeterCheck\obj\x64\Release\CodeMete.9323C439.Up2Date
+E:\posen_project\点胶检测\上位机程序\WpfApp2\ThreeD\CodeMeterCheck\obj\x64\Release\CodeMeterCheck.exe
+E:\posen_project\点胶检测\上位机程序\WpfApp2\ThreeD\CodeMeterCheck\obj\x64\Release\CodeMeterCheck.pdb

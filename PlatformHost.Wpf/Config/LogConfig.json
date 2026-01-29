@@ -1,0 +1,23 @@
+{
+  "LogConfiguration": {
+    "EnableDebugLog": false,
+    "EnableVerboseLog": false,
+    "EnableFileLog": true,
+    "EnableUILog": true,
+    "EnableErrorPopup": true,
+    "EnableCriticalPopup": true,
+    "LogFilePath": "Log",
+    "MaxLogFileSize": 10485760,
+    "MaxLogFiles": 10,
+    "ProductionMode": true,
+    "Description": {
+      "EnableDebugLog": "是否启用调试日志（生产环境建议关闭）",
+      "EnableVerboseLog": "是否启用详细日志（技术细节，生产环境建议关闭）",
+      "EnableFileLog": "是否启用文件日志",
+      "EnableUILog": "是否启用界面日志显示",
+      "EnableErrorPopup": "是否启用错误弹窗",
+      "EnableCriticalPopup": "是否启用严重错误弹窗（建议始终开启）",
+      "ProductionMode": "生产模式：true=关闭调试和详细日志，false=开启所有日志"
+    }
+  }
+} 

@@ -1,0 +1,437 @@
+﻿<Page x:Class="WpfApp2.UI.ConfigPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:local="clr-namespace:WpfApp2.UI"
+      xmlns:Release="clr-namespace:VMControls.WPF.Release"
+      mc:Ignorable="d" 
+      d:DesignHeight="1024" d:DesignWidth="1920"
+      Title="模板配置">
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- 顶部标题栏 -->
+        <Grid Grid.Row="0" Background="#FF020223" Height="80">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="150"/>
+            </Grid.ColumnDefinitions>
+
+            <StackPanel Orientation="Vertical" VerticalAlignment="Center" Grid.Column="0" Margin="30,0,0,0">
+                <TextBlock x:Name="TitleText" Text="模板配置" FontSize="28" FontWeight="Bold" Foreground="White"/>
+                <TextBlock x:Name="SubtitleText" Text="请选择您要进行的操作" FontSize="16" Foreground="LightGray" Margin="0,5,0,0"/>
+            </StackPanel>
+
+            <Button x:Name="SmartBackButton" Grid.Column="1" Content="← 返回主页" 
+                    Click="BackButton_Click" 
+                    Background="Transparent" 
+                    Foreground="White" 
+                    BorderThickness="1" 
+                    BorderBrush="White"
+                    Padding="10,5" 
+                    Margin="10"
+                    FontSize="16"/>
+        </Grid>
+
+        <!-- 主内容区 -->
+        <Grid Grid.Row="1" Margin="40">
+            
+            <!-- 第一阶段：选择操作类型 -->
+            <Grid x:Name="OperationSelectionGrid" Visibility="Visible">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <!-- 新建模板卡片 -->
+                <Border Grid.Column="0" BorderBrush="#FF4A90E2" BorderThickness="3" 
+                        CornerRadius="20" Margin="20" Background="White" 
+                        MouseEnter="OperationCard_MouseEnter" MouseLeave="OperationCard_MouseLeave"
+                        Tag="NewTemplate">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+
+                        <!-- 图标区域 -->
+                        <Viewbox Grid.Row="0" Width="80" Height="80" Margin="0,40,0,20">
+                            <Canvas Width="24" Height="24">
+                                <Path Data="M19,13H13V19H11V13H5V11H11V5H13V11H19V13Z" Fill="#FF4A90E2"/>
+                            </Canvas>
+                        </Viewbox>
+
+                        <!-- 操作名称 -->
+                        <TextBlock Grid.Row="1" Text="创建新模板" FontSize="32" FontWeight="Bold" 
+                                  HorizontalAlignment="Center" VerticalAlignment="Center"
+                                  Foreground="#FF4A90E2" Margin="20"/>
+
+                        <!-- 描述 -->
+                        <TextBlock Grid.Row="2" FontSize="16" HorizontalAlignment="Center"
+                                  Foreground="Gray" TextWrapping="Wrap" Margin="20,10"
+                                  TextAlignment="Center">
+                            根据不同样品类型创建新的检测模板<LineBreak/>
+                            支持MESA、其他等类型
+                        </TextBlock>
+
+                        <!-- 选择按钮 -->
+                        <Button Grid.Row="3" Content="创建新模板" FontSize="18" FontWeight="Bold"
+                               Height="55" Margin="20,20,20,30" 
+                               Background="#FF4A90E2" Foreground="White"
+                               BorderThickness="0" Click="NewTemplate_Click"/>
+                    </Grid>
+                </Border>
+
+                <!-- 加载现有模板卡片 -->
+                <Border Grid.Column="1" BorderBrush="#FF50C878" BorderThickness="3" 
+                        CornerRadius="20" Margin="20" Background="White"
+                        MouseEnter="OperationCard_MouseEnter" MouseLeave="OperationCard_MouseLeave"
+                        Tag="LoadTemplate">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+
+                        <!-- 图标区域 -->
+                        <Viewbox Grid.Row="0" Width="80" Height="80" Margin="0,40,0,20">
+                            <Canvas Width="24" Height="24">
+                                <Path Data="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z" Fill="#FF50C878"/>
+                            </Canvas>
+                        </Viewbox>
+
+                        <!-- 操作名称 -->
+                        <TextBlock Grid.Row="1" Text="加载现有模板" FontSize="32" FontWeight="Bold" 
+                                  HorizontalAlignment="Center" VerticalAlignment="Center"
+                                  Foreground="#FF50C878" Margin="20"/>
+
+                        <!-- 描述 -->
+                        <TextBlock Grid.Row="2" FontSize="16" HorizontalAlignment="Center" 
+                                  Foreground="Gray" TextWrapping="Wrap" Margin="20,10"
+                                  TextAlignment="Center">
+                            从已保存的模板中选择并加载<LineBreak/>
+                            继续使用之前配置好的检测参数
+                        </TextBlock>
+
+                        <!-- 选择按钮 -->
+                        <Button Grid.Row="3" Content="加载现有模板" FontSize="18" FontWeight="Bold"
+                               Height="55" Margin="20,20,20,30" 
+                               Background="#FF50C878" Foreground="White"
+                               BorderThickness="0" Click="LoadExistingTemplate_Click"/>
+                    </Grid>
+                </Border>
+
+                <!-- 打开当前模板卡片 -->
+                <Border Grid.Column="2" BorderBrush="#FFFF9500" BorderThickness="3" 
+                        CornerRadius="20" Margin="20" Background="White"
+                        MouseEnter="OperationCard_MouseEnter" MouseLeave="OperationCard_MouseLeave"
+                        Tag="OpenCurrentTemplate">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+
+                        <!-- 图标区域 -->
+                        <Viewbox Grid.Row="0" Width="80" Height="80" Margin="0,40,0,20">
+                            <Canvas Width="24" Height="24">
+                                <Path Data="M12,2A2,2 0 0,1 14,4C14,4.74 13.6,5.39 13,5.73V7H14A7,7 0 0,1 21,14H22A1,1 0 0,1 23,15V18A1,1 0 0,1 22,19H21V20A2,2 0 0,1 19,22H5A2,2 0 0,1 3,20V19H2A1,1 0 0,1 1,18V15A1,1 0 0,1 2,14H3A7,7 0 0,1 10,7H11V5.73C10.4,5.39 10,4.74 10,4A2,2 0 0,1 12,2M7.5,13A2.5,2.5 0 0,0 5,15.5A2.5,2.5 0 0,0 7.5,18A2.5,2.5 0 0,0 10,15.5A2.5,2.5 0 0,0 7.5,13M16.5,13A2.5,2.5 0 0,0 14,15.5A2.5,2.5 0 0,0 16.5,18A2.5,2.5 0 0,0 19,15.5A2.5,2.5 0 0,0 16.5,13Z" Fill="#FFFF9500"/>
+                            </Canvas>
+                        </Viewbox>
+
+                        <!-- 操作名称 -->
+                        <TextBlock Grid.Row="1" Text="打开当前模板" FontSize="32" FontWeight="Bold" 
+                                  HorizontalAlignment="Center" VerticalAlignment="Center"
+                                  Foreground="#FFFF9500" Margin="20"/>
+
+                        <!-- 描述 -->
+                        <TextBlock Grid.Row="2" FontSize="16" HorizontalAlignment="Center" 
+                                  Foreground="Gray" TextWrapping="Wrap" Margin="20,10"
+                                  TextAlignment="Center">
+                            直接配置当前正在使用的模板<LineBreak/>
+                            <TextBlock x:Name="CurrentTemplateNameDisplay" Text="当前模板：未知" FontWeight="Bold" Foreground="#FFFF9500"/>
+                        </TextBlock>
+
+                        <!-- 选择按钮 -->
+                        <Button Grid.Row="3" Content="打开当前模板" FontSize="18" FontWeight="Bold"
+                               Height="55" Margin="20,20,20,30" 
+                               Background="#FFFF9500" Foreground="White"
+                               BorderThickness="0" Click="OpenCurrentTemplate_Click"/>
+                    </Grid>
+                </Border>
+            </Grid>
+
+            <!-- 第二阶段：样品类型选择（创建新模板时显示） -->
+            <Grid x:Name="SampleTypeSelectionGrid" Visibility="Collapsed">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <!-- 样品类型选择区域 -->
+                <Grid Grid.Row="0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <!-- MESA 样品类型卡片 -->
+                    <Border Grid.Column="0" BorderBrush="#FF4A90E2" BorderThickness="2"
+                            CornerRadius="15" Margin="20" Background="White"
+                            MouseEnter="SampleTypeCard_MouseEnter" MouseLeave="SampleTypeCard_MouseLeave"
+                            Tag="MESA">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+
+                            <!-- 样品类型名称 -->
+                            <TextBlock Grid.Row="0" Text="MESA" FontSize="32" FontWeight="Bold"
+                                      HorizontalAlignment="Center" Margin="0,30,0,10"
+                                      Foreground="#FF4A90E2"/>
+
+                            <!-- 样品特征描述 -->
+                            <TextBlock Grid.Row="1" Text="抛光，内部凹陷" FontSize="18"
+                                      HorizontalAlignment="Center" VerticalAlignment="Center"
+                                      Foreground="Gray" TextWrapping="Wrap" Margin="20"/>
+
+
+                            <!-- 选择按钮 -->
+                            <Button Grid.Row="3" Content="选择此类型" FontSize="18" FontWeight="Bold"
+                                   Height="50" Margin="30,20,30,30"
+                                   Background="#FF4A90E2" Foreground="White"
+                                   BorderThickness="0" Click="SelectSampleType_Click" Tag="MESA"/>
+                        </Grid>
+                    </Border>
+
+                    <!-- 其他 样品类型卡片 -->
+                    <Border Grid.Column="1" BorderBrush="#FFFF9500" BorderThickness="2"
+                            CornerRadius="15" Margin="20" Background="White"
+                            MouseEnter="SampleTypeCard_MouseEnter" MouseLeave="SampleTypeCard_MouseLeave"
+                            Tag="Other">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+
+                            <!-- 样品类型名称 -->
+                            <TextBlock Grid.Row="0" Text="其他" FontSize="32" FontWeight="Bold"
+                                      HorizontalAlignment="Center" Margin="0,30,0,10"
+                                      Foreground="#FFFF9500"/>
+
+                            <!-- 样品特征描述 -->
+                            <TextBlock Grid.Row="1" Text="除MESA之外" FontSize="18"
+                                      HorizontalAlignment="Center" VerticalAlignment="Center"
+                                      Foreground="Gray" TextWrapping="Wrap" Margin="20"/>
+
+
+                            <!-- 选择按钮 -->
+                            <Button Grid.Row="3" Content="选择此类型" FontSize="18" FontWeight="Bold"
+                                   Height="50" Margin="30,20,30,30"
+                                   Background="#FFFF9500" Foreground="White"
+                                   BorderThickness="0" Click="SelectSampleType_Click" Tag="Other"/>
+                        </Grid>
+                    </Border>
+                </Grid>
+            </Grid>
+
+            <!-- 第三阶段：涂布类型选择（创建新模板时显示） -->
+            <Grid x:Name="CoatingTypeSelectionGrid" Visibility="Collapsed">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <!-- 选择的样品类型显示 -->
+                <Border Grid.Row="0" Background="#FFF8F9FA" BorderBrush="#FFE9ECEF" BorderThickness="1" 
+                        CornerRadius="10" Margin="0,0,0,30" Padding="20">
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                        <TextBlock Text="已选择样品类型：" FontSize="18" Foreground="Gray" VerticalAlignment="Center"/>
+                        <TextBlock x:Name="SelectedSampleTypeText" Text="" FontSize="20" FontWeight="Bold" 
+                                  Foreground="#FF4A90E2" Margin="10,0,0,0" VerticalAlignment="Center"/>
+                    </StackPanel>
+                </Border>
+
+                <!-- 涂布类型选择区域 -->
+                <Grid Grid.Row="1">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <!-- 单涂布 类型卡片 -->
+                    <Border Grid.Column="0" BorderBrush="#FF50C878" BorderThickness="3" 
+                            CornerRadius="20" Margin="40" Background="White" 
+                            MouseEnter="CoatingTypeCard_MouseEnter" MouseLeave="CoatingTypeCard_MouseLeave"
+                            Tag="Single">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+
+                            <!-- 图标区域 -->
+                            <Viewbox Grid.Row="0" Width="100" Height="100" Margin="0,40,0,20">
+                                <Canvas Width="24" Height="24">
+                                    <Path Data="M12,2A10,10 0 0,1 22,12A10,10 0 0,1 12,22A10,10 0 0,1 2,12A10,10 0 0,1 12,2M12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20A8,8 0 0,0 20,12A8,8 0 0,0 12,4M12,6A6,6 0 0,1 18,12A6,6 0 0,1 12,18A6,6 0 0,1 6,12A6,6 0 0,1 12,6Z" Fill="#FF50C878"/>
+                                </Canvas>
+                            </Viewbox>
+
+                            <!-- 涂布类型名称 -->
+                            <TextBlock Grid.Row="1" Text="单涂布" FontSize="36" FontWeight="Bold" 
+                                      HorizontalAlignment="Center" VerticalAlignment="Center"
+                                      Foreground="#FF50C878" Margin="20"/>
+
+                            <!-- 描述 -->
+                            <TextBlock Grid.Row="2" FontSize="18" HorizontalAlignment="Center" 
+                                      Foreground="Gray" TextWrapping="Wrap" Margin="30,10"
+                                      TextAlignment="Center">
+                                标准单层涂布工艺<LineBreak/>
+                                使用常规检测流程
+                            </TextBlock>
+
+                            <!-- 选择按钮 -->
+                            <Button Grid.Row="3" Content="选择单涂布" FontSize="20" FontWeight="Bold"
+                                   Height="60" Margin="40,30,40,40" 
+                                   Background="#FF50C878" Foreground="White"
+                                   BorderThickness="0" Click="SelectCoatingType_Click" Tag="Single"/>
+                        </Grid>
+                    </Border>
+
+                    <!-- 双涂布 类型卡片 -->
+                    <Border Grid.Column="1" BorderBrush="#FFFF9500" BorderThickness="3" 
+                            CornerRadius="20" Margin="40" Background="White"
+                            MouseEnter="CoatingTypeCard_MouseEnter" MouseLeave="CoatingTypeCard_MouseLeave"
+                            Tag="Double">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+
+                            <!-- 图标区域 -->
+                            <Viewbox Grid.Row="0" Width="100" Height="100" Margin="0,40,0,20">
+                                <Canvas Width="24" Height="24">
+                                    <Path Data="M12,2A10,10 0 0,1 22,12A10,10 0 0,1 12,22A10,10 0 0,1 2,12A10,10 0 0,1 12,2M12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20A8,8 0 0,0 20,12A8,8 0 0,0 12,4M12,6A6,6 0 0,1 18,12A6,6 0 0,1 12,18A6,6 0 0,1 6,12A6,6 0 0,1 12,6M12,8A4,4 0 0,0 8,12A4,4 0 0,0 12,16A4,4 0 0,0 16,12A4,4 0 0,0 12,8Z" Fill="#FFFF9500"/>
+                                </Canvas>
+                            </Viewbox>
+
+                            <!-- 涂布类型名称 -->
+                            <TextBlock Grid.Row="1" Text="双涂布" FontSize="36" FontWeight="Bold" 
+                                      HorizontalAlignment="Center" VerticalAlignment="Center"
+                                      Foreground="#FFFF9500" Margin="20"/>
+
+                            <!-- 描述 -->
+                            <TextBlock Grid.Row="2" FontSize="18" HorizontalAlignment="Center" 
+                                      Foreground="Gray" TextWrapping="Wrap" Margin="30,10"
+                                      TextAlignment="Center">
+                                双层涂布工艺<LineBreak/>
+                                自动添加胶点检测步骤
+                            </TextBlock>
+
+                            <!-- 选择按钮 -->
+                            <Button Grid.Row="3" Content="选择双涂布" FontSize="20" FontWeight="Bold"
+                                   Height="60" Margin="40,30,40,40" 
+                                   Background="#FFFF9500" Foreground="White"
+                                   BorderThickness="0" Click="SelectCoatingType_Click" Tag="Double"/>
+                        </Grid>
+                    </Border>
+                </Grid>
+            </Grid>
+
+            <!-- 第二阶段：模板列表区域（加载现有模板时显示） -->
+            <Grid x:Name="TemplateListGrid" Visibility="Collapsed" Background="White">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                
+                <TextBlock Grid.Row="0" Text="选择现有模板" FontSize="24" FontWeight="Bold" 
+                          HorizontalAlignment="Center" Margin="0,0,0,20"/>
+                
+                <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
+                    <ListBox x:Name="TemplateListBox" Margin="10" BorderThickness="0" Background="Transparent">
+                        <!-- 模板列表项将在代码中添加 -->
+                    </ListBox>
+                </ScrollViewer>
+            </Grid>
+        </Grid>
+
+        <!-- 底部提示信息 -->
+        <Border Grid.Row="2" Background="#FFF0F0F0" Height="60">
+            <TextBlock x:Name="FooterText" Text="选择操作类型开始配置检测模板" 
+                      FontSize="16" Foreground="Gray" 
+                      HorizontalAlignment="Center" VerticalAlignment="Center"/>
+        </Border>
+
+        <!-- 加载覆盖层 -->
+        <Grid x:Name="LoadingOverlay" Grid.RowSpan="3" Background="#80000000" Visibility="Collapsed">
+            <Border Background="White" CornerRadius="15" 
+                    Width="400" Height="200" 
+                    HorizontalAlignment="Center" VerticalAlignment="Center">
+                <Border.Effect>
+                    <DropShadowEffect Color="Black" BlurRadius="20" ShadowDepth="5" Opacity="0.3"/>
+                </Border.Effect>
+                <StackPanel Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Center">
+                    <!-- 加载动画 -->
+                    <Grid Width="60" Height="60" Margin="0,20,0,20">
+                        <Ellipse Width="60" Height="60" 
+                                 Stroke="#FF4A90E2" StrokeThickness="4" 
+                                 StrokeDashArray="15,15" 
+                                 RenderTransformOrigin="0.5,0.5">
+                            <Ellipse.RenderTransform>
+                                <RotateTransform x:Name="LoadingRotateTransform"/>
+                            </Ellipse.RenderTransform>
+                            <Ellipse.Triggers>
+                                <EventTrigger RoutedEvent="Loaded">
+                                    <BeginStoryboard>
+                                        <Storyboard RepeatBehavior="Forever">
+                                            <DoubleAnimation Storyboard.TargetName="LoadingRotateTransform"
+                                                           Storyboard.TargetProperty="Angle"
+                                                           From="0" To="360" Duration="0:0:2"/>
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </EventTrigger>
+                            </Ellipse.Triggers>
+                        </Ellipse>
+                    </Grid>
+                    
+                    <!-- 加载文字 -->
+                    <TextBlock x:Name="LoadingText" Text="正在创建模板配置页面..." 
+                              FontSize="18" FontWeight="Bold" 
+                              Foreground="#FF4A90E2" 
+                              HorizontalAlignment="Center" 
+                              Margin="0,10,0,20"/>
+                    
+                    <!-- 提示文字 -->
+                    <TextBlock Text="请稍候，系统正在初始化检测参数和界面组件" 
+                              FontSize="14" Foreground="Gray" 
+                              HorizontalAlignment="Center" TextWrapping="Wrap"
+                              TextAlignment="Center" Margin="20,0,20,20"/>
+                </StackPanel>
+            </Border>
+        </Grid>
+    </Grid>
+</Page>

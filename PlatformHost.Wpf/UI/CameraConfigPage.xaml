@@ -1,0 +1,554 @@
+﻿<Page x:Class="WpfApp2.UI.CameraConfigPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:local="clr-namespace:WpfApp2.UI"
+      xmlns:vm="clr-namespace:VMControls.WPF.Release"
+      mc:Ignorable="d" 
+      d:DesignHeight="1024" d:DesignWidth="1920"
+      Title="相机配置页面"
+      Background="#FF151515">
+    
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="60"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- 顶部标题栏 -->
+        <Grid Grid.Row="0" Background="#FF020223">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Grid.Column="0" Margin="20,0">
+                <Image Source="../posen_monitor.ico" Height="30" Margin="0,0,15,0"/>
+                <TextBlock FontSize="28" Text="相机参数配置" Foreground="White" VerticalAlignment="Center" FontWeight="Bold"/>
+            </StackPanel>
+
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Grid.Column="1" Margin="0,0,20,0">
+                <Button x:Name="LightTestButton"
+                        Click="LightTestButton_Click" 
+                        Padding="15,8" 
+                        Background="#FF6C63FF" 
+                        BorderThickness="0" 
+                        Margin="0,0,10,0"
+                        VerticalAlignment="Center">
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                        <TextBlock x:Name="LightTestButtonText" Text="💡 定拍测试" Foreground="White" FontSize="16" VerticalAlignment="Center"/>
+                    </StackPanel>
+                </Button>
+                
+                <Button x:Name="SaveImagesButton" 
+                        Click="SaveImagesButton_Click" 
+                        Padding="15,8" 
+                        Background="#FF28A745" 
+                        BorderThickness="0" 
+                        Margin="0,0,10,0"
+                        VerticalAlignment="Center">
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                        <TextBlock Text="📷 保存图片" Foreground="White" FontSize="16" VerticalAlignment="Center"/>
+                    </StackPanel>
+                </Button>
+                
+                <Button x:Name="BackButton" Content="← 返回主界面"
+                        Click="BackButton_Click" 
+                        Background="Transparent" 
+                        Foreground="White" 
+                        BorderThickness="1" 
+                        BorderBrush="White"
+                        Padding="10,5" 
+                        FontSize="16"
+                        VerticalAlignment="Center"/>
+            </StackPanel>
+        </Grid>
+
+        <!-- 主内容区域 -->
+        <Grid Grid.Row="1" Margin="20">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="10"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="10"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- 飞拍相机配置区域 -->
+            <Border Grid.Column="0" 
+                    Background="#FF2A2A2A" 
+                    CornerRadius="10" 
+                    BorderBrush="#FF444444" 
+                    BorderThickness="2"
+                    Padding="20">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="400"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <!-- 飞拍相机标题 -->
+                    <TextBlock Grid.Row="0" 
+                               Text="飞拍相机" 
+                               FontSize="24" 
+                               FontWeight="Bold" 
+                               Foreground="#FF00D4FF" 
+                               HorizontalAlignment="Center" 
+                               Margin="0,0,0,20"/>
+
+                    <!-- 飞拍相机画面显示区域 -->
+                    <Border Grid.Row="1" 
+                            Background="#FF1A1A1A" 
+                            BorderBrush="#FF555555" 
+                            BorderThickness="2" 
+                            CornerRadius="5">
+                        <vm:VmRenderControl x:Name="FlyingCameraRender" Background="Black"/>
+                    </Border>
+
+                    <!-- 飞拍相机参数配置区域 -->
+                    <StackPanel Grid.Row="2" Margin="0,20,0,0">
+                        <!-- 45度和0度光使能 -->
+                        <Grid Margin="0,0,0,15">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="120"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0"
+                                       Text="光源使能:"
+                                       Foreground="White"
+                                       FontSize="16"
+                                       VerticalAlignment="Center"/>
+                            <CheckBox Grid.Column="1"
+                                      x:Name="Enable45DegreeCheckBox"
+                                      Content="45度光"
+                                      Foreground="White"
+                                      FontSize="14"
+                                      VerticalAlignment="Center"
+                                      HorizontalAlignment="Left"
+                                      Margin="0,0,10,0"
+                                      Checked="Enable45DegreeCheckBox_Checked"
+                                      Unchecked="Enable45DegreeCheckBox_Unchecked"/>
+                            <CheckBox Grid.Column="2"
+                                      x:Name="Enable0DegreeCheckBox"
+                                      Content="0度光"
+                                      Foreground="White"
+                                      FontSize="14"
+                                      VerticalAlignment="Center"
+                                      HorizontalAlignment="Left"
+                                      Checked="Enable0DegreeCheckBox_Checked"
+                                      Unchecked="Enable0DegreeCheckBox_Unchecked"/>
+                        </Grid>
+
+                        <!-- 曝光时间 -->
+                        <Grid Margin="0,0,0,15">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="120"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="60"/>
+                                <ColumnDefinition Width="25"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" 
+                                       Text="飞拍曝光时间:" 
+                                       Foreground="White" 
+                                       FontSize="16" 
+                                       VerticalAlignment="Center"/>
+                            <Slider Grid.Column="1" 
+                                    x:Name="FlyingExposureSlider" 
+                                    Minimum="5" 
+                                    Maximum="10" 
+                                    Value="8" 
+                                    TickFrequency="1"
+                                    IsSnapToTickEnabled="True"
+                                    VerticalAlignment="Center"
+                                    ValueChanged="FlyingExposureSlider_ValueChanged"/>
+                            <TextBox Grid.Column="2" 
+                                     x:Name="FlyingExposureTextBox" 
+                                     Text="8" 
+                                     FontSize="14" 
+                                     Padding="5" 
+                                     Background="#FF333333" 
+                                     Foreground="White" 
+                                     BorderBrush="#FF555555"
+                                     TextAlignment="Center"
+                                     TextChanged="FlyingExposureTextBox_TextChanged"/>
+                            <TextBlock Grid.Column="3"
+                                       Text="us"
+                                       Foreground="#FF888888"
+                                       FontSize="12"
+                                       VerticalAlignment="Center"
+                                       Margin="5,0,0,0"/>
+                        </Grid>
+
+                        <!-- 延迟时间 -->
+                        <Grid Margin="0,0,0,15">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="120"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="60"/>
+                                <ColumnDefinition Width="25"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" 
+                                       Text="飞拍延迟时间:" 
+                                       Foreground="White" 
+                                       FontSize="16" 
+                                       VerticalAlignment="Center"/>
+                            <Slider Grid.Column="1" 
+                                    x:Name="FlyingDelaySlider" 
+                                    Minimum="0" 
+                                    Maximum="10000" 
+                                    Value="0" 
+                                    TickFrequency="1"
+                                    IsSnapToTickEnabled="True"
+                                    VerticalAlignment="Center"
+                                    ValueChanged="FlyingDelaySlider_ValueChanged"/>
+                            <TextBox Grid.Column="2" 
+                                     x:Name="FlyingDelayTextBox" 
+                                     Text="0" 
+                                     FontSize="14" 
+                                     Padding="5" 
+                                     Background="#FF333333" 
+                                     Foreground="White" 
+                                     BorderBrush="#FF555555"
+                                     TextAlignment="Center"
+                                     TextChanged="FlyingDelayTextBox_TextChanged"/>
+                            <TextBlock Grid.Column="3"
+                                       Text="us"
+                                       Foreground="#FF888888"
+                                       FontSize="12"
+                                       VerticalAlignment="Center"
+                                       Margin="5,0,0,0"/>
+                        </Grid>
+
+                        <!-- 操作按钮 -->
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,20,0,0">
+                            <Button x:Name="FlyingApplyButton"
+                                    Click="FlyingApplyButton_Click"
+                                    Content="应用参数"
+                                    Width="240"
+                                    Padding="15,8"
+                                    Background="#FF007BFF"
+                                    Foreground="White"
+                                    BorderThickness="0"
+                                    FontSize="14"/>
+                        </StackPanel>
+
+                        <!-- 图像选择按钮 - 作为BLK图像 -->
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,10,0,0">
+                            <Button x:Name="FlyingAsLidButton"
+                                    Click="FlyingAsLidButton_Click"
+                                    Content="作为BLK图像"
+                                    Width="240"
+                                    Padding="15,8"
+                                    Background="#FF6C757D"
+                                    Foreground="White"
+                                    BorderThickness="0"
+                                    FontSize="14"/>
+                        </StackPanel>
+
+                        <!-- 图像选择按钮 - 作为镀膜图像 -->
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,10,0,0">
+                            <Button x:Name="FlyingAsCoatingButton"
+                                    Click="FlyingAsCoatingButton_Click"
+                                    Content="作为镀膜图像"
+                                    Width="240"
+                                    Padding="15,8"
+                                    Background="#FF6C757D"
+                                    Foreground="White"
+                                    BorderThickness="0"
+                                    FontSize="14"/>
+                        </StackPanel>
+                    </StackPanel>
+                </Grid>
+            </Border>
+
+            <!-- 定拍相机1配置区域 -->
+            <Border Grid.Column="2" 
+                    Background="#FF2A2A2A" 
+                    CornerRadius="10" 
+                    BorderBrush="#FF444444" 
+                    BorderThickness="2"
+                    Padding="20">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="400"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <!-- 定拍相机1标题 -->
+                    <TextBlock Grid.Row="0" 
+                               Text="定拍相机 参数1" 
+                               FontSize="24" 
+                               FontWeight="Bold" 
+                               Foreground="#FF00D4FF" 
+                               HorizontalAlignment="Center" 
+                               Margin="0,0,0,20"/>
+
+                    <!-- 定拍相机1画面显示区域 -->
+                    <Border Grid.Row="1" 
+                            Background="#FF1A1A1A" 
+                            BorderBrush="#FF555555" 
+                            BorderThickness="2" 
+                            CornerRadius="5">
+                        <vm:VmRenderControl x:Name="FixedCamera1Render" Background="Black"/>
+                    </Border>
+
+                    <!-- 定拍相机1参数配置区域 -->
+                    <StackPanel Grid.Row="2" Margin="0,20,0,0">
+                        <!-- 环形光曝光时间 -->
+                        <Grid Margin="0,0,0,15">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="120"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="60"/>
+                                <ColumnDefinition Width="25"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0"
+                                       Text="环形光曝光时间:"
+                                       Foreground="White"
+                                       FontSize="16"
+                                       VerticalAlignment="Center"/>
+                            <Slider Grid.Column="1"
+                                    x:Name="Fixed1ExposureTimeSlider"
+                                    Minimum="0"
+                                    Maximum="1000"
+                                    Value="100"
+                                    TickFrequency="10"
+                                    IsSnapToTickEnabled="True"
+                                    VerticalAlignment="Center"
+                                    ValueChanged="Fixed1ExposureTimeSlider_ValueChanged"/>
+                            <TextBox Grid.Column="2"
+                                     x:Name="Fixed1ExposureTimeTextBox"
+                                     Text="100"
+                                     FontSize="14"
+                                     Padding="5"
+                                     Background="#FF333333"
+                                     Foreground="White"
+                                     BorderBrush="#FF555555"
+                                     TextAlignment="Center"
+                                     TextChanged="Fixed1ExposureTimeTextBox_TextChanged"/>
+                            <TextBlock Grid.Column="3"
+                                       Text="us"
+                                       Foreground="#FF888888"
+                                       FontSize="12"
+                                       VerticalAlignment="Center"
+                                       Margin="5,0,0,0"/>
+                        </Grid>
+
+                        <!-- 同轴光曝光时间 -->
+                        <Grid Margin="0,0,0,15">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="120"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="60"/>
+                                <ColumnDefinition Width="25"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0"
+                                       Text="同轴光曝光时间:"
+                                       Foreground="White"
+                                       FontSize="16"
+                                       VerticalAlignment="Center"/>
+                            <Slider Grid.Column="1"
+                                    x:Name="Fixed1CoaxialTimeSlider"
+                                    Minimum="0"
+                                    Maximum="800"
+                                    Value="100"
+                                    TickFrequency="10"
+                                    IsSnapToTickEnabled="True"
+                                    VerticalAlignment="Center"
+                                    ValueChanged="Fixed1CoaxialTimeSlider_ValueChanged"/>
+                            <TextBox Grid.Column="2"
+                                     x:Name="Fixed1CoaxialTimeTextBox"
+                                     Text="100"
+                                     FontSize="14"
+                                     Padding="5"
+                                     Background="#FF333333"
+                                     Foreground="White"
+                                     BorderBrush="#FF555555"
+                                     TextAlignment="Center"
+                                     TextChanged="Fixed1CoaxialTimeTextBox_TextChanged"/>
+                            <TextBlock Grid.Column="3"
+                                       Text="us"
+                                       Foreground="#FF888888"
+                                       FontSize="12"
+                                       VerticalAlignment="Center"
+                                       Margin="5,0,0,0"/>
+                        </Grid>
+
+                        <!-- 操作按钮 -->
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,20,0,0">
+                            <Button x:Name="Fixed1ApplyButton"
+                                    Click="Fixed1ApplyButton_Click"
+                                    Content="应用参数"
+                                    Width="240"
+                                    Padding="15,8"
+                                    Background="#FF007BFF"
+                                    Foreground="White"
+                                    BorderThickness="0"
+                                    FontSize="14"/>
+                        </StackPanel>
+
+                        <!-- 图像选择按钮 - 作为BLK图像 -->
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,10,0,0">
+                            <Button x:Name="Fixed1AsLidButton"
+                                    Click="Fixed1AsLidButton_Click"
+                                    Content="作为BLK图像"
+                                    Width="240"
+                                    Padding="15,8"
+                                    Background="#FF6C757D"
+                                    Foreground="White"
+                                    BorderThickness="0"
+                                    FontSize="14"/>
+                        </StackPanel>
+                    </StackPanel>
+                </Grid>
+            </Border>
+
+            <!-- 定拍相机2配置区域 -->
+            <Border Grid.Column="4" 
+                    Background="#FF2A2A2A" 
+                    CornerRadius="10" 
+                    BorderBrush="#FF444444" 
+                    BorderThickness="2"
+                    Padding="20">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="400"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <!-- 定拍相机2标题 -->
+                    <TextBlock Grid.Row="0" 
+                               Text="定拍相机 参数2" 
+                               FontSize="24" 
+                               FontWeight="Bold" 
+                               Foreground="#FF00D4FF" 
+                               HorizontalAlignment="Center" 
+                               Margin="0,0,0,20"/>
+
+                    <!-- 定拍相机2画面显示区域 -->
+                    <Border Grid.Row="1" 
+                            Background="#FF1A1A1A" 
+                            BorderBrush="#FF555555" 
+                            BorderThickness="2" 
+                            CornerRadius="5">
+                        <vm:VmRenderControl x:Name="FixedCamera2Render" Background="Black"/>
+                    </Border>
+
+                    <!-- 定拍相机2参数配置区域 -->
+                    <StackPanel Grid.Row="2" Margin="0,20,0,0">
+                        <!-- 环形光曝光时间 -->
+                        <Grid Margin="0,0,0,15">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="120"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="60"/>
+                                <ColumnDefinition Width="25"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0"
+                                       Text="环形光曝光时间:"
+                                       Foreground="White"
+                                       FontSize="16"
+                                       VerticalAlignment="Center"/>
+                            <Slider Grid.Column="1"
+                                    x:Name="Fixed2ExposureTimeSlider"
+                                    Minimum="0"
+                                    Maximum="1000"
+                                    Value="100"
+                                    TickFrequency="10"
+                                    IsSnapToTickEnabled="True"
+                                    VerticalAlignment="Center"
+                                    ValueChanged="Fixed2ExposureTimeSlider_ValueChanged"/>
+                            <TextBox Grid.Column="2"
+                                     x:Name="Fixed2ExposureTimeTextBox"
+                                     Text="100"
+                                     FontSize="14"
+                                     Padding="5"
+                                     Background="#FF333333"
+                                     Foreground="White"
+                                     BorderBrush="#FF555555"
+                                     TextAlignment="Center"
+                                     TextChanged="Fixed2ExposureTimeTextBox_TextChanged"/>
+                            <TextBlock Grid.Column="3"
+                                       Text="us"
+                                       Foreground="#FF888888"
+                                       FontSize="12"
+                                       VerticalAlignment="Center"
+                                       Margin="5,0,0,0"/>
+                        </Grid>
+
+                        <!-- 同轴光曝光时间 -->
+                        <Grid Margin="0,0,0,15">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="120"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="60"/>
+                                <ColumnDefinition Width="25"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0"
+                                       Text="同轴光曝光时间:"
+                                       Foreground="White"
+                                       FontSize="16"
+                                       VerticalAlignment="Center"/>
+                            <Slider Grid.Column="1"
+                                    x:Name="Fixed2CoaxialTimeSlider"
+                                    Minimum="0"
+                                    Maximum="800"
+                                    Value="100"
+                                    TickFrequency="10"
+                                    IsSnapToTickEnabled="True"
+                                    VerticalAlignment="Center"
+                                    ValueChanged="Fixed2CoaxialTimeSlider_ValueChanged"/>
+                            <TextBox Grid.Column="2"
+                                     x:Name="Fixed2CoaxialTimeTextBox"
+                                     Text="100"
+                                     FontSize="14"
+                                     Padding="5"
+                                     Background="#FF333333"
+                                     Foreground="White"
+                                     BorderBrush="#FF555555"
+                                     TextAlignment="Center"
+                                     TextChanged="Fixed2CoaxialTimeTextBox_TextChanged"/>
+                            <TextBlock Grid.Column="3"
+                                       Text="us"
+                                       Foreground="#FF888888"
+                                       FontSize="12"
+                                       VerticalAlignment="Center"
+                                       Margin="5,0,0,0"/>
+                        </Grid>
+
+                        <!-- 操作按钮 -->
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,20,0,0">
+                            <Button x:Name="Fixed2ApplyButton"
+                                    Click="Fixed2ApplyButton_Click"
+                                    Content="应用参数"
+                                    Width="240"
+                                    Padding="15,8"
+                                    Background="#FF007BFF"
+                                    Foreground="White"
+                                    BorderThickness="0"
+                                    FontSize="14"/>
+                        </StackPanel>
+
+                        <!-- 图像选择按钮 - 作为镀膜图像 -->
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,10,0,0">
+                            <Button x:Name="Fixed2AsCoatingButton"
+                                    Click="Fixed2AsCoatingButton_Click"
+                                    Content="作为镀膜图像"
+                                    Width="240"
+                                    Padding="15,8"
+                                    Background="#FF6C757D"
+                                    Foreground="White"
+                                    BorderThickness="0"
+                                    FontSize="14"/>
+                        </StackPanel>
+                    </StackPanel>
+                </Grid>
+            </Border>
+        </Grid>
+    </Grid>
+</Page> 

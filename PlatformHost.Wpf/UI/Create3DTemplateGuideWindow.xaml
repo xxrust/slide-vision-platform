@@ -1,0 +1,150 @@
+<Window x:Class="WpfApp2.UI.Create3DTemplateGuideWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="创建3D模板"
+        Height="520"
+        Width="760"
+        WindowStartupLocation="CenterOwner"
+        ResizeMode="NoResize"
+        Background="#FF1F2A36">
+
+    <Grid Margin="18">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Title -->
+        <Border Grid.Row="0" CornerRadius="10" Background="#FF2C3E50" Padding="16" Margin="0,0,0,14">
+            <StackPanel>
+                <TextBlock Text="创建3D模板指引"
+                           FontSize="20"
+                           FontWeight="Bold"
+                           Foreground="White"/>
+                <TextBlock x:Name="TemplateNameText"
+                           Text="模板："
+                           FontSize="13"
+                           Foreground="#FFBFC7D5"
+                           Margin="0,6,0,0"/>
+            </StackPanel>
+        </Border>
+
+        <!-- Content -->
+        <Border Grid.Row="1" CornerRadius="10" Background="#FF2C3E50" Padding="16">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <TextBlock Grid.Row="0"
+                           Text="操作步骤"
+                           FontSize="15"
+                           FontWeight="Bold"
+                           Foreground="White"
+                           Margin="0,0,0,10"/>
+
+                <StackPanel Grid.Row="1" Margin="0,0,0,14">
+                    <TextBlock Text="1. 稍后会打开基恩士 LJ Developer"
+                               FontSize="13"
+                               Foreground="#FFE6EAF2"
+                               Margin="0,2"/>
+                    <TextBlock Text="2. 请打开与拟创建模板相近的模板"
+                               FontSize="13"
+                               Foreground="#FFE6EAF2"
+                               Margin="0,2"/>
+                    <TextBlock Text="3. 另存为模板，取一个容易识别的名称"
+                               FontSize="13"
+                               Foreground="#FFE6EAF2"
+                               Margin="0,2"/>
+                    <TextBlock Text="4. 对新的模板进行配置"
+                               FontSize="13"
+                               Foreground="#FFE6EAF2"
+                               Margin="0,2"/>
+                    <TextBlock Text="5. 选择代码输出"
+                               FontSize="13"
+                               Foreground="#FFE6EAF2"
+                               Margin="0,2"/>
+                </StackPanel>
+
+                <TextBlock Grid.Row="2"
+                           Text="提示：可点击【复制当前3D图地址】复制当前加载的3D图片所在目录（3D文件夹路径），方便在 LJ Developer 中直接粘贴。"
+                           FontSize="12"
+                           Foreground="#FFBFC7D5"
+                           TextWrapping="Wrap"
+                           Margin="0,0,0,10"/>
+
+                <Border Grid.Row="3" Background="#FF22303E" CornerRadius="8" Padding="12">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+
+                        <TextBox x:Name="PathTextBox"
+                                 Grid.Row="0"
+                                 Grid.Column="0"
+                                 Height="30"
+                                 VerticalContentAlignment="Center"
+                                 IsReadOnly="True"
+                                 Background="#FF1B2632"
+                                 Foreground="White"
+                                 BorderBrush="#FF3C5673"
+                                 BorderThickness="1"
+                                 Padding="8,0"
+                                 Margin="0,0,10,0"/>
+
+                        <Button x:Name="CopyButton"
+                                Grid.Row="0"
+                                Grid.Column="1"
+                                Content="复制当前3D图地址"
+                                Height="30"
+                                Padding="14,0"
+                                Background="#FF8E44AD"
+                                Foreground="White"
+                                BorderThickness="0"
+                                Cursor="Hand"
+                                Click="CopyButton_Click"/>
+
+                        <TextBlock x:Name="CopyStatusText"
+                                   Grid.Row="1"
+                                   Grid.ColumnSpan="2"
+                                   Text=""
+                                   FontSize="12"
+                                   Foreground="#FF7ED957"
+                                   Margin="0,10,0,0"/>
+                    </Grid>
+                </Border>
+            </Grid>
+        </Border>
+
+        <!-- Buttons -->
+        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,14,0,0">
+            <Button Content="取消"
+                    Width="90"
+                    Height="34"
+                    Margin="0,0,10,0"
+                    Background="#FF95A5A6"
+                    Foreground="White"
+                    BorderThickness="0"
+                    Cursor="Hand"
+                    Click="CancelButton_Click"/>
+
+            <Button Content="确定并打开LJ Developer"
+                    Width="190"
+                    Height="34"
+                    Background="#FF3498DB"
+                    Foreground="White"
+                    BorderThickness="0"
+                    Cursor="Hand"
+                    Click="OkButton_Click"/>
+        </StackPanel>
+    </Grid>
+</Window>

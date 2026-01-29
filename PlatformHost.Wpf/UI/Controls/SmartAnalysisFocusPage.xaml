@@ -1,0 +1,160 @@
+<UserControl x:Class="WpfApp2.UI.Controls.SmartAnalysisFocusPage"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             Background="White"
+             MinHeight="500" Width="650">
+    
+    <UserControl.Resources>
+        <!-- 列表框样式 -->
+        <Style x:Key="ProjectListBoxStyle" TargetType="ListBox">
+            <Setter Property="Background" Value="#FAFAFA"/>
+            <Setter Property="BorderBrush" Value="#E0E0E0"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Padding" Value="6"/>
+            <Setter Property="SelectionMode" Value="Multiple"/>
+            <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Disabled"/>
+            <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto"/>
+            <Setter Property="ScrollViewer.CanContentScroll" Value="True"/>
+            <Setter Property="VirtualizingStackPanel.IsVirtualizing" Value="True"/>
+            <Setter Property="VirtualizingStackPanel.VirtualizationMode" Value="Recycling"/>
+            <Setter Property="MaxHeight" Value="500"/>
+        </Style>
+
+        <!-- 列表项样式 -->
+        <Style x:Key="ProjectListBoxItemStyle" TargetType="ListBoxItem">
+            <Setter Property="Padding" Value="10,6"/>
+            <Setter Property="Margin" Value="1"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ListBoxItem">
+                        <Border Background="{TemplateBinding Background}" 
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="3"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="#E3F2FD"/>
+                            </Trigger>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter Property="Background" Value="#2196F3"/>
+                                <Setter Property="Foreground" Value="White"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </UserControl.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- 标题栏 -->
+        <Grid Grid.Row="0" Background="#2C3E50" Height="45">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            
+            <Button Grid.Column="0" x:Name="BackButton" Content="← 返回" 
+                    Background="Transparent" Foreground="White" BorderThickness="0"
+                    FontSize="14" Padding="15,0" VerticalAlignment="Center"
+                    Click="BackButton_Click" Cursor="Hand"/>
+            
+            <TextBlock Grid.Column="1" Text="🎯 关注项目设置" FontSize="16" FontWeight="Bold" 
+                       Foreground="White" VerticalAlignment="Center" 
+                       HorizontalAlignment="Center"/>
+        </Grid>
+
+        <!-- 主内容区 -->
+        <Grid Grid.Row="1" Margin="16">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="2*" MinWidth="250"/>
+                <ColumnDefinition Width="120" MinWidth="120"/>
+                <ColumnDefinition Width="2*" MinWidth="250"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- 左侧：所有项目 -->
+            <Grid Grid.Column="0" Margin="0,0,8,0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,8">
+                    <TextBlock Text="📋 所有检测项目" FontSize="14" FontWeight="SemiBold" 
+                               Foreground="#2C3E50" VerticalAlignment="Center"/>
+                </StackPanel>
+
+                <ListBox Grid.Row="1" x:Name="AllProjectsListBox" 
+                         Style="{StaticResource ProjectListBoxStyle}"
+                         ItemContainerStyle="{StaticResource ProjectListBoxItemStyle}"/>
+
+                <TextBlock Grid.Row="2" x:Name="AllProjectsCountText" Text="共 0 个项目" 
+                           FontSize="11" Foreground="#6C757D" Margin="4,4,0,0"/>
+            </Grid>
+
+            <!-- 中间：操作按钮 -->
+            <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="8,0">
+                <Button x:Name="AddButton" Content="添加 →" Width="80" Height="28"
+                        Click="AddButton_Click" ToolTip="将选中项目添加到关注列表" Margin="0,0,0,3"/>
+                <Button x:Name="RemoveButton" Content="← 移除" Width="80" Height="28"
+                        Click="RemoveButton_Click" ToolTip="从关注列表移除选中项目" Margin="0,0,0,8"/>
+                <Button x:Name="AddAllButton" Content="全部添加" Width="80" Height="28"
+                        Click="AddAllButton_Click" ToolTip="添加所有项目到关注列表" Margin="0,0,0,3"/>
+                <Button x:Name="RemoveAllButton" Content="全部移除" Width="80" Height="28"
+                        Click="RemoveAllButton_Click" ToolTip="清空关注列表"/>
+            </StackPanel>
+
+            <!-- 右侧：关注项目 -->
+            <Grid Grid.Column="2" Margin="8,0,0,0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,8">
+                    <TextBlock Text="🎯 关注项目" FontSize="14" FontWeight="SemiBold" 
+                               Foreground="#2C3E50" VerticalAlignment="Center"/>
+                    <TextBlock Text="(只有这些项目会受监控)" 
+                               FontSize="11" Foreground="#868E96" 
+                               VerticalAlignment="Center" Margin="8,0,0,0"/>
+                </StackPanel>
+
+                <ListBox Grid.Row="1" x:Name="FocusedProjectsListBox" 
+                         Style="{StaticResource ProjectListBoxStyle}"
+                         ItemContainerStyle="{StaticResource ProjectListBoxItemStyle}"/>
+
+                <TextBlock Grid.Row="2" x:Name="FocusedProjectsCountText" Text="共 0 个关注项目" 
+                           FontSize="11" Foreground="#6C757D" Margin="4,4,0,0"/>
+            </Grid>
+        </Grid>
+
+        <!-- 底部：操作按钮 -->
+        <Grid Grid.Row="2" Background="#F8F9FA" Height="50">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+
+            <Button Grid.Column="1" x:Name="SaveButton" Content="确定" Width="80" Height="30" 
+                    IsDefault="True" Click="SaveButton_Click" Margin="0,0,10,0"/>
+            <Button Grid.Column="2" x:Name="CancelButton" Content="取消" Width="80" Height="30" 
+                    IsCancel="True" Click="CancelButton_Click"/>
+        </Grid>
+    </Grid>
+</UserControl> 

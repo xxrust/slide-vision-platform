@@ -1,0 +1,87 @@
+using System.Collections.ObjectModel;
+using System.Linq;
+using System.Windows;
+using Microsoft.Win32;
+
+namespace WpfApp2.UI
+{
+    public partial class CicdImageSetCollectionWindow : Window
+    {
+        public ObservableCollection<string> SelectedFiles { get; } = new ObservableCollection<string>();
+
+        public CicdImageSetCollectionWindow()
+        {
+            InitializeComponent();
+            DataContext = this;
+        }
+
+        private void AddFileButton_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                var dialog = new OpenFileDialog
+                {
+                    Title = "选择要加入CICD图片集的图片文件（建议从“图像源1”选择）",
+                    Filter = "图片文件 (*.bmp;*.png)|*.bmp;*.png|BMP图片文件 (*.bmp)|*.bmp|PNG图片文件 (*.png)|*.png|所有文件 (*.*)|*.*",
+                    Multiselect = true
+                };
+
+                if (dialog.ShowDialog() != true)
+                {
+                    return;
+                }
+
+                foreach (var file in dialog.FileNames ?? new string[0])
+                {
+                    string selected = file;
+                    if (string.IsNullOrWhiteSpace(selected))
+                    {
+                        continue;
+                    }
+
+                    if (SelectedFiles.Any(p => string.Equals(p, selected, System.StringComparison.OrdinalIgnoreCase)))
+                    {
+                        continue;
+                    }
+
+                    SelectedFiles.Add(selected);
+                }
+            }
+            catch (System.Exception ex)
+            {
+                MessageBox.Show($"添加文件失败: {ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        private void RemoveFileButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (FileListBox.SelectedItem is string selected)
+            {
+                SelectedFiles.Remove(selected);
+            }
+        }
+
+        private void ClearButton_Click(object sender, RoutedEventArgs e)
+        {
+            SelectedFiles.Clear();
+        }
+
+        private void ConfirmButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (SelectedFiles.Count == 0)
+            {
+                MessageBox.Show("请至少添加一个图片文件", "提示", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            DialogResult = true;
+            Close();
+        }
+
+        private void CancelButton_Click(object sender, RoutedEventArgs e)
+        {
+            DialogResult = false;
+            Close();
+        }
+    }
+}
