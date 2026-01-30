@@ -285,7 +285,7 @@ namespace WpfApp2
                             var template = TemplateParameters.LoadFromFile(templateFilePath);
 
                             // 根据样品类型和涂布类型创建对应的模板配置页面
-                            var templateConfigPage = CreateTemplateConfigPage(template.SampleType, template.CoatingType, AlgorithmEngineSettingsManager.PreferredEngineId);
+                            var templateConfigPage = CreateTemplateConfigPage(template.SampleType, template.CoatingType, template.AlgorithmEngineId);
 
                             // 自动加载模板（但不自动执行，避免重复执行）
                             templateConfigPage.LoadTemplate(templateFilePath, autoExecute: false);

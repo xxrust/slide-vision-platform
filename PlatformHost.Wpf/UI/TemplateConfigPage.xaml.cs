@@ -30,6 +30,7 @@ using WpfApp2.ThreeD;
 using System;
 using GlueInspect.Algorithm.Contracts;
 using WpfApp2.Algorithms;
+using WpfApp2.Rendering;
 
 namespace WpfApp2.UI
 {
@@ -309,6 +310,10 @@ namespace WpfApp2.UI
         /// 步骤分组配置列表
         /// </summary>
         private List<StepGroup> stepGroups = new List<StepGroup>();
+
+        // 图像渲染器（项目级配置）
+        private IImageRenderer _imageRenderer;
+        private ImageRendererContext _imageRendererContext;
 
         /// <summary>
         /// 按钮缓存，用于避免重新创建按钮
@@ -892,9 +897,7 @@ namespace WpfApp2.UI
             currentSampleType = sampleType;
             currentCoatingType = coatingType;
 
-            var preferredEngineId = string.IsNullOrWhiteSpace(algorithmEngineId)
-                ? AlgorithmEngineSettingsManager.PreferredEngineId
-                : algorithmEngineId;
+            var preferredEngineId = AlgorithmEngineSettingsManager.PreferredEngineId;
             currentTemplate.AlgorithmEngineId = preferredEngineId;
 
             // 更新相机选择状态，支持飞拍作为BLK的布局调整
@@ -912,6 +915,8 @@ namespace WpfApp2.UI
             
             // 设置静态实例引用
             Instance = this;
+
+            InitializeImageRenderer();
 
             // 动态生成步骤按钮
             InitializeStepGroups(); // 初始化步骤分组
@@ -972,6 +977,29 @@ namespace WpfApp2.UI
                 string errorMsg = $"设置样品类型或涂布类型全局变量失败: {ex.Message}";
                 LogManager.Error(errorMsg, "初始化");
                 MessageBox.Show(errorMsg);
+            }
+        }
+
+        private void InitializeImageRenderer()
+        {
+            try
+            {
+                _imageRendererContext = new ImageRendererContext
+                {
+                    VmRender1 = VmRender1,
+                    VmRender2_1 = VmRender2_1,
+                    VmRender2_2 = VmRender2_2,
+                    PreviewImage1 = PreviewImage1,
+                    PreviewImage2_1 = PreviewImage2_1,
+                    PreviewImage2_2 = PreviewImage2_2
+                };
+
+                _imageRenderer = ImageRendererManager.ResolveRenderer(_imageRendererContext);
+                _imageRenderer?.Bind(_imageRendererContext);
+            }
+            catch (Exception ex)
+            {
+                LogManager.Warning($"初始化图像渲染器失败: {ex.Message}");
             }
         }
 
@@ -1535,68 +1563,98 @@ namespace WpfApp2.UI
                     PageManager.Page1Instance.DetectionManager.SetSystemState(SystemDetectionState.TemplateConfiguring);
                 }
 
-                // 1. 更新图像SDK（确保每次执行都设置最新的图片路径）
-                UpdateImageSdk();
+                bool useVmEngine = ShouldAutoLoadVmSolution();
+
+                // 1. 更新图像SDK（仅VM流程需要）
+                if (useVmEngine)
+                {
+                    UpdateImageSdk();
+                }
 
                 // 2. 将参数应用到全局变量
                 ApplyParametersToGlobalVariables();
 
-                // 3. 统一执行完整的"获取路径图像"流程（不管是哪个步骤）
-                ExecuteImageSelectionStep();
-                
-                // 🔧 新增：执行VM流程后，创建/更新当前图像组，包括3D图像路径
+                // 3. VM流程：执行"获取路径图像"；算法流程：直接使用当前路径
+                if (useVmEngine)
+                {
+                    ExecuteImageSelectionStep();
+                }
+
+                // 4. 生成当前图像组（与VM解耦）
                 try
                 {
                     var (source1, source2_1, source2_2) = GetCurrentImagePaths();
-                    
-                    if (!string.IsNullOrEmpty(source1))
+                    _currentImageGroup = BuildImageGroupFromPaths(source1, source2_1, source2_2);
+
+                    if (_currentImageGroup == null)
                     {
-                        string parentDir = Path.GetDirectoryName(source1);
-                        string baseName = Path.GetFileNameWithoutExtension(source1);
-                        
-                        // 移除常见的后缀，获取纯基础名
-                        if (baseName.EndsWith("_1") || baseName.EndsWith("_0"))
-                        {
-                            baseName = baseName.Substring(0, baseName.LastIndexOf('_'));
-                        }
-                        
-                        _currentImageGroup = new ImageGroupSet
-                        {
-                            Source1Path = source1,
-                            Source2_1Path = source2_1,
-                            Source2_2Path = source2_2,
-                            BaseName = baseName
-                        };
-                        
-                        // 🔧 关键：如果3D启用，添加3D图像路径（复用现有函数）
-                        bool is3DImageEnabled = ThreeDSettings.CurrentDetection3DParams?.Enable3DDetection == true;
-                        if (is3DImageEnabled)
-                        {
-                            string suffix = Path.GetFileNameWithoutExtension(source1);
-                            if (suffix.Contains("_"))
-                            {
-                                suffix = suffix.Substring(suffix.LastIndexOf('_'));
-                            }
-                            
-                            Page1.FindAndSet3DImagesForGroup(Path.GetDirectoryName(parentDir), suffix, _currentImageGroup, enableLogging: true);
-                            LogMessage($"已为图像组添加3D图像路径", LogLevel.Info);
-                        }
-                        
-                        LogMessage($"已创建当前图像组: {baseName}, 2D图像: {_currentImageGroup.Has2DImages}, 3D图像: {_currentImageGroup.Has3DImages}", LogLevel.Info);
+                        LogMessage("未找到有效图像路径，无法生成图像组", LogLevel.Warning);
+                        return;
                     }
                 }
                 catch (Exception ex)
                 {
                     LogMessage($"创建当前图像组失败: {ex.Message}", LogLevel.Warning);
+                    return;
                 }
+
+                // 5. 算法引擎流程（OpenCV + ONNX）
+                _imageRenderer?.DisplayImageGroup(_currentImageGroup);
+
+                if (!useVmEngine)
+                {
+                    _ = PageManager.Page1Instance?.ExecuteAlgorithmPipelineForImageGroup(_currentImageGroup, isTemplateConfig: true);
+                    LogMessage($"已为步骤 {stepName} 执行算法引擎流程", LogLevel.Info);
+                    return;
+                }
+
                 // 3D执行/渲染已迁移到独立进程（Host/Tool），模板配置阶段主进程不执行3D。
-                
                 LogMessage($"已为步骤 {stepName} 执行完整的获取路径图像流程", LogLevel.Info);
             }
             catch (Exception ex)
             {
                 LogMessage($"执行{stepName}失败: {ex.Message}", LogLevel.Error);
             }
+        }
+
+        private ImageGroupSet BuildImageGroupFromPaths(string source1, string source2_1, string source2_2)
+        {
+            if (string.IsNullOrWhiteSpace(source1))
+            {
+                return null;
+            }
+
+            string parentDir = Path.GetDirectoryName(source1);
+            string baseName = Path.GetFileNameWithoutExtension(source1);
+
+            if (baseName.EndsWith("_1") || baseName.EndsWith("_0"))
+            {
+                baseName = baseName.Substring(0, baseName.LastIndexOf('_'));
+            }
+
+            var imageGroup = new ImageGroupSet
+            {
+                Source1Path = source1,
+                Source2_1Path = source2_1,
+                Source2_2Path = source2_2,
+                BaseName = baseName
+            };
+
+            bool is3DImageEnabled = ThreeDSettings.CurrentDetection3DParams?.Enable3DDetection == true;
+            if (is3DImageEnabled)
+            {
+                string suffix = Path.GetFileNameWithoutExtension(source1);
+                if (suffix.Contains("_"))
+                {
+                    suffix = suffix.Substring(suffix.LastIndexOf('_'));
+                }
+
+                Page1.FindAndSet3DImagesForGroup(Path.GetDirectoryName(parentDir), suffix, imageGroup, enableLogging: true);
+                LogMessage("已为图像组添加3D图像路径", LogLevel.Info);
+            }
+
+            LogMessage($"已创建当前图像组: {baseName}, 2D图像: {imageGroup.Has2DImages}, 3D图像: {imageGroup.Has3DImages}", LogLevel.Info);
+            return imageGroup;
         }
 
         /// <summary>
@@ -1725,7 +1783,7 @@ namespace WpfApp2.UI
 
         private bool ShouldAutoLoadVmSolution()
         {
-            return string.Equals(currentTemplate?.AlgorithmEngineId, AlgorithmEngineIds.Vm, StringComparison.OrdinalIgnoreCase);
+            return string.Equals(AlgorithmEngineSettingsManager.PreferredEngineId, AlgorithmEngineIds.Vm, StringComparison.OrdinalIgnoreCase);
         }
 
         private void TryAutoLoadVmSolution()
@@ -1759,6 +1817,10 @@ namespace WpfApp2.UI
                 return;
             }
 
+            // 项目级引擎：不允许模板内选择
+            currentTemplate.AlgorithmEngineId = AlgorithmEngineSettingsManager.PreferredEngineId;
+            return;
+
             AlgorithmEngineRegistry.EnsureInitialized(PageManager.Page1Instance);
 
             var panel = new StackPanel
@@ -1784,7 +1846,9 @@ namespace WpfApp2.UI
             };
 
             comboBox.SelectionChanged += AlgorithmEngineComboBox_SelectionChanged;
-            comboBox.SelectedValue = AlgorithmEngineSettingsManager.PreferredEngineId;
+            comboBox.SelectedValue = string.IsNullOrWhiteSpace(currentTemplate?.AlgorithmEngineId)
+                ? AlgorithmEngineSettingsManager.PreferredEngineId
+                : currentTemplate.AlgorithmEngineId;
 
             _algorithmEngineComboBox = comboBox;
 
@@ -1810,20 +1874,7 @@ namespace WpfApp2.UI
         {
             if (_algorithmEngineComboBox?.SelectedItem is AlgorithmEngineDescriptor descriptor)
             {
-                if (currentTemplate != null)
-                {
-                    AlgorithmEngineSettingsManager.UpdatePreferredEngine(descriptor.EngineId);
-                    currentTemplate.AlgorithmEngineId = AlgorithmEngineSettingsManager.PreferredEngineId;
-                }
-
-                UpdateAlgorithmEngineHint(descriptor);
-                PageManager.Page1Instance?.LogUpdate($"算法引擎切换为: {descriptor.EngineName}");
-
-                if (string.Equals(currentTemplate?.AlgorithmEngineId, AlgorithmEngineIds.Vm, StringComparison.OrdinalIgnoreCase))
-                {
-                    TryAutoLoadVmSolution();
-                    SetSampleTypeGlobalVariable();
-                }
+                return;
             }
         }
 
@@ -1843,12 +1894,12 @@ namespace WpfApp2.UI
             if (descriptor.IsAvailable)
             {
                 _algorithmEngineHintText.Foreground = Brushes.LightGray;
-                _algorithmEngineHintText.Text = $"全局设置：{descriptor.Description ?? string.Empty}";
+                _algorithmEngineHintText.Text = $"模板设置：{descriptor.Description ?? string.Empty}";
             }
             else
             {
                 _algorithmEngineHintText.Foreground = Brushes.Goldenrod;
-                _algorithmEngineHintText.Text = $"全局设置：{descriptor.Description}（未启用，运行时自动回退VM）";
+                _algorithmEngineHintText.Text = $"模板设置：{descriptor.Description}（未启用，运行时自动回退VM）";
             }
         }
 
@@ -2929,6 +2980,7 @@ namespace WpfApp2.UI
             // 设置样品类型和涂布类型
             currentTemplate.SampleType = currentSampleType;
             currentTemplate.CoatingType = currentCoatingType;
+            currentTemplate.AlgorithmEngineId = AlgorithmEngineSettingsManager.PreferredEngineId;
             
             // 记录保存的涂布类型信息
             string coatingTypeDisplay = currentCoatingType == CoatingType.Single ? "单涂布" : "双涂布";
@@ -3439,8 +3491,7 @@ namespace WpfApp2.UI
                 SingleImageContainer.Visibility = Visibility.Collapsed;
                 MultiImageContainer.Visibility = Visibility.Visible;
 
-                // 设置3个图像源模块到对应的VmRenderControl
-                SetupMultiImageRenderControls();
+                _imageRenderer?.DisplayImageGroup(_currentImageGroup);
 
                 PageManager.Page1Instance?.LogUpdate("已切换到多图像显示模式");
                 return;
@@ -3450,6 +3501,12 @@ namespace WpfApp2.UI
                 // 切换到单一VM控件显示模式
                 SingleImageContainer.Visibility = Visibility.Visible;
                 MultiImageContainer.Visibility = Visibility.Collapsed;
+            }
+
+            if (!ShouldAutoLoadVmSolution())
+            {
+                PageManager.Page1Instance?.LogUpdate("非VM引擎，跳过VM模块切换");
+                return;
             }
 
             // 如果名称为空或不需要VM模块，直接返回
@@ -3801,12 +3858,7 @@ namespace WpfApp2.UI
                                     Source2_2Path = imagePaths.Item3,
                                     BaseName = Path.GetFileNameWithoutExtension(imagePaths.Item1)
                                 };
-                                
-                                // 设置3张图片路径到对应的VM模块
-                                SetImagePathsToVM();
-                                
-                                // 设置到VmRenderControl显示
-                                SetupMultiImageRenderControls();
+                                _imageRenderer?.DisplayImageGroup(_currentImageGroup);
                                 
                                 PageManager.Page1Instance?.LogUpdate($"已从模板加载完整的3张图片组: {_currentImageGroup.BaseName}");
                                 LogMessage($"模板加载: 3张图片全部加载成功", LogLevel.Info);
@@ -3854,11 +3906,7 @@ namespace WpfApp2.UI
                                     // 匹配成功，保存到成员变量
                                     _currentImageGroup = matchedGroup;
                                     
-                                    // 设置3张图片路径到对应的VM模块
-                                    SetImagePathsToVM();
-                                    
-                                    // 设置到VmRenderControl显示
-                                    SetupMultiImageRenderControls();
+                                    _imageRenderer?.DisplayImageGroup(_currentImageGroup);
                                     
                                     PageManager.Page1Instance?.LogUpdate($"已从模板加载并自动匹配图片组: {matchedGroup.BaseName}");
                                     LogMessage($"模板加载: 自动匹配成功 - {matchedGroup.BaseName}", LogLevel.Info);
@@ -3879,17 +3927,13 @@ namespace WpfApp2.UI
                                     ScrollableMessageWindow.Show(warningMsg, "图片匹配失败", false);
                                     LogMessage($"模板加载: 图片自动匹配失败 - {imagePath}", LogLevel.Warning);
                                     
-                                    // 仍然设置这一张图片到第一个图像源
-                                    var imageSource1 = VmSolution.Instance["获取路径图像.图1"] as ImageSourceModuleCs.ImageSourceModuleTool;
-                                    if (imageSource1 != null)
+                                    _currentImageGroup = new ImageGroupSet
                                     {
-                                        imageSource1.SetImagePath(imagePath);
-                                        PageManager.Page1Instance?.LogUpdate($"已加载模板图片(仅一张): {Path.GetFileName(imagePath)}");
-                                    }
-                                    else
-                                    {
-                                        LogMessage("未找到图像源1模块，无法设置图片路径", LogLevel.Error);
-                                    }
+                                        Source1Path = imagePath,
+                                        BaseName = Path.GetFileNameWithoutExtension(imagePath)
+                                    };
+                                    _imageRenderer?.DisplayImageGroup(_currentImageGroup);
+                                    PageManager.Page1Instance?.LogUpdate($"已加载模板图片(仅一张): {Path.GetFileName(imagePath)}");
                             }
                         }
                         catch (Exception ex)
@@ -7962,11 +8006,7 @@ namespace WpfApp2.UI
                             MessageBoxImage.Information);
                     }
                     
-                    // 设置3张图片到VM模块
-                    SetImagePathsToVM();
-                    
-                    // 设置到VmRenderControl显示
-                    SetupMultiImageRenderControls();
+                    _imageRenderer?.DisplayImageGroup(_currentImageGroup);
                     
                     // 保存参数
                     SaveStepParameters(currentStep);
@@ -8123,11 +8163,7 @@ namespace WpfApp2.UI
                                 MessageBoxImage.Warning);
                         }
                         
-                        // 设置3张图片到VM模块
-                        SetImagePathsToVM();
-                        
-                        // 设置到VmRenderControl显示
-                        SetupMultiImageRenderControls();
+                        _imageRenderer?.DisplayImageGroup(_currentImageGroup);
                         
                         PageManager.Page1Instance?.LogUpdate($"已加载图片组: {_currentImageGroup.BaseName}");
                     }

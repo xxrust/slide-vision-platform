@@ -10,11 +10,11 @@ none
 false
 DEBUG;TRACE
 E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\PlatformHost.Wpf\App.xaml
-44-530015016
-27-468067306
-92-1769668366
-47592149269
-MainWindow.xaml;UI\AutoDeleteImageWindow.xaml;UI\ConfigPage.xaml;UI\CameraConfigPage.xaml;UI\LotSettingWindow.xaml;UI\RemoteSourceSettingWindow.xaml;UI\LoadingDialog.xaml;UI\Page1.xaml;UI\Page2.xaml;UI\RealTimeDataExportConfigWindow.xaml;UI\PLCSerialConfigPage.xaml;UI\SearchPicture.xaml;UI\TemplateConfigPage.xaml;UI\HardwareConfigPage.xaml;UI\GPIOSettingsWindow.xaml;UI\SplashScreen.xaml;UI\ComponentEditDialog.xaml;UI\FileSelectionWindow.xaml;UI\ImageTestModeSelectionWindow.xaml;UI\CicdAcceptanceCriteriaWindow.xaml;UI\CicdImageSetCollectionWindow.xaml;UI\CicdImageSetParametersWindow.xaml;UI\CicdCompareDetailsWindow.xaml;UI\SingleSampleDynamicStaticParametersWindow.xaml;UI\FixedShotTestWindow.xaml;UI\Create3DTemplateGuideWindow.xaml;UI\LJDeveloperUserProjectSelectWindow.xaml;UI\ThreeDMappingAnalysisWindow.xaml;UI\ThreeDCalibrationWindow.xaml;UI\ValidatorMachineParametersWindow.xaml;UI\ValidatorMachineResultsWindow.xaml;UI\SystemTestWindow.xaml;UI\MotorParameterSettingsWindow.xaml;UI\Controls\SmartInputCard.xaml;UI\Controls\SmartInputCardWindow.xaml;UI\Controls\SmartInputParameterConfigWindow.xaml;UI\Controls\VirtualKeyboardControl.xaml;UI\Controls\SmartAnalysisWidget.xaml;UI\Controls\SmartAnalysisMainPage.xaml;UI\Controls\SmartAnalysisSettingsPage.xaml;UI\Controls\SmartAnalysisHelpPage.xaml;UI\Controls\SmartAnalysisAlertPage.xaml;UI\Controls\SmartAnalysisFocusPage.xaml;UI\Controls\AlertSettingsDialog.xaml;
+45-263931333
+271350394556
+971224774054
+47-986314126
+MainWindow.xaml;UI\AutoDeleteImageWindow.xaml;UI\ConfigPage.xaml;UI\CameraConfigPage.xaml;UI\LotSettingWindow.xaml;UI\RemoteSourceSettingWindow.xaml;UI\LoadingDialog.xaml;UI\Page1.xaml;UI\Page2.xaml;UI\RealTimeDataExportConfigWindow.xaml;UI\PLCSerialConfigPage.xaml;UI\SearchPicture.xaml;UI\TemplateConfigPage.xaml;UI\HardwareConfigPage.xaml;UI\GPIOSettingsWindow.xaml;UI\SplashScreen.xaml;UI\ComponentEditDialog.xaml;UI\FileSelectionWindow.xaml;UI\ImageTestModeSelectionWindow.xaml;UI\CicdAcceptanceCriteriaWindow.xaml;UI\CicdImageSetCollectionWindow.xaml;UI\CicdImageSetParametersWindow.xaml;UI\CicdCompareDetailsWindow.xaml;UI\SingleSampleDynamicStaticParametersWindow.xaml;UI\FixedShotTestWindow.xaml;UI\Create3DTemplateGuideWindow.xaml;UI\LJDeveloperUserProjectSelectWindow.xaml;UI\ThreeDMappingAnalysisWindow.xaml;UI\ThreeDCalibrationWindow.xaml;UI\ValidatorMachineParametersWindow.xaml;UI\ValidatorMachineResultsWindow.xaml;UI\SystemTestWindow.xaml;UI\MotorParameterSettingsWindow.xaml;UI\Controls\SmartInputCard.xaml;UI\Controls\SmartInputCardWindow.xaml;UI\Controls\SmartInputParameterConfigWindow.xaml;UI\Controls\VirtualKeyboardControl.xaml;UI\Controls\SmartAnalysisWidget.xaml;UI\Controls\SmartAnalysisMainPage.xaml;UI\Controls\SmartAnalysisSettingsPage.xaml;UI\Controls\SmartAnalysisHelpPage.xaml;UI\Controls\SmartAnalysisAlertPage.xaml;UI\Controls\SmartAnalysisFocusPage.xaml;UI\Controls\GenericCameraConfigControl.xaml;UI\Controls\AlertSettingsDialog.xaml;
 
-False
+True
 

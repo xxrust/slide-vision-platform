@@ -7272,6 +7272,32 @@ namespace WpfApp2.UI
             return engine;
         }
 
+        public async Task ExecuteAlgorithmPipelineForImageGroup(ImageGroupSet imageGroup, bool isTemplateConfig = false)
+        {
+            if (imageGroup == null)
+            {
+                LogUpdate("图像组为空，无法执行算法引擎");
+                return;
+            }
+
+            try
+            {
+                var engine = ResolveAlgorithmEngine();
+                var algorithmInput = BuildAlgorithmInput(imageGroup);
+                TrackAlgorithmExecution(engine, algorithmInput);
+                await ExecuteAlgorithmEngineDetectionAsync(engine, algorithmInput);
+
+                if (isTemplateConfig)
+                {
+                    LogUpdate($"模板配置触发算法引擎完成: {engine.EngineName}");
+                }
+            }
+            catch (Exception ex)
+            {
+                LogUpdate($"算法引擎执行失败: {ex.Message}");
+            }
+        }
+
         private AlgorithmInput BuildAlgorithmInput(ImageGroupSet imageGroup)
         {
             var input = new AlgorithmInput
@@ -7474,16 +7500,29 @@ namespace WpfApp2.UI
             var placeholderMeasurements = BuildPlaceholderMeasurementsFromTemplate(template);
             var normalized = new AlgorithmResult
             {
-                EngineId = engine?.EngineId ?? AlgorithmEngineIds.OpenCv,
+                EngineId = engine?.EngineId ?? AlgorithmEngineIds.OpenCvOnnx,
                 EngineVersion = engine?.EngineVersion ?? "unknown",
-                Status = AlgorithmExecutionStatus.Success,
-                IsOk = true,
-                DefectType = "良品",
-                Description = "参数对齐占位结果"
+                Status = result?.Status ?? AlgorithmExecutionStatus.Success,
+                IsOk = result?.IsOk ?? true,
+                DefectType = string.IsNullOrWhiteSpace(result?.DefectType) ? "良品" : result.DefectType,
+                Description = result?.Description ?? "参数对齐占位结果",
+                ErrorMessage = result?.ErrorMessage
             };
 
             normalized.DebugInfo["EngineName"] = engine?.EngineName ?? "unknown";
             normalized.DebugInfo["TemplateName"] = template?.TemplateName ?? string.Empty;
+            if (result?.DebugInfo != null)
+            {
+                foreach (var entry in result.DebugInfo)
+                {
+                    if (entry.Key == null)
+                    {
+                        continue;
+                    }
+
+                    normalized.DebugInfo[$"Result.{entry.Key}"] = entry.Value ?? string.Empty;
+                }
+            }
 
             if (placeholderMeasurements.Count > 0)
             {

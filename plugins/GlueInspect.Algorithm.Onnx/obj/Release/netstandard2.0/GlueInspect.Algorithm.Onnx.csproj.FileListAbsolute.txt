@@ -1,0 +1,13 @@
+E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\plugins\GlueInspect.Algorithm.Onnx\bin\Release\netstandard2.0\GlueInspect.Algorithm.Onnx.deps.json
+E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\plugins\GlueInspect.Algorithm.Onnx\bin\Release\netstandard2.0\GlueInspect.Algorithm.Onnx.dll
+E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\plugins\GlueInspect.Algorithm.Onnx\bin\Release\netstandard2.0\GlueInspect.Algorithm.Onnx.pdb
+E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\plugins\GlueInspect.Algorithm.Onnx\bin\Release\netstandard2.0\GlueInspect.Platform.Abstractions.dll
+E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\plugins\GlueInspect.Algorithm.Onnx\bin\Release\netstandard2.0\GlueInspect.Platform.Abstractions.pdb
+E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\plugins\GlueInspect.Algorithm.Onnx\obj\Release\netstandard2.0\GlueInspect.Algorithm.Onnx.csproj.AssemblyReference.cache
+E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\plugins\GlueInspect.Algorithm.Onnx\obj\Release\netstandard2.0\GlueInspect.Algorithm.Onnx.GeneratedMSBuildEditorConfig.editorconfig
+E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\plugins\GlueInspect.Algorithm.Onnx\obj\Release\netstandard2.0\GlueInspect.Algorithm.Onnx.AssemblyInfoInputs.cache
+E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\plugins\GlueInspect.Algorithm.Onnx\obj\Release\netstandard2.0\GlueInspect.Algorithm.Onnx.AssemblyInfo.cs
+E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\plugins\GlueInspect.Algorithm.Onnx\obj\Release\netstandard2.0\GlueInspect.Algorithm.Onnx.csproj.CoreCompileInputs.cache
+E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\plugins\GlueInspect.Algorithm.Onnx\obj\Release\netstandard2.0\GlueInsp.024BB95D.Up2Date
+E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\plugins\GlueInspect.Algorithm.Onnx\obj\Release\netstandard2.0\GlueInspect.Algorithm.Onnx.dll
+E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\plugins\GlueInspect.Algorithm.Onnx\obj\Release\netstandard2.0\GlueInspect.Algorithm.Onnx.pdb

@@ -5,10 +5,8 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Threading;
-using VM.Core;
-using GlobalCameraModuleCs;
 using WpfApp2.SMTGPIO;
-using static WpfApp2.UI.Page1;
+using WpfApp2.Hardware;
 using WpfApp2.UI.Models;
 using System.Threading.Tasks;
 
@@ -19,10 +17,6 @@ namespace WpfApp2.UI
     /// </summary>
     public partial class HardwareConfigPage : Page
     {
-        // 相机模块
-        private GlobalCameraModuleTool _flyingCameraModule;
-        private GlobalCameraModuleTool _fixedCameraModule;
-        
         // IO状态更新定时器
         private DispatcherTimer _ioStatusTimer;
         
@@ -55,201 +49,27 @@ namespace WpfApp2.UI
             // 启动PLC状态定时器
             InitializePLCStatusTimer();
             
-            // 延迟一小段时间，确保VM解决方案已完全加载
+            // 延迟加载通用相机配置
             Dispatcher.BeginInvoke(new Action(() =>
             {
-                InitializeCameraModules();
+                InitializeCameraProfiles();
             }), System.Windows.Threading.DispatcherPriority.Background);
         }
 
         /// <summary>
-        /// 初始化相机模块
+        /// 初始化通用相机配置
         /// </summary>
-        private void InitializeCameraModules()
+        private void InitializeCameraProfiles()
         {
             try
             {
-                // 检查VM解决方案是否已加载
-                if (!IsVmSolutionReady())
-                {
-                    LogMessage("VM解决方案尚未完全加载，跳过相机模块初始化", LogLevel.Warning);
-                    return;
-                }
-
-                // 初始化飞拍相机模块
-                InitializeFlyingCamera();
-                
-                // 初始化定拍相机模块
-                InitializeFixedCamera();
-                
-                LogMessage("相机模块初始化完成");
+                FlyingCameraControl?.LoadProfile(CameraRole.Flying);
+                FixedCameraControl?.LoadProfile(CameraRole.Fixed);
+                LogMessage("通用相机配置已加载");
             }
             catch (Exception ex)
             {
-                LogMessage($"初始化相机模块失败: {ex.Message}", LogLevel.Warning);
-            }
-        }
-
-        /// <summary>
-        /// 检查VM解决方案是否准备就绪
-        /// </summary>
-        private bool IsVmSolutionReady()
-        {
-            try
-            {
-                // 检查VmSolution实例是否存在
-                if (VmSolution.Instance == null)
-                {
-                    return false;
-                }
-
-                // 检查是否有模板配置页面实例（表示VM已加载）
-                if (TemplateConfigPage.Instance == null)
-                {
-                    return false;
-                }
-
-                // 尝试访问一个基本的VM模块来验证VM是否真正可用
-                var testModule = VmSolution.Instance["获取路径图像"];
-                return testModule != null;
-            }
-            catch (Exception)
-            {
-                return false;
-            }
-        }
-
-        /// <summary>
-        /// 列出VM中可用的模块，帮助用户调试
-        /// </summary>
-        private void ListAvailableModules(string targetModuleName)
-        {
-            try
-            {
-                if (VmSolution.Instance == null) return;
-
-                LogMessage($"正在查找与'{targetModuleName}'相关的模块...");
-                
-                // 尝试列出一些常见的模块名称模式
-                var commonPatterns = new[]
-                {
-                    targetModuleName,
-                    targetModuleName.Replace("相机", ""),
-                    "相机",
-                    "Camera",
-                    "GlobalCamera",
-                    "飞拍",
-                    "定拍"
-                };
-
-                bool foundAny = false;
-                foreach (var pattern in commonPatterns)
-                {
-                    try
-                    {
-                        var module = VmSolution.Instance[pattern];
-                        if (module != null)
-                        {
-                            LogMessage($"  找到模块: '{pattern}' (类型: {module.GetType().Name})");
-                            foundAny = true;
-                        }
-                    }
-                    catch (Exception)
-                    {
-                        // 忽略单个模块查找失败
-                    }
-                }
-
-                if (!foundAny)
-                {
-                    LogMessage("  未找到相关的相机模块，请检查VM解决方案配置");
-                }
-            }
-            catch (Exception ex)
-            {
-                LogMessage($"列出可用模块时出错: {ex.Message}");
-            }
-        }
-
-        /// <summary>
-        /// 初始化飞拍相机
-        /// </summary>
-        private void InitializeFlyingCamera()
-        {
-            try
-            {
-                // 检查VmSolution是否已加载
-                if (VmSolution.Instance == null)
-                {
-                    LogMessage("VM解决方案未加载，跳过飞拍相机初始化", LogLevel.Warning);
-                    return;
-                }
-
-                LogMessage("正在查找飞拍相机模块...");
-
-                // 参考TemplateConfigPage的方式，直接通过模块名获取
-                _flyingCameraModule = (GlobalCameraModuleCs.GlobalCameraModuleTool)VmSolution.Instance["飞拍相机"];
-                
-                if (_flyingCameraModule != null)
-                {
-                    LogMessage("✓ 已找到飞拍相机模块");
-                    
-                    // 参考TemplateConfigPage的方式，设置ModuleSource
-                    FlyingCameraControl.ModuleSource = _flyingCameraModule;
-                    LogMessage("✓ 飞拍相机模块已绑定到界面控件");
-                }
-                else
-                {
-                    LogMessage("⚠ 未找到飞拍相机模块，请在VM解决方案中添加名为'飞拍相机'的GlobalCameraModuleTool模块", LogLevel.Warning);
-                    
-                    // 列出当前VM中所有可用的模块，帮助用户调试
-                    ListAvailableModules("飞拍相机");
-                }
-            }
-            catch (Exception ex)
-            {
-                LogMessage($"初始化飞拍相机失败: {ex.Message}", LogLevel.Warning);
-            }
-        }
-
-        /// <summary>
-        /// 初始化定拍相机
-        /// </summary>
-        private void InitializeFixedCamera()
-        {
-            try
-            {
-                // 检查VmSolution是否已加载
-                if (VmSolution.Instance == null)
-                {
-                    LogMessage("VM解决方案未加载，跳过定拍相机初始化", LogLevel.Warning);
-                    return;
-                }
-
-                LogMessage("正在查找定拍相机模块...");
-
-                // 参考TemplateConfigPage的方式，直接通过模块名获取
-                _fixedCameraModule = (GlobalCameraModuleCs.GlobalCameraModuleTool)VmSolution.Instance["定拍相机"];
-                
-                if (_fixedCameraModule != null)
-                {
-                    LogMessage("✓ 已找到定拍相机模块");
-                    
-                    // 参考TemplateConfigPage的方式，设置ModuleSource
-                    FixedCameraControl.ModuleSource = _fixedCameraModule;
-                    LogMessage("✓ 定拍相机模块已绑定到界面控件");
-                }
-                else
-                {
-                    LogMessage("⚠ 未找到定拍相机模块，请在VM解决方案中添加名为'定拍相机'的GlobalCameraModuleTool模块", LogLevel.Warning);
-                    
-                    // 列出当前VM中所有可用的模块，帮助用户调试
-                    ListAvailableModules("定拍相机");
-                }
-            }
-            catch (Exception ex)
-            {
-                LogMessage($"初始化定拍相机失败: {ex.Message}", LogLevel.Warning);
+                LogMessage($"初始化通用相机配置失败: {ex.Message}", LogLevel.Warning);
             }
         }
 
@@ -782,12 +602,12 @@ namespace WpfApp2.UI
         {
             try
             {
-                LogMessage("手动刷新飞拍相机模块...");
-                InitializeFlyingCamera();
+                LogMessage("手动刷新飞拍相机配置...");
+                FlyingCameraControl?.LoadProfile(CameraRole.Flying);
             }
             catch (Exception ex)
             {
-                LogMessage($"手动刷新飞拍相机模块失败: {ex.Message}", LogLevel.Warning);
+                LogMessage($"手动刷新飞拍相机配置失败: {ex.Message}", LogLevel.Warning);
             }
         }
 
@@ -798,12 +618,12 @@ namespace WpfApp2.UI
         {
             try
             {
-                LogMessage("手动刷新定拍相机模块...");
-                InitializeFixedCamera();
+                LogMessage("手动刷新定拍相机配置...");
+                FixedCameraControl?.LoadProfile(CameraRole.Fixed);
             }
             catch (Exception ex)
             {
-                LogMessage($"手动刷新定拍相机模块失败: {ex.Message}", LogLevel.Warning);
+                LogMessage($"手动刷新定拍相机配置失败: {ex.Message}", LogLevel.Warning);
             }
         }
 
@@ -914,41 +734,27 @@ namespace WpfApp2.UI
                 LogMessage("正在保存相机参数...");
 
                 // 保存飞拍相机参数
-                if (_flyingCameraModule != null)
+                try
                 {
-                    try
-                    {
-                        _flyingCameraModule.SaveParamToUser1();
-                        LogMessage("✓ 飞拍相机参数已保存");
-                        LogManager.Info("飞拍相机参数已保存");
-                    }
-                    catch (Exception ex)
-                    {
-                        LogMessage($"保存飞拍相机参数失败: {ex.Message}", LogLevel.Warning);
-                    }
+                    FlyingCameraControl?.SaveProfile();
+                    LogMessage("✓ 飞拍相机参数已保存");
+                    LogManager.Info("飞拍相机参数已保存");
                 }
-                else
+                catch (Exception ex)
                 {
-                    LogMessage("飞拍相机模块未初始化，跳过参数保存", LogLevel.Warning);
+                    LogMessage($"保存飞拍相机参数失败: {ex.Message}", LogLevel.Warning);
                 }
 
                 // 保存定拍相机参数
-                if (_fixedCameraModule != null)
+                try
                 {
-                    try
-                    {
-                        _fixedCameraModule.SaveParamToUser1();
-                        LogMessage("✓ 定拍相机参数已保存");
-                        LogManager.Info("定拍相机参数已保存");
-                    }
-                    catch (Exception ex)
-                    {
-                        LogMessage($"保存定拍相机参数失败: {ex.Message}", LogLevel.Warning);
-                    }
+                    FixedCameraControl?.SaveProfile();
+                    LogMessage("✓ 定拍相机参数已保存");
+                    LogManager.Info("定拍相机参数已保存");
                 }
-                else
+                catch (Exception ex)
                 {
-                    LogMessage("定拍相机模块未初始化，跳过参数保存", LogLevel.Warning);
+                    LogMessage($"保存定拍相机参数失败: {ex.Message}", LogLevel.Warning);
                 }
 
                 LogMessage("相机参数保存操作完成");

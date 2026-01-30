@@ -7,7 +7,7 @@ namespace WpfApp2.UI.Models
 {
     public sealed class AlgorithmEngineSettings
     {
-        public string PreferredEngineId { get; set; } = AlgorithmEngineIds.Vm;
+        public string PreferredEngineId { get; set; } = AlgorithmEngineIds.OpenCvOnnx;
     }
 
     public static class AlgorithmEngineSettingsManager
@@ -21,7 +21,7 @@ namespace WpfApp2.UI.Models
             get
             {
                 EnsureLoaded();
-                return _cached?.PreferredEngineId ?? AlgorithmEngineIds.Vm;
+                return _cached?.PreferredEngineId ?? AlgorithmEngineIds.OpenCvOnnx;
             }
         }
 
@@ -88,7 +88,18 @@ namespace WpfApp2.UI.Models
 
         private static string NormalizeEngineId(string engineId)
         {
-            return string.IsNullOrWhiteSpace(engineId) ? AlgorithmEngineIds.Vm : engineId;
+            if (string.IsNullOrWhiteSpace(engineId))
+            {
+                return AlgorithmEngineIds.OpenCvOnnx;
+            }
+
+            if (string.Equals(engineId, AlgorithmEngineIds.OpenCv, StringComparison.OrdinalIgnoreCase) ||
+                string.Equals(engineId, AlgorithmEngineIds.Onnx, StringComparison.OrdinalIgnoreCase))
+            {
+                return AlgorithmEngineIds.OpenCvOnnx;
+            }
+
+            return engineId;
         }
     }
 }

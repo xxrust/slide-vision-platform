@@ -3,7 +3,7 @@
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-      xmlns:Release="clr-namespace:VMControls.WPF.Release"
+      xmlns:controls="clr-namespace:WpfApp2.UI.Controls"
       mc:Ignorable="d" 
       d:DesignHeight="1024" d:DesignWidth="1920"
       Title="硬件配置">
@@ -163,7 +163,7 @@
                     
                     <!-- 飞拍相机配置控件 -->
                     <Border Background="#FF2C3E50" CornerRadius="8" Padding="15">
-                        <Release:VmParamsConfigControl x:Name="FlyingCameraControl" Height="800" HorizontalAlignment="Stretch"/>
+                        <controls:GenericCameraConfigControl x:Name="FlyingCameraControl" Height="800" HorizontalAlignment="Stretch"/>
                     </Border>
                 </StackPanel>
             </Border>
@@ -184,7 +184,7 @@
                     
                     <!-- 定拍相机配置控件 -->
                     <Border Background="#FF2C3E50" CornerRadius="8" Padding="15">
-                        <Release:VmParamsConfigControl x:Name="FixedCameraControl" Height="800" HorizontalAlignment="Stretch"/>
+                        <controls:GenericCameraConfigControl x:Name="FixedCameraControl" Height="800" HorizontalAlignment="Stretch"/>
                     </Border>
                 </StackPanel>
             </Border>

@@ -232,6 +232,14 @@
     <Compile Include="Algorithms\AlgorithmGlobalVariables.cs" />
     <Compile Include="Algorithms\AlgorithmEngineRegistry.cs" />
     <Compile Include="Algorithms\AlgorithmResultEventArgs.cs" />
+    <Compile Include="Algorithms\OpenCvOnnxAlgorithmEngine.cs" />
+    <Compile Include="Rendering\ImageRendererContracts.cs" />
+    <Compile Include="Rendering\ImageRendererManager.cs" />
+    <Compile Include="Rendering\RendererSettingsManager.cs" />
+    <Compile Include="Rendering\VmImageRenderer.cs" />
+    <Compile Include="Rendering\FileImageRenderer.cs" />
+    <Compile Include="Hardware\GenericCameraModels.cs" />
+    <Compile Include="Hardware\GenericCameraManager.cs" />
     <Compile Include="UI\Models\Class1.cs" />
     <Compile Include="UI\Models\ChipHeightAnalysisSnapshot.cs" />
     <Compile Include="UI\Models\AlertSettings.cs" />
@@ -373,6 +381,9 @@
     <Compile Include="UI\Models\FocusedProjectsManager.cs" />
     <Compile Include="UI\Controls\SmartAnalysisFocusPage.xaml.cs">
       <DependentUpon>SmartAnalysisFocusPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\Controls\GenericCameraConfigControl.xaml.cs">
+      <DependentUpon>GenericCameraConfigControl.xaml</DependentUpon>
     </Compile>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
@@ -554,6 +565,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="UI\Controls\GenericCameraConfigControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="UI\Controls\AlertSettingsDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -588,6 +603,9 @@
   <ItemGroup>
     <None Include="App.config" />
     <None Include="Config\AlgorithmEngine.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Config\Renderer.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="Config\ParameterConfigs.json">

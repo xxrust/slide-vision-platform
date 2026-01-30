@@ -245,7 +245,7 @@ namespace WpfApp2.Models
         public string TemplateName { get; set; }
 
         // 算法引擎标识（VM/OpenCV/ONNX）
-        public string AlgorithmEngineId { get; set; } = AlgorithmEngineIds.Vm;
+        public string AlgorithmEngineId { get; set; } = AlgorithmEngineIds.OpenCvOnnx;
 
         // 备注信息
         public string Remark { get; set; }
@@ -305,7 +305,7 @@ namespace WpfApp2.Models
             // 确保算法引擎有默认值（兼容旧版本模板文件）
             if (string.IsNullOrWhiteSpace(template.AlgorithmEngineId))
             {
-                template.AlgorithmEngineId = AlgorithmEngineIds.Vm;
+                template.AlgorithmEngineId = AlgorithmEngineIds.OpenCvOnnx;
             }
             
             return template;

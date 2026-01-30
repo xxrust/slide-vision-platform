@@ -16,8 +16,12 @@ namespace WpfApp2.Algorithms
         {
             if (!_initialized)
             {
-                Engines[AlgorithmEngineIds.OpenCv] = new OpenCvAlgorithmEngine();
-                Engines[AlgorithmEngineIds.Onnx] = new OnnxAlgorithmEngine();
+                var openCvEngine = new OpenCvAlgorithmEngine();
+                var onnxEngine = new OnnxAlgorithmEngine();
+
+                Engines[AlgorithmEngineIds.OpenCv] = openCvEngine;
+                Engines[AlgorithmEngineIds.Onnx] = onnxEngine;
+                Engines[AlgorithmEngineIds.OpenCvOnnx] = new OpenCvOnnxAlgorithmEngine(openCvEngine, onnxEngine);
                 _initialized = true;
                 return;
             }
@@ -39,7 +43,13 @@ namespace WpfApp2.Algorithms
 
             if (string.IsNullOrWhiteSpace(preferredEngineId))
             {
-                preferredEngineId = AlgorithmEngineIds.OpenCv;
+                preferredEngineId = AlgorithmEngineIds.OpenCvOnnx;
+            }
+
+            if (string.Equals(preferredEngineId, AlgorithmEngineIds.OpenCv, StringComparison.OrdinalIgnoreCase) ||
+                string.Equals(preferredEngineId, AlgorithmEngineIds.Onnx, StringComparison.OrdinalIgnoreCase))
+            {
+                preferredEngineId = AlgorithmEngineIds.OpenCvOnnx;
             }
 
             if (Engines.TryGetValue(preferredEngineId, out var preferredEngine) && preferredEngine != null)
@@ -50,7 +60,9 @@ namespace WpfApp2.Algorithms
                 }
             }
 
-            return Engines.TryGetValue(AlgorithmEngineIds.OpenCv, out var openCvEngine) ? openCvEngine : preferredEngine;
+            return Engines.TryGetValue(AlgorithmEngineIds.OpenCvOnnx, out var compositeEngine)
+                ? compositeEngine
+                : Engines.TryGetValue(AlgorithmEngineIds.OpenCv, out var openCvEngine) ? openCvEngine : preferredEngine;
         }
 
         public static IReadOnlyList<AlgorithmEngineDescriptor> GetDescriptors()
@@ -80,14 +92,19 @@ namespace WpfApp2.Algorithms
 
         private static string GetDefaultDescription(string engineId)
         {
+            if (string.Equals(engineId, AlgorithmEngineIds.OpenCvOnnx, StringComparison.OrdinalIgnoreCase))
+            {
+                return "OpenCV + ONNX pipeline (classic + deep learning)";
+            }
+
             if (string.Equals(engineId, AlgorithmEngineIds.OpenCv, StringComparison.OrdinalIgnoreCase))
             {
-                return "OpenCV classic pipeline (incremental)";
+                return "OpenCV classic pipeline (legacy)";
             }
 
             if (string.Equals(engineId, AlgorithmEngineIds.Onnx, StringComparison.OrdinalIgnoreCase))
             {
-                return "ONNX inference engine (model-based)";
+                return "ONNX inference engine (legacy)";
             }
 
             return string.Empty;

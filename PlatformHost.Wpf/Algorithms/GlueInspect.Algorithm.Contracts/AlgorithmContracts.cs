@@ -10,6 +10,7 @@ namespace GlueInspect.Algorithm.Contracts
         public const string Vm = "VM";
         public const string OpenCv = "OpenCV";
         public const string Onnx = "ONNX";
+        public const string OpenCvOnnx = "OpenCV+ONNX";
     }
 
     public sealed class AlgorithmEngineDescriptor
