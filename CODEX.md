@@ -1,9 +1,27 @@
-ï»¿ä½ æ˜¯è¿è¡Œåœ¨æœ¬ä»“åº“ Platform/ ç›®å½•ä¸‹çš„è‡ªåŠ¨åŒ–ä»£ç†ã€‚
-ä»»åŠ¡ï¼šå°† PRD åˆ†è§£ä¸º JSON ç»“æ„å¹¶å†™å…¥ prd.jsonã€‚
-è¾“å…¥ï¼šDocs/PRD_PlatformHost_WPF48.mdã€‚
-è¾“å‡ºï¼šPlatform/prd.jsonï¼ˆè¦†ç›–å³å¯ï¼‰ã€‚
-è¦æ±‚ï¼š
-- ä»…ä¿®æ”¹ prd.jsonï¼Œä¸ä¿®æ”¹å…¶ä»–æ–‡ä»¶ã€‚
-- JSON éœ€åŒ…å«ï¼štitle, goal, scope, non_goals, principles, decoupling_scope, reusable_assets, pages, data_persistence, acceptance, milestones, key_pathsã€‚
-- key_paths ä¸­å¿…é¡»åŒ…å«ï¼šåŸç‚¹èƒ¶é¡¹ç›®è·¯å¾„ã€å¹³å°å·¥ç¨‹è·¯å¾„ã€å·²éªŒè¯æ’ä»¶ DLL è·¯å¾„ã€å·²éªŒè¯ç¤ºä¾‹èµ„æºè·¯å¾„ã€‚
-å®Œæˆåè¾“å‡º <promise>COMPLETE</promise>ã€‚
+ÄãÊÇÔËĞĞÔÚ±¾²Ö¿â Platform/ Ä¿Â¼ÏÂµÄ×Ô¶¯»¯´úÀí¡£
+ÈÎÎñ£ºÖ´ĞĞ¡°È«¾ÖÄ£°å·Ö¼¶+È¥ÑùÆ·/Í¿²¼´´½¨Á÷³Ì¡±µÄ¸ÄÔì¼Æ»®¡£
+Ä¿±ê£º
+- ĞÂÔöÈ«¾ÖÄ£°å·Ö¼¶¶¨ÒåÎÄ¼ş£¬²¢ÒÔ ProfileId Çı¶¯Ä£°å´´½¨/¼ÓÔØ/²½ÖèÅäÖÃ
+- ´´½¨Ä£°åÁ÷³Ì½ö±£Áô¡°´´½¨Ò»¸öÄ£°å¡±£¬²»ÔÙ×ßÑùÆ·/Í¿²¼Á½¼¶Ñ¡Ôñ
+- ¾ÉÄ£°åÍ¨¹ı LegacyMappings ×ö¼æÈİ
+- ¸üĞÂ skill_¿ª·¢ÖĞ.md£¬Ğ´ÈëÊ¾ÀıÒµÎñ½á¹¹
+
+Éæ¼°ÎÄ¼ş£¨ÈçÒÑÍê³ÉÇë±£³Ö²»¸Ä£©£º
+- PlatformHost.Wpf/Config/TemplateHierarchy.json
+- PlatformHost.Wpf/UI/Models/TemplateHierarchyConfig.cs
+- PlatformHost.Wpf/UI/Models/Class1.cs (TemplateParameters Ôö¼Ó ProfileId + LoadFromFile ¼æÈİ)
+- PlatformHost.Wpf/UI/Models/ModuleRegistry.cs (GetStepConfigurations ¸ÄÎª ProfileId Çı¶¯)
+- PlatformHost.Wpf/UI/TemplateConfigPage.xaml.cs (Profile ³õÊ¼»¯¡¢È«¾Ö±äÁ¿Ğ´Èë¡¢È¥ TYPE/Í¿²¼ÊıÄ¿)
+- PlatformHost.Wpf/UI/ConfigPage.xaml(+.cs) (´´½¨Á÷³Ì¸ÄÎªÄ£°åµµ°¸Ñ¡Ôñ)
+- PlatformHost.Wpf/MainWindow.xaml.cs (¼ÓÔØÄ£°å¸ÄÎª ProfileId)
+- PlatformHost.Wpf/UI/Page1.xaml.cs (Ëã·¨ÊäÈëÓëÕ¼Î»Ö¸±ê¸ÄÎª ProfileId)
+- PlatformHost.Wpf/Algorithms/GlueInspect.Algorithm.Contracts/AlgorithmContracts.cs (ĞÂÔö TemplateProfileId/Name)
+- PlatformHost.Wpf/Algorithms/GlueInspect.Algorithm.OpenCV/OpenCvAlgorithmEngine.cs (Demo Âß¼­¸ÄÎª profile-basic)
+- PlatformHost.Wpf/UI/Ljd3DDetectionWindow.xaml.cs (È¥ MESA Ä¬ÈÏÂ·¾¶)
+- PlatformHost.Wpf/UI/Models/RealTimeDataExportConfig.cs + Config/RealTimeDataExportConfig.json (Ä¬ÈÏÄ£°åÃûÈ¥ÒµÎñ»¯)
+- skill_¿ª·¢ÖĞ.md (²¹³ä TemplateHierarchy.json ÓëÊ¾ÀıÒµÎñËµÃ÷)
+
+ÒªÇó£º
+- Èç¹ûÒÑÍê³É£¬±£³Ö²»¸Ä²¢Ö±½ÓÊä³ö <promise>COMPLETE</promise>¡£
+- Ö»ĞŞ¸ÄÉÏÊö·¶Î§ÄÚÎÄ¼ş¡£
+- Íê³ÉºóÊä³ö <promise>COMPLETE</promise>¡£

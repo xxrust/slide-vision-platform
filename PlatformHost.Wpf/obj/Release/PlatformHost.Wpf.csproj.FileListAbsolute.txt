@@ -19,7 +19,9 @@ E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\PlatformHost.Wpf\
 E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\PlatformHost.Wpf\bin\Release\arm64\libSkiaSharp.so
 E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\PlatformHost.Wpf\bin\Release\musl-x64\libSkiaSharp.so
 E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\PlatformHost.Wpf\bin\Release\Config\AlgorithmEngine.json
+E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\PlatformHost.Wpf\bin\Release\Config\Renderer.json
 E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\PlatformHost.Wpf\bin\Release\Config\ParameterConfigs.json
+E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\PlatformHost.Wpf\bin\Release\Config\TemplateHierarchy.json
 E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\PlatformHost.Wpf\bin\Release\Config\RealTimeDataExportConfig.json
 E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\PlatformHost.Wpf\bin\Release\posen.ico
 E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\PlatformHost.Wpf\bin\Release\GlueInspect.exe.config
@@ -112,9 +114,11 @@ E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\PlatformHost.Wpf\
 E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\PlatformHost.Wpf\obj\Release\UI\Controls\VirtualKeyboardControl.baml
 E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\PlatformHost.Wpf\obj\Release\UI\Controls\SmartAnalysisMainPage.baml
 E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\PlatformHost.Wpf\obj\Release\UI\Controls\SmartAnalysisSettingsPage.baml
+E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\PlatformHost.Wpf\obj\Release\UI\Controls\ImageInspectionViewer.baml
 E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\PlatformHost.Wpf\obj\Release\UI\Controls\SmartAnalysisHelpPage.baml
 E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\PlatformHost.Wpf\obj\Release\UI\Controls\SmartAnalysisAlertPage.baml
 E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\PlatformHost.Wpf\obj\Release\UI\Controls\SmartAnalysisFocusPage.baml
+E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\PlatformHost.Wpf\obj\Release\UI\Controls\GenericCameraConfigControl.baml
 E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\PlatformHost.Wpf\obj\Release\UI\Controls\AlertSettingsDialog.baml
 E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\PlatformHost.Wpf\obj\Release\MainWindow.g.cs
 E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\PlatformHost.Wpf\obj\Release\UI\AutoDeleteImageWindow.g.cs
@@ -156,9 +160,11 @@ E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\PlatformHost.Wpf\
 E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\PlatformHost.Wpf\obj\Release\UI\Controls\SmartAnalysisWidget.g.cs
 E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\PlatformHost.Wpf\obj\Release\UI\Controls\SmartAnalysisMainPage.g.cs
 E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\PlatformHost.Wpf\obj\Release\UI\Controls\SmartAnalysisSettingsPage.g.cs
+E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\PlatformHost.Wpf\obj\Release\UI\Controls\ImageInspectionViewer.g.cs
 E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\PlatformHost.Wpf\obj\Release\UI\Controls\SmartAnalysisHelpPage.g.cs
 E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\PlatformHost.Wpf\obj\Release\UI\Controls\SmartAnalysisAlertPage.g.cs
 E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\PlatformHost.Wpf\obj\Release\UI\Controls\SmartAnalysisFocusPage.g.cs
+E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\PlatformHost.Wpf\obj\Release\UI\Controls\GenericCameraConfigControl.g.cs
 E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\PlatformHost.Wpf\obj\Release\UI\Controls\AlertSettingsDialog.g.cs
 E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\PlatformHost.Wpf\obj\Release\App.g.cs
 E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\PlatformHost.Wpf\obj\Release\GlueInspect_Content.g.cs
@@ -186,8 +192,3 @@ E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\PlatformHost.Wpf\
 E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\PlatformHost.Wpf\obj\Release\Platform.E052C7BE.Up2Date
 E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\PlatformHost.Wpf\obj\Release\GlueInspect.exe
 E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\PlatformHost.Wpf\obj\Release\GlueInspect.pdb
-E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\PlatformHost.Wpf\obj\Release\UI\Controls\GenericCameraConfigControl.baml
-E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\PlatformHost.Wpf\obj\Release\UI\Controls\GenericCameraConfigControl.g.cs
-E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\PlatformHost.Wpf\bin\Release\Config\Renderer.json
-E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\PlatformHost.Wpf\obj\Release\UI\Controls\ImageInspectionViewer.baml
-E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\PlatformHost.Wpf\obj\Release\UI\Controls\ImageInspectionViewer.g.cs

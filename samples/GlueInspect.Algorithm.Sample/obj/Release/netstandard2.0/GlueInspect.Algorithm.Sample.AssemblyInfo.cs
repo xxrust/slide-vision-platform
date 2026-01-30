@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("GlueInspect.Algorithm.Sample")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Release")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+70fce5ab6a9c6f3256e2e5e4c6450ebba38c2783")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+d52d3d9d06a560de6b00d9b25754e19774a13c71")]
 [assembly: System.Reflection.AssemblyProductAttribute("GlueInspect.Algorithm.Sample")]
 [assembly: System.Reflection.AssemblyTitleAttribute("GlueInspect.Algorithm.Sample")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
