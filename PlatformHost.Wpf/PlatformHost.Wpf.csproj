@@ -245,6 +245,7 @@
     <Compile Include="UI\Models\AlertSettings.cs" />
     <Compile Include="UI\Models\ModuleDefinition.cs" />
     <Compile Include="UI\Models\ModuleRegistry.cs" />
+    <Compile Include="UI\Models\TemplateHierarchyConfig.cs" />
     <Compile Include="UI\Models\SmartInputParameterDisplayConfig.cs" />
     <Compile Include="UI\Models\RemoteSourceConfig.cs" />
     <Compile Include="UI\Models\RemoteFileMonitorService.cs" />
@@ -616,6 +617,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="Config\ParameterConfigs.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Config\TemplateHierarchy.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="Config\RealTimeDataExportConfig.json">

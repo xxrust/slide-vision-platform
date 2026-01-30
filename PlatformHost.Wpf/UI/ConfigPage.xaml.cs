@@ -16,9 +16,10 @@ namespace WpfApp2.UI
         // 存储所有模板的列表
         private List<TemplateParameters> availableTemplates = new List<TemplateParameters>();
         
-        // 存储当前选择的样品类型和涂布类型
-        private SampleType selectedSampleType;
-        private CoatingType selectedCoatingType;
+        // 存储当前选择的模板档案
+        private string selectedProfileId = string.Empty;
+
+        private List<TemplateProfileDefinition> availableProfiles = new List<TemplateProfileDefinition>();
 
         public ConfigPage()
         {
@@ -42,6 +43,9 @@ namespace WpfApp2.UI
             
             // 更新当前模板名称显示
             UpdateCurrentTemplateDisplay();
+
+            // 加载模板档案配置
+            LoadProfileCards();
         }
 
         private void UpdateCurrentTemplateDisplay()
@@ -65,6 +69,48 @@ namespace WpfApp2.UI
             }
         }
 
+        private void LoadProfileCards()
+        {
+            try
+            {
+                availableProfiles = TemplateHierarchyConfig.Instance.Profiles ?? new List<TemplateProfileDefinition>();
+                var slots = new[]
+                {
+                    (Title: ProfileCard1Title, Description: ProfileCard1Description, Button: ProfileCard1Button),
+                    (Title: ProfileCard2Title, Description: ProfileCard2Description, Button: ProfileCard2Button),
+                    (Title: ProfileCard3Title, Description: ProfileCard3Description, Button: ProfileCard3Button)
+                };
+
+                for (int i = 0; i < slots.Length; i++)
+                {
+                    var slot = slots[i];
+                    var profile = i < availableProfiles.Count ? availableProfiles[i] : null;
+                    if (profile == null)
+                    {
+                        slot.Title.Text = "Unavailable";
+                        slot.Description.Text = "No profile configured.";
+                        slot.Button.IsEnabled = false;
+                        slot.Button.Tag = null;
+                        continue;
+                    }
+
+                    slot.Title.Text = string.IsNullOrWhiteSpace(profile.DisplayName) ? profile.Id : profile.DisplayName;
+                    slot.Description.Text = profile.Description ?? string.Empty;
+                    slot.Button.IsEnabled = true;
+                    slot.Button.Tag = profile.Id;
+                }
+
+                if (availableProfiles.Count > slots.Length)
+                {
+                    LogManager.Info($"模板档案超过可显示数量: {availableProfiles.Count} (仅显示前 {slots.Length} 个)");
+                }
+            }
+            catch (Exception ex)
+            {
+                LogManager.Error($"加载模板档案失败: {ex.Message}");
+            }
+        }
+
         /// <summary>
         /// 重置到操作选择界面
         /// </summary>
@@ -73,7 +119,6 @@ namespace WpfApp2.UI
             // 显示操作选择界面，隐藏其他界面
             OperationSelectionGrid.Visibility = Visibility.Visible;
             SampleTypeSelectionGrid.Visibility = Visibility.Collapsed;
-            CoatingTypeSelectionGrid.Visibility = Visibility.Collapsed;
             TemplateListGrid.Visibility = Visibility.Collapsed;
 
             // 恢复原始标题和提示
@@ -88,12 +133,7 @@ namespace WpfApp2.UI
         private void BackButton_Click(object sender, RoutedEventArgs e)
         {
             // 智能返回：根据当前界面状态决定返回行为
-            if (CoatingTypeSelectionGrid.Visibility == Visibility.Visible)
-            {
-                // 当前在第三层（涂布类型选择），返回到第二层（样品类型选择）
-                BackToSampleTypeSelection();
-            }
-            else if (SampleTypeSelectionGrid.Visibility == Visibility.Visible || 
+            if (SampleTypeSelectionGrid.Visibility == Visibility.Visible || 
                      TemplateListGrid.Visibility == Visibility.Visible)
             {
                 // 当前在第二层，返回到第一层（操作选择界面）
@@ -130,13 +170,12 @@ namespace WpfApp2.UI
             // 显示样品类型选择界面，隐藏其他界面
             OperationSelectionGrid.Visibility = Visibility.Collapsed;
             SampleTypeSelectionGrid.Visibility = Visibility.Visible;
-            CoatingTypeSelectionGrid.Visibility = Visibility.Collapsed;
             TemplateListGrid.Visibility = Visibility.Collapsed;
 
             // 更新标题和提示
             TitleText.Text = "创建新模板";
-            SubtitleText.Text = "请选择要配置的样品类型";
-            FooterText.Text = "选择样品类型后将进入对应的配置流程，不同类型使用不同的检测参数和流程";
+            SubtitleText.Text = "请选择模板档案";
+            FooterText.Text = "选择档案后将进入对应的配置流程，不同档案使用不同的参数与步骤";
 
             // 更新智能返回按钮
             UpdateSmartBackButton();
@@ -148,7 +187,6 @@ namespace WpfApp2.UI
         private void UpdateSmartBackButton()
         {
             if (SampleTypeSelectionGrid.Visibility == Visibility.Visible || 
-                CoatingTypeSelectionGrid.Visibility == Visibility.Visible ||
                 TemplateListGrid.Visibility == Visibility.Visible)
             {
                 // 第二层或第三层：显示返回上一步
@@ -175,8 +213,8 @@ namespace WpfApp2.UI
 
             // 更新标题和提示
             TitleText.Text = "创建新模板";
-            SubtitleText.Text = "请选择要配置的样品类型";
-            FooterText.Text = "选择样品类型后将进入对应的配置流程，不同类型使用不同的检测参数和流程";
+            SubtitleText.Text = "请选择模板档案";
+            FooterText.Text = "选择档案后将进入对应的配置流程，不同档案使用不同的参数与步骤";
 
             // 更新智能返回按钮
             UpdateSmartBackButton();
@@ -279,7 +317,7 @@ namespace WpfApp2.UI
                 TrySyncCameraParametersToTemplate(mainWindow, templateFilePath);
                 
                 // 创建对应样品类型和涂布类型的模板配置页面
-                var templateConfigPage = mainWindow.CreateTemplateConfigPage(template.SampleType, template.CoatingType);
+                var templateConfigPage = mainWindow.CreateTemplateConfigPage(template.ProfileId);
 
                 // 切换到模板配置页面
                 mainWindow.ContentC.Content = mainWindow.frame_TemplateConfigPage;
@@ -314,50 +352,50 @@ namespace WpfApp2.UI
             {
                 if (sender is Button button && button.Tag != null)
                 {
-                    string sampleTypeStr = button.Tag.ToString();
-                    
-                    // 解析样品类型
-                    if (Enum.TryParse<SampleType>(sampleTypeStr, out SampleType sampleType))
+                    selectedProfileId = button.Tag.ToString();
+                    var profile = TemplateHierarchyConfig.Instance.ResolveProfile(selectedProfileId);
+                    var profileName = profile?.DisplayName ?? selectedProfileId;
+                    var profileDescription = profile?.Description ?? string.Empty;
+
+                    var confirmMessage = string.IsNullOrWhiteSpace(profileDescription)
+                        ? $"您的选择：{profileName}\n\n确定要创建此档案的新模板吗？"
+                        : $"您的选择：{profileName}\n{profileDescription}\n\n确定要创建此档案的新模板吗？";
+
+                    MessageBoxResult result = MessageBox.Show(
+                        confirmMessage,
+                        "确认模板档案",
+                        MessageBoxButton.YesNo,
+                        MessageBoxImage.Question);
+
+                    if (result == MessageBoxResult.Yes)
                     {
-                        // 存储选择的样品类型
-                        selectedSampleType = sampleType;
-                        
-                        // 获取样品类型信息用于显示
-                        var sampleTypeInfo = TemplateParameters.GetAllSampleTypes()
-                            .Find(s => s.Type == sampleType);
+                        ShowLoadingOverlay($"正在创建 {profileName} 模板配置页面...");
 
-                        // 切换到涂布类型选择界面
-                        OperationSelectionGrid.Visibility = Visibility.Collapsed;
-                        SampleTypeSelectionGrid.Visibility = Visibility.Collapsed;
-                        CoatingTypeSelectionGrid.Visibility = Visibility.Visible;
-                        TemplateListGrid.Visibility = Visibility.Collapsed;
+                        try
+                        {
+                            // 异步创建模板配置页面
+                            Task.Run(() => Task.Delay(500).Wait()).Wait();
 
-                        // 显示选择的样品类型
-                        SelectedSampleTypeText.Text = sampleTypeInfo?.DisplayName ?? sampleType.ToString();
-
-                        // 更新标题和提示
-                        TitleText.Text = "选择涂布类型";
-                        SubtitleText.Text = "请选择您的涂布工艺类型";
-                        FooterText.Text = "双涂布模式将自动添加胶点检测步骤，以确保检测结果的准确性";
-
-                        // 更新智能返回按钮
-                        UpdateSmartBackButton();
-
-                        // 记录日志
-                        LogManager.Info($"已选择样品类型: {sampleTypeInfo?.DisplayName}，正在选择涂布类型");
-                    }
-                    else
-                    {
-                        MessageBox.Show($"无效的样品类型: {sampleTypeStr}", "错误", 
-                            MessageBoxButton.OK, MessageBoxImage.Error);
+                            Application.Current.Dispatcher.Invoke(() =>
+                            {
+                                var mainWindow = (MainWindow)Application.Current.MainWindow;
+                                var templateConfigPage = mainWindow.CreateTemplateConfigPage(selectedProfileId);
+                                mainWindow.ContentC.Content = mainWindow.frame_TemplateConfigPage;
+                                LogManager.Info($"开始配置新模板 - 模板档案: {profileName}");
+                            });
+                        }
+                        finally
+                        {
+                            HideLoadingOverlay();
+                        }
                     }
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"选择样品类型时出错: {ex.Message}", "错误", 
+                MessageBox.Show($"选择模板档案时出错: {ex.Message}", "错误", 
                     MessageBoxButton.OK, MessageBoxImage.Error);
-                LogManager.Info($"选择样品类型失败: {ex.Message}");
+                LogManager.Info($"选择模板档案失败: {ex.Message}");
             }
         }
 
@@ -513,32 +551,19 @@ namespace WpfApp2.UI
                         };
                         templateItem.Children.Add(nameText);
 
-                        // 添加样品类型信息
-                        var sampleTypeInfo = TemplateParameters.GetAllSampleTypes()
-                            .Find(s => s.Type == template.SampleType);
-                        TextBlock sampleTypeText = new TextBlock
+                        // 添加模板档案信息
+                        var profile = TemplateHierarchyConfig.Instance.ResolveProfile(template.ProfileId);
+                        var profileDisplayName = profile?.DisplayName ?? template.ProfileId ?? "Unknown";
+                        TextBlock profileText = new TextBlock
                         {
-                            Text = $"类型: {sampleTypeInfo?.DisplayName ?? "未知"}",
+                            Text = $"档案: {profileDisplayName}",
                             FontSize = 12,
                             Foreground = new SolidColorBrush(Colors.Blue),
-                            Margin = new Thickness(0, 5, 0, 2),
+                            Margin = new Thickness(0, 5, 0, 5),
                             HorizontalAlignment = HorizontalAlignment.Center,
                             TextAlignment = TextAlignment.Center
                         };
-                        templateItem.Children.Add(sampleTypeText);
-
-                        // 添加涂布类型信息
-                        string coatingTypeDisplay = template.CoatingType == CoatingType.Single ? "单涂布" : "双涂布";
-                        TextBlock coatingTypeText = new TextBlock
-                        {
-                            Text = $"涂布: {coatingTypeDisplay}",
-                            FontSize = 12,
-                            Foreground = new SolidColorBrush(template.CoatingType == CoatingType.Double ? Colors.Orange : Colors.Green),
-                            Margin = new Thickness(0, 2, 0, 5),
-                            HorizontalAlignment = HorizontalAlignment.Center,
-                            TextAlignment = TextAlignment.Center
-                        };
-                        templateItem.Children.Add(coatingTypeText);
+                        templateItem.Children.Add(profileText);
 
                         // 添加最后修改时间
                         TextBlock timeText = new TextBlock
@@ -679,7 +704,7 @@ namespace WpfApp2.UI
                         TrySyncCameraParametersToTemplate(mainWindow, templateFilePath);
                         
                         // 使用MainWindow的方法创建对应样品类型和涂布类型的模板配置页面
-                        var templateConfigPage = mainWindow.CreateTemplateConfigPage(template.SampleType, template.CoatingType);
+                        var templateConfigPage = mainWindow.CreateTemplateConfigPage(template.ProfileId);
 
                         // 切换到模板配置页面（使用Frame而不是直接的Page）
                         mainWindow.ContentC.Content = mainWindow.frame_TemplateConfigPage;
@@ -698,11 +723,10 @@ namespace WpfApp2.UI
                         TemplateListGrid.Visibility = Visibility.Collapsed;
 
                         // 记录日志
-                        var sampleTypeInfo = TemplateParameters.GetAllSampleTypes()
-                            .Find(s => s.Type == template.SampleType);
-                        string coatingTypeDisplay = template.CoatingType == CoatingType.Single ? "单涂布" : "双涂布";
+                        var profile = TemplateHierarchyConfig.Instance.ResolveProfile(template.ProfileId);
+                        var profileDisplayName = profile?.DisplayName ?? template.ProfileId ?? "Unknown";
                         LogManager.Info(
-                            $"已加载模板: {template.TemplateName} (类型: {sampleTypeInfo?.DisplayName}, 涂布: {coatingTypeDisplay})");
+                            $"已加载模板: {template.TemplateName} (档案: {profileDisplayName})");
                     });
 
                     // 短暂延迟后隐藏加载弹窗
@@ -795,136 +819,6 @@ namespace WpfApp2.UI
 
         #endregion
 
-        #region 涂布类型选择相关方法
-
-        /// <summary>
-        /// 涂布类型卡片鼠标悬停效果
-        /// </summary>
-        private void CoatingTypeCard_MouseEnter(object sender, System.Windows.Input.MouseEventArgs e)
-        {
-            if (sender is Border border)
-            {
-                // 添加悬停效果 - 轻微放大和阴影
-                border.RenderTransform = new ScaleTransform(1.05, 1.05);
-                border.RenderTransformOrigin = new Point(0.5, 0.5);
-                
-                // 添加阴影效果
-                border.Effect = new System.Windows.Media.Effects.DropShadowEffect
-                {
-                    Color = Colors.Gray,
-                    BlurRadius = 15,
-                    ShadowDepth = 8,
-                    Opacity = 0.4
-                };
-            }
-        }
-
-        /// <summary>
-        /// 涂布类型卡片鼠标离开效果
-        /// </summary>
-        private void CoatingTypeCard_MouseLeave(object sender, System.Windows.Input.MouseEventArgs e)
-        {
-            if (sender is Border border)
-            {
-                // 恢复原始大小
-                border.RenderTransform = new ScaleTransform(1.0, 1.0);
-                
-                // 移除阴影效果
-                border.Effect = null;
-            }
-        }
-
-        /// <summary>
-        /// 涂布类型选择事件处理
-        /// </summary>
-        private async void SelectCoatingType_Click(object sender, RoutedEventArgs e)
-        {
-            try
-            {
-                if (sender is Button button && button.Tag != null)
-                {
-                    string coatingTypeStr = button.Tag.ToString();
-                    
-                    // 解析涂布类型
-                    if (Enum.TryParse<CoatingType>(coatingTypeStr, out CoatingType coatingType))
-                    {
-                        // 存储选择的涂布类型
-                        selectedCoatingType = coatingType;
-                        
-                        // 获取样品类型信息
-                        var sampleTypeInfo = TemplateParameters.GetAllSampleTypes()
-                            .Find(s => s.Type == selectedSampleType);
-
-                        string coatingTypeDisplayName = coatingType == CoatingType.Single ? "单涂布" : "双涂布";
-
-                        // 显示确认对话框
-                        MessageBoxResult result = MessageBox.Show(
-                            $"您的选择：\n" +
-                            $"样品类型：{sampleTypeInfo?.DisplayName}\n" +
-                            $"涂布类型：{coatingTypeDisplayName}\n\n" +
-                            $"确定要创建此配置的新模板吗？",
-                            "确认模板配置",
-                            MessageBoxButton.YesNo,
-                            MessageBoxImage.Question);
-
-                        if (result == MessageBoxResult.Yes)
-                        {
-                            // 显示加载弹窗
-                            ShowLoadingOverlay($"正在创建 {sampleTypeInfo?.DisplayName} {coatingTypeDisplayName} 模板配置页面...");
-
-                            try
-                            {
-                                // 异步创建模板配置页面
-                                await Task.Run(() =>
-                                {
-                                    // 模拟一些初始化时间，让用户看到加载动画
-                                    Task.Delay(500).Wait();
-                                });
-
-                                // 在UI线程中执行页面创建和导航
-                                await Application.Current.Dispatcher.InvokeAsync(() =>
-                                {
-                                    // 获取MainWindow实例
-                                    var mainWindow = (MainWindow)Application.Current.MainWindow;
-                                    
-                                    // 使用MainWindow的方法创建带样品类型和涂布类型的模板配置页面
-                                    var templateConfigPage = mainWindow.CreateTemplateConfigPage(selectedSampleType, selectedCoatingType);
-                                    
-                                    // 导航到模板配置页面（使用Frame而不是直接的Page）
-                                    mainWindow.ContentC.Content = mainWindow.frame_TemplateConfigPage;
-
-                                    // 记录日志
-                                    LogManager.Info($"开始配置新模板 - 样品类型: {sampleTypeInfo?.DisplayName}, 涂布类型: {coatingTypeDisplayName}");
-                                });
-
-                                // 短暂延迟后隐藏加载弹窗，确保页面完全加载
-                                await Task.Delay(200);
-                            }
-                            catch (Exception _)
-                            {
-                                // 出错时隐藏加载弹窗
-                                HideLoadingOverlay();
-                                throw; // 重新抛出异常以便外层处理
-                            }
-                        }
-                    }
-                    else
-                    {
-                        MessageBox.Show($"无效的涂布类型: {coatingTypeStr}", "错误", 
-                            MessageBoxButton.OK, MessageBoxImage.Error);
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                // 确保出错时隐藏加载弹窗
-                HideLoadingOverlay();
-                MessageBox.Show($"选择涂布类型时出错: {ex.Message}", "错误", 
-                    MessageBoxButton.OK, MessageBoxImage.Error);
-                LogManager.Info($"选择涂布类型失败: {ex.Message}");
-            }
-        }
-
         /// <summary>
         /// 在切换至模板配置页面前尝试将当前相机参数写入目标模板，避免未应用的调整丢失。
         /// </summary>
@@ -949,7 +843,5 @@ namespace WpfApp2.UI
                 }
             }
         }
-
-        #endregion
     }
 }

@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using GlueInspect.Algorithm.Contracts;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace WpfApp2.Models
 {
@@ -14,7 +15,8 @@ namespace WpfApp2.Models
     public enum SampleType
     {
         MESA = 0,           // 抛光，内部凹陷
-        Other = 2           // 其他类型(原正常磨砂)
+        Other = 2,          // 其他类型(原正常磨砂)
+        Demo = 3            // 示例项目（统一框架验证）
     }
 
     /// <summary>
@@ -59,7 +61,10 @@ namespace WpfApp2.Models
         ScratchDetection,  // 划痕检测
         DeepDamageDetection, // 深度破损检测
         ThreeDConfiguration, // 3D配置
-        TemplateName       // 模板命名
+        TemplateName,      // 模板命名
+        DemoSetup,         // 示例：基础参数
+        DemoCalculation,   // 示例：计算参数
+        DemoSummary        // 示例：输出汇总
     }
 
     /// <summary>
@@ -70,6 +75,57 @@ namespace WpfApp2.Models
         public SampleType Type { get; set; }
         public string DisplayName { get; set; }
         public string Description { get; set; }
+    }
+
+    public static class StepTypeLegacyMap
+    {
+        public static bool TryParse(string raw, out StepType stepType)
+        {
+            return Enum.TryParse(raw, true, out stepType);
+        }
+    }
+
+    public sealed class StepTypeDictionaryConverter : JsonConverter<Dictionary<StepType, Dictionary<string, string>>>
+    {
+        public override Dictionary<StepType, Dictionary<string, string>> ReadJson(
+            JsonReader reader,
+            Type objectType,
+            Dictionary<StepType, Dictionary<string, string>> existingValue,
+            bool hasExistingValue,
+            JsonSerializer serializer)
+        {
+            var obj = JObject.Load(reader);
+            var result = new Dictionary<StepType, Dictionary<string, string>>();
+
+            foreach (var property in obj.Properties())
+            {
+                if (!StepTypeLegacyMap.TryParse(property.Name, out var stepType))
+                {
+                    continue;
+                }
+
+                var parameters = property.Value.ToObject<Dictionary<string, string>>(serializer)
+                                 ?? new Dictionary<string, string>();
+                result[stepType] = parameters;
+            }
+
+            return result;
+        }
+
+        public override void WriteJson(JsonWriter writer, Dictionary<StepType, Dictionary<string, string>> value, JsonSerializer serializer)
+        {
+            writer.WriteStartObject();
+            if (value != null)
+            {
+                foreach (var kvp in value)
+                {
+                    writer.WritePropertyName(kvp.Key.ToString());
+                    serializer.Serialize(writer, kvp.Value);
+                }
+            }
+
+            writer.WriteEndObject();
+        }
     }
 
     /// <summary>
@@ -220,16 +276,24 @@ namespace WpfApp2.Models
     public class TemplateParameters
     {
         /// <summary>
-        /// 样品类型
+        /// 模板配置档案ID（用于全局分级定义）
+        /// </summary>
+        public string ProfileId { get; set; } = string.Empty;
+
+        /// <summary>
+        /// 样品类型（项目特异）
         /// </summary>
         public SampleType SampleType { get; set; } = SampleType.Other;
 
+
         /// <summary>
-        /// 涂布类型
+        /// 涂布类型（项目特异）
         /// </summary>
         public CoatingType CoatingType { get; set; } = CoatingType.Single;
 
+
         // 存储每个步骤的输入参数，Key为步骤类型(StepType)，Value为该步骤的所有参数
+        [JsonConverter(typeof(StepTypeDictionaryConverter))]
         public Dictionary<StepType, Dictionary<string, string>> InputParameters { get; set; } = new Dictionary<StepType, Dictionary<string, string>>();
 
         // 相机参数配置
@@ -276,7 +340,17 @@ namespace WpfApp2.Models
                 throw new FileNotFoundException($"找不到模板文件: {filePath}");
 
             string json = File.ReadAllText(filePath);
-            var template = JsonConvert.DeserializeObject<TemplateParameters>(json);
+            TemplateParameters template;
+            var sanitized = SanitizeInvalidJsonEscapes(json);
+            if (!string.Equals(json, sanitized, StringComparison.Ordinal))
+            {
+                template = JsonConvert.DeserializeObject<TemplateParameters>(sanitized);
+                File.WriteAllText(filePath, sanitized);
+            }
+            else
+            {
+                template = JsonConvert.DeserializeObject<TemplateParameters>(json);
+            }
             
             // 确保相机参数不为null（兼容旧版本模板文件）
             if (template.CameraParams == null)
@@ -307,8 +381,99 @@ namespace WpfApp2.Models
             {
                 template.AlgorithmEngineId = AlgorithmEngineIds.OpenCvOnnx;
             }
+
+            if (string.IsNullOrWhiteSpace(template.ProfileId))
+            {
+                template.ProfileId = TemplateHierarchyConfig.Instance.ResolveProfileId(template.SampleType, template.CoatingType);
+            }
+
+            // 兼容旧模板字段已由默认序列化完成
             
             return template;
+        }
+
+        private static string SanitizeInvalidJsonEscapes(string json)
+        {
+            if (string.IsNullOrEmpty(json))
+            {
+                return json;
+            }
+
+            var sb = new StringBuilder(json.Length + 16);
+            bool inString = false;
+
+            for (int i = 0; i < json.Length; i++)
+            {
+                char ch = json[i];
+
+                if (!inString)
+                {
+                    if (ch == '"')
+                    {
+                        inString = true;
+                    }
+
+                    sb.Append(ch);
+                    continue;
+                }
+
+                if (ch == '\\')
+                {
+                    if (i + 1 >= json.Length)
+                    {
+                        sb.Append("\\\\");
+                        continue;
+                    }
+
+                    char next = json[i + 1];
+                    if (next == 'u' &&
+                        i + 5 < json.Length &&
+                        IsHex(json[i + 2]) &&
+                        IsHex(json[i + 3]) &&
+                        IsHex(json[i + 4]) &&
+                        IsHex(json[i + 5]))
+                    {
+                        sb.Append("\\u");
+                        sb.Append(json[i + 2]);
+                        sb.Append(json[i + 3]);
+                        sb.Append(json[i + 4]);
+                        sb.Append(json[i + 5]);
+                        i += 5;
+                        continue;
+                    }
+
+                    if (next == '"' || next == '\\' || next == '/' ||
+                        next == 'b' || next == 'f' || next == 'n' ||
+                        next == 'r' || next == 't')
+                    {
+                        sb.Append('\\');
+                        sb.Append(next);
+                        i++;
+                        continue;
+                    }
+
+                    sb.Append("\\\\");
+                    continue;
+                }
+
+                if (ch == '"')
+                {
+                    inString = false;
+                    sb.Append(ch);
+                    continue;
+                }
+
+                sb.Append(ch);
+            }
+
+            return sb.ToString();
+        }
+
+        private static bool IsHex(char value)
+        {
+            return (value >= '0' && value <= '9') ||
+                   (value >= 'a' && value <= 'f') ||
+                   (value >= 'A' && value <= 'F');
         }
 
 
@@ -363,6 +528,12 @@ namespace WpfApp2.Models
                     Type = SampleType.Other,
                     DisplayName = "其他",
                     Description = "除了MESA，抛光和平片都选这类，区别在于相机（光源）参数配置"
+                },
+                new SampleTypeInfo
+                {
+                    Type = SampleType.Demo,
+                    DisplayName = "示例",
+                    Description = "统一框架演示：最小配置步骤与输出显示"
                 }
             };
         }

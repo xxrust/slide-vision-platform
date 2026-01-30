@@ -7310,8 +7310,11 @@ namespace WpfApp2.UI
             var template = TryLoadCurrentTemplateParameters();
             if (template != null)
             {
-                input.SampleType = template.SampleType.ToString();
-                input.CoatingType = template.CoatingType.ToString();
+                var profile = TemplateHierarchyConfig.Instance.ResolveProfile(template.ProfileId);
+                input.Parameters["TemplateProfileId"] = template.ProfileId ?? string.Empty;
+                input.Parameters["TemplateProfileName"] = profile?.DisplayName ?? template.ProfileId ?? string.Empty;
+                input.Parameters["SampleType"] = template.SampleType.ToString();
+                input.Parameters["CoatingType"] = template.CoatingType.ToString();
                 PopulateAlgorithmInputParameters(input, template);
             }
 
@@ -7524,13 +7527,65 @@ namespace WpfApp2.UI
                 }
             }
 
+            var engineMeasurements = result?.Measurements ?? new List<AlgorithmMeasurement>();
+
             if (placeholderMeasurements.Count > 0)
             {
-                normalized.Measurements.AddRange(placeholderMeasurements);
+                var merged = new List<AlgorithmMeasurement>(placeholderMeasurements.Count);
+                var engineMap = new Dictionary<string, AlgorithmMeasurement>(StringComparer.OrdinalIgnoreCase);
+
+                foreach (var measurement in engineMeasurements)
+                {
+                    if (!string.IsNullOrWhiteSpace(measurement?.Name))
+                    {
+                        engineMap[measurement.Name] = measurement;
+                    }
+                }
+
+                foreach (var measurement in placeholderMeasurements)
+                {
+                    if (measurement == null)
+                    {
+                        continue;
+                    }
+
+                    if (engineMap.TryGetValue(measurement.Name, out var actual))
+                    {
+                        measurement.Value = actual.Value;
+                        measurement.ValueText = string.IsNullOrWhiteSpace(actual.ValueText)
+                            ? actual.Value.ToString("F3")
+                            : actual.ValueText;
+                        measurement.HasValidData = actual.HasValidData;
+                        if (actual.LowerLimit != double.MinValue || actual.UpperLimit != double.MaxValue)
+                        {
+                            measurement.LowerLimit = actual.LowerLimit;
+                            measurement.UpperLimit = actual.UpperLimit;
+                        }
+                        measurement.IsOutOfRange = actual.IsOutOfRange;
+                        measurement.Is3DItem = actual.Is3DItem;
+                    }
+
+                    merged.Add(measurement);
+                }
+
+                foreach (var measurement in engineMeasurements)
+                {
+                    if (measurement == null || string.IsNullOrWhiteSpace(measurement.Name))
+                    {
+                        continue;
+                    }
+
+                    if (!merged.Any(item => string.Equals(item.Name, measurement.Name, StringComparison.OrdinalIgnoreCase)))
+                    {
+                        merged.Add(measurement);
+                    }
+                }
+
+                normalized.Measurements.AddRange(merged);
             }
-            else if (result?.Measurements != null && result.Measurements.Count > 0)
+            else if (engineMeasurements.Count > 0)
             {
-                normalized.Measurements.AddRange(result.Measurements);
+                normalized.Measurements.AddRange(engineMeasurements);
             }
 
             return normalized;
@@ -7544,7 +7599,7 @@ namespace WpfApp2.UI
                 return measurements;
             }
 
-            var stepConfigurations = ModuleRegistry.GetStepConfigurations(template.SampleType, template.CoatingType);
+            var stepConfigurations = ModuleRegistry.GetStepConfigurations(template.ProfileId);
             int toolIndex = 1;
 
             foreach (var stepConfig in stepConfigurations)

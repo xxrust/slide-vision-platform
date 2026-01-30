@@ -1,0 +1,60 @@
+{
+  "Version": 1,
+  "DefaultProfileId": "profile-standard",
+  "Profiles": [
+    {
+      "Id": "profile-basic",
+      "DisplayName": "Basic Template",
+      "Description": "Minimal configuration flow for quick verification.",
+      "Steps": [
+        "ImageSelection",
+        "DemoSetup",
+        "DemoSummary",
+        "TemplateName"
+      ],
+      "GlobalVariables": {
+        "PROFILE": "basic",
+        "PIPELINE": "quick"
+      },
+      "DefaultTemplateName": "Template-Basic",
+      "MeasurementOutputCount": 1
+    },
+    {
+      "Id": "profile-standard",
+      "DisplayName": "Standard Template",
+      "Description": "Standard configuration with calculation stage.",
+      "Steps": [
+        "ImageSelection",
+        "DemoSetup",
+        "DemoCalculation",
+        "DemoSummary",
+        "TemplateName"
+      ],
+      "GlobalVariables": {
+        "PROFILE": "standard",
+        "PIPELINE": "default"
+      },
+      "DefaultTemplateName": "Template-Standard",
+      "MeasurementOutputCount": 1
+    },
+    {
+      "Id": "profile-3d",
+      "DisplayName": "3D Template",
+      "Description": "Standard configuration with 3D setup enabled.",
+      "Steps": [
+        "ImageSelection",
+        "DemoSetup",
+        "DemoCalculation",
+        "ThreeDConfiguration",
+        "DemoSummary",
+        "TemplateName"
+      ],
+      "GlobalVariables": {
+        "PROFILE": "3d",
+        "PIPELINE": "extended"
+      },
+      "DefaultTemplateName": "Template-3D",
+      "MeasurementOutputCount": 1
+    }
+  ]
+}

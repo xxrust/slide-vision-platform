@@ -1,0 +1,21 @@
+# Visual Studio / IDE
+.vs/
+.vscode/
+.idea/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Build output
+**/bin/
+**/obj/
+TestResults/
+
+# Logs and caches
+*.log
+*.cache
+*.db
+*.db-shm
+*.db-wal
+*.vsidx

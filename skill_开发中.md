@@ -12,7 +12,7 @@
 仅在用户明确要求“基于该框架进行工业项目集成”并要求“生成/更新 skill”时使用。
 
 ## 必要输入
-- 项目元信息：样品类型、涂布类型、步骤清单、缺陷分类
+- 项目元信息：模板档案分级（profiles）、步骤清单、缺陷分类
 - 算法路线：插件模式（Platform/）或 WPF 引擎（PlatformHost.Wpf/Algorithms）
 - 参数规格：参数名、单位、范围、默认值、换算规则
 - 输出规格：指标名、上下限、OK/NG 判定逻辑、缺陷命名
@@ -36,6 +36,7 @@
 - 通用相机配置文件: `PlatformHost.Wpf/Config/GenericCameraProfiles.json`
 - 图像渲染器: `PlatformHost.Wpf/Rendering/`（项目级选择，Renderer.json）
 - 图像查看器: `PlatformHost.Wpf/UI/Controls/ImageInspectionViewer.*`（缩放/平移/坐标RGB/像素级显示）
+- 示例档案: `PlatformHost.Wpf/Config/TemplateHierarchy.json`（profile-basic 用于框架验证）
 - UI 流程: `PlatformHost.Wpf/UI/`
 - 模板目录: `PlatformHost.Wpf/Templates/`（运行时生成）
 - 配置目录: `PlatformHost.Wpf/Config/`
@@ -84,7 +85,7 @@
 - `PlatformHost.Wpf/UI/Models/ModuleDefinition.cs`
   - 参数换算与映射
 - `PlatformHost.Wpf/UI/Models/Class1.cs`
-  - StepType / SampleType / CoatingType / TemplateParameters
+  - StepType（项目步骤）/ SampleType / CoatingType（legacy）/ TemplateParameters
 
 ### IO/PLC
 - `PlatformHost.Wpf/SMTGPIO/IOManager.cs`
@@ -101,7 +102,7 @@
 - `src/GlueInspect.Platform.Runtime/AlgorithmRegistry.cs`
 
 ## 交付物清单
-- [ ] 新/改 SampleType + CoatingType + StepType
+- [ ] 新/改 TemplateHierarchy.json（profiles）+ StepType
 - [ ] ModuleRegistry 步骤映射（输入/输出/动作）
 - [ ] 模板 JSON（每个产线模板）
 - [ ] 算法引擎或插件实现 + 注册
@@ -116,6 +117,41 @@
 4) 硬件型号与 IO/PLC 映射？
 5) 性能与验收约束？
 6) 模板 JSON 由谁维护？
+
+## 模板分级（全局定义）
+- 文件：`PlatformHost.Wpf/Config/TemplateHierarchy.json`
+- 目的：把“模板分级/档案”集中在一个文件内维护，模板只记录 ProfileId。
+- 约定：项目特异步骤直接使用业务名，平台通用步骤保持通用命名。
+- profile 字段要点：
+  - Id: 全局唯一档案ID（字符串）
+  - DisplayName/Description: UI显示
+  - Steps: StepType 名称列表（字符串）
+  - GlobalVariables: 写入算法全局变量（键值对）
+  - DefaultTemplateName: 新模板默认名
+  - MeasurementOutputCount: 输出通道数量（影响 out1 读取）
+- LegacyMappings: 默认不在文件中出现，仅在需要兼容旧模板时临时加入。
+- 旧模板兼容：旧步骤名会在加载时自动映射为当前步骤名。
+
+示例（节选）：
+```json
+{
+  "DefaultProfileId": "profile-standard",
+  "Profiles": [
+    {
+      "Id": "profile-basic",
+      "DisplayName": "Basic Template",
+      "Steps": ["ImageSelection", "DemoSetup", "DemoSummary", "TemplateName"],
+      "GlobalVariables": { "PROFILE": "basic" }
+    }
+  ]
+}
+```
+
+## 示例业务（本次自定义）
+- Profile A: profile-basic（最小步骤验证流程）
+- Profile B: profile-standard（增加计算步骤）
+- Profile C: profile-3d（增加 3D 配置步骤）
+- UI 仅展示前 3 个 profile；更多档案请扩展 UI 或复用列表模式。
 
 ## 非目标
 - 不改 UI 结构

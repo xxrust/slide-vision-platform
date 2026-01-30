@@ -79,8 +79,8 @@
                         <TextBlock Grid.Row="2" FontSize="16" HorizontalAlignment="Center"
                                   Foreground="Gray" TextWrapping="Wrap" Margin="20,10"
                                   TextAlignment="Center">
-                            根据不同样品类型创建新的检测模板<LineBreak/>
-                            支持MESA、其他等类型
+                            根据模板档案创建新的检测模板<LineBreak/>
+                            支持多档案配置
                         </TextBlock>
 
                         <!-- 选择按钮 -->
@@ -174,24 +174,25 @@
                 </Border>
             </Grid>
 
-            <!-- 第二阶段：样品类型选择（创建新模板时显示） -->
+            <!-- 第二阶段：模板档案选择（创建新模板时显示） -->
             <Grid x:Name="SampleTypeSelectionGrid" Visibility="Collapsed">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
 
-                <!-- 样品类型选择区域 -->
+                <!-- 模板档案选择区域 -->
                 <Grid Grid.Row="0">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
 
-                    <!-- MESA 样品类型卡片 -->
+                    <!-- 模板档案卡片 1 -->
                     <Border Grid.Column="0" BorderBrush="#FF4A90E2" BorderThickness="2"
                             CornerRadius="15" Margin="20" Background="White"
                             MouseEnter="SampleTypeCard_MouseEnter" MouseLeave="SampleTypeCard_MouseLeave"
-                            Tag="MESA">
+                            Tag="Profile1">
                         <Grid>
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="Auto"/>
@@ -201,29 +202,29 @@
                             </Grid.RowDefinitions>
 
                             <!-- 样品类型名称 -->
-                            <TextBlock Grid.Row="0" Text="MESA" FontSize="32" FontWeight="Bold"
+                            <TextBlock x:Name="ProfileCard1Title" Grid.Row="0" Text="Profile A" FontSize="32" FontWeight="Bold"
                                       HorizontalAlignment="Center" Margin="0,30,0,10"
                                       Foreground="#FF4A90E2"/>
 
                             <!-- 样品特征描述 -->
-                            <TextBlock Grid.Row="1" Text="抛光，内部凹陷" FontSize="18"
+                            <TextBlock x:Name="ProfileCard1Description" Grid.Row="1" Text="Profile description." FontSize="18"
                                       HorizontalAlignment="Center" VerticalAlignment="Center"
                                       Foreground="Gray" TextWrapping="Wrap" Margin="20"/>
 
 
                             <!-- 选择按钮 -->
-                            <Button Grid.Row="3" Content="选择此类型" FontSize="18" FontWeight="Bold"
+                            <Button x:Name="ProfileCard1Button" Grid.Row="3" Content="选择此档案" FontSize="18" FontWeight="Bold"
                                    Height="50" Margin="30,20,30,30"
                                    Background="#FF4A90E2" Foreground="White"
-                                   BorderThickness="0" Click="SelectSampleType_Click" Tag="MESA"/>
+                                   BorderThickness="0" Click="SelectSampleType_Click" Tag="profile-basic"/>
                         </Grid>
                     </Border>
 
-                    <!-- 其他 样品类型卡片 -->
+                    <!-- 模板档案卡片 2 -->
                     <Border Grid.Column="1" BorderBrush="#FFFF9500" BorderThickness="2"
                             CornerRadius="15" Margin="20" Background="White"
                             MouseEnter="SampleTypeCard_MouseEnter" MouseLeave="SampleTypeCard_MouseLeave"
-                            Tag="Other">
+                            Tag="Profile2">
                         <Grid>
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="Auto"/>
@@ -233,55 +234,29 @@
                             </Grid.RowDefinitions>
 
                             <!-- 样品类型名称 -->
-                            <TextBlock Grid.Row="0" Text="其他" FontSize="32" FontWeight="Bold"
+                            <TextBlock x:Name="ProfileCard2Title" Grid.Row="0" Text="Profile B" FontSize="32" FontWeight="Bold"
                                       HorizontalAlignment="Center" Margin="0,30,0,10"
                                       Foreground="#FFFF9500"/>
 
                             <!-- 样品特征描述 -->
-                            <TextBlock Grid.Row="1" Text="除MESA之外" FontSize="18"
+                            <TextBlock x:Name="ProfileCard2Description" Grid.Row="1" Text="Profile description." FontSize="18"
                                       HorizontalAlignment="Center" VerticalAlignment="Center"
                                       Foreground="Gray" TextWrapping="Wrap" Margin="20"/>
 
 
                             <!-- 选择按钮 -->
-                            <Button Grid.Row="3" Content="选择此类型" FontSize="18" FontWeight="Bold"
+                            <Button x:Name="ProfileCard2Button" Grid.Row="3" Content="选择此档案" FontSize="18" FontWeight="Bold"
                                    Height="50" Margin="30,20,30,30"
                                    Background="#FFFF9500" Foreground="White"
-                                   BorderThickness="0" Click="SelectSampleType_Click" Tag="Other"/>
+                                   BorderThickness="0" Click="SelectSampleType_Click" Tag="profile-standard"/>
                         </Grid>
                     </Border>
-                </Grid>
-            </Grid>
 
-            <!-- 第三阶段：涂布类型选择（创建新模板时显示） -->
-            <Grid x:Name="CoatingTypeSelectionGrid" Visibility="Collapsed">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="*"/>
-                </Grid.RowDefinitions>
-
-                <!-- 选择的样品类型显示 -->
-                <Border Grid.Row="0" Background="#FFF8F9FA" BorderBrush="#FFE9ECEF" BorderThickness="1" 
-                        CornerRadius="10" Margin="0,0,0,30" Padding="20">
-                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                        <TextBlock Text="已选择样品类型：" FontSize="18" Foreground="Gray" VerticalAlignment="Center"/>
-                        <TextBlock x:Name="SelectedSampleTypeText" Text="" FontSize="20" FontWeight="Bold" 
-                                  Foreground="#FF4A90E2" Margin="10,0,0,0" VerticalAlignment="Center"/>
-                    </StackPanel>
-                </Border>
-
-                <!-- 涂布类型选择区域 -->
-                <Grid Grid.Row="1">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="*"/>
-                    </Grid.ColumnDefinitions>
-
-                    <!-- 单涂布 类型卡片 -->
-                    <Border Grid.Column="0" BorderBrush="#FF50C878" BorderThickness="3" 
-                            CornerRadius="20" Margin="40" Background="White" 
-                            MouseEnter="CoatingTypeCard_MouseEnter" MouseLeave="CoatingTypeCard_MouseLeave"
-                            Tag="Single">
+                    <!-- 模板档案卡片 3 -->
+                    <Border Grid.Column="2" BorderBrush="#FF6A5ACD" BorderThickness="2"
+                            CornerRadius="15" Margin="20" Background="White"
+                            MouseEnter="SampleTypeCard_MouseEnter" MouseLeave="SampleTypeCard_MouseLeave"
+                            Tag="Profile3">
                         <Grid>
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="Auto"/>
@@ -290,72 +265,21 @@
                                 <RowDefinition Height="Auto"/>
                             </Grid.RowDefinitions>
 
-                            <!-- 图标区域 -->
-                            <Viewbox Grid.Row="0" Width="100" Height="100" Margin="0,40,0,20">
-                                <Canvas Width="24" Height="24">
-                                    <Path Data="M12,2A10,10 0 0,1 22,12A10,10 0 0,1 12,22A10,10 0 0,1 2,12A10,10 0 0,1 12,2M12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20A8,8 0 0,0 20,12A8,8 0 0,0 12,4M12,6A6,6 0 0,1 18,12A6,6 0 0,1 12,18A6,6 0 0,1 6,12A6,6 0 0,1 12,6Z" Fill="#FF50C878"/>
-                                </Canvas>
-                            </Viewbox>
+                            <!-- 档案名称 -->
+                            <TextBlock x:Name="ProfileCard3Title" Grid.Row="0" Text="Profile C" FontSize="32" FontWeight="Bold"
+                                      HorizontalAlignment="Center" Margin="0,30,0,10"
+                                      Foreground="#FF6A5ACD"/>
 
-                            <!-- 涂布类型名称 -->
-                            <TextBlock Grid.Row="1" Text="单涂布" FontSize="36" FontWeight="Bold" 
+                            <!-- 档案描述 -->
+                            <TextBlock x:Name="ProfileCard3Description" Grid.Row="1" Text="Profile description." FontSize="18"
                                       HorizontalAlignment="Center" VerticalAlignment="Center"
-                                      Foreground="#FF50C878" Margin="20"/>
-
-                            <!-- 描述 -->
-                            <TextBlock Grid.Row="2" FontSize="18" HorizontalAlignment="Center" 
-                                      Foreground="Gray" TextWrapping="Wrap" Margin="30,10"
-                                      TextAlignment="Center">
-                                标准单层涂布工艺<LineBreak/>
-                                使用常规检测流程
-                            </TextBlock>
+                                      Foreground="Gray" TextWrapping="Wrap" Margin="20"/>
 
                             <!-- 选择按钮 -->
-                            <Button Grid.Row="3" Content="选择单涂布" FontSize="20" FontWeight="Bold"
-                                   Height="60" Margin="40,30,40,40" 
-                                   Background="#FF50C878" Foreground="White"
-                                   BorderThickness="0" Click="SelectCoatingType_Click" Tag="Single"/>
-                        </Grid>
-                    </Border>
-
-                    <!-- 双涂布 类型卡片 -->
-                    <Border Grid.Column="1" BorderBrush="#FFFF9500" BorderThickness="3" 
-                            CornerRadius="20" Margin="40" Background="White"
-                            MouseEnter="CoatingTypeCard_MouseEnter" MouseLeave="CoatingTypeCard_MouseLeave"
-                            Tag="Double">
-                        <Grid>
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="*"/>
-                                <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="Auto"/>
-                            </Grid.RowDefinitions>
-
-                            <!-- 图标区域 -->
-                            <Viewbox Grid.Row="0" Width="100" Height="100" Margin="0,40,0,20">
-                                <Canvas Width="24" Height="24">
-                                    <Path Data="M12,2A10,10 0 0,1 22,12A10,10 0 0,1 12,22A10,10 0 0,1 2,12A10,10 0 0,1 12,2M12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20A8,8 0 0,0 20,12A8,8 0 0,0 12,4M12,6A6,6 0 0,1 18,12A6,6 0 0,1 12,18A6,6 0 0,1 6,12A6,6 0 0,1 12,6M12,8A4,4 0 0,0 8,12A4,4 0 0,0 12,16A4,4 0 0,0 16,12A4,4 0 0,0 12,8Z" Fill="#FFFF9500"/>
-                                </Canvas>
-                            </Viewbox>
-
-                            <!-- 涂布类型名称 -->
-                            <TextBlock Grid.Row="1" Text="双涂布" FontSize="36" FontWeight="Bold" 
-                                      HorizontalAlignment="Center" VerticalAlignment="Center"
-                                      Foreground="#FFFF9500" Margin="20"/>
-
-                            <!-- 描述 -->
-                            <TextBlock Grid.Row="2" FontSize="18" HorizontalAlignment="Center" 
-                                      Foreground="Gray" TextWrapping="Wrap" Margin="30,10"
-                                      TextAlignment="Center">
-                                双层涂布工艺<LineBreak/>
-                                自动添加胶点检测步骤
-                            </TextBlock>
-
-                            <!-- 选择按钮 -->
-                            <Button Grid.Row="3" Content="选择双涂布" FontSize="20" FontWeight="Bold"
-                                   Height="60" Margin="40,30,40,40" 
-                                   Background="#FFFF9500" Foreground="White"
-                                   BorderThickness="0" Click="SelectCoatingType_Click" Tag="Double"/>
+                            <Button x:Name="ProfileCard3Button" Grid.Row="3" Content="选择此档案" FontSize="18" FontWeight="Bold"
+                                   Height="50" Margin="30,20,30,30"
+                                    Background="#FF6A5ACD" Foreground="White"
+                                   BorderThickness="0" Click="SelectSampleType_Click" Tag="profile-3d"/>
                         </Grid>
                     </Border>
                 </Grid>

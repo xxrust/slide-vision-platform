@@ -14,6 +14,7 @@ namespace WpfApp2.UI.Controls
         private readonly TranslateTransform _translateTransform = new TranslateTransform();
         private readonly TransformGroup _transformGroup = new TransformGroup();
         private Point? _lastDragPoint;
+        private bool _pendingFit;
 
         private BitmapSource _bitmap;
         private byte[] _pixelBuffer;
@@ -31,6 +32,7 @@ namespace WpfApp2.UI.Controls
             ImageCanvas.MouseLeftButtonDown += ImageCanvas_MouseLeftButtonDown;
             ImageCanvas.MouseLeftButtonUp += ImageCanvas_MouseLeftButtonUp;
             ImageCanvas.MouseMove += ImageCanvas_MouseMove;
+            ImageCanvas.SizeChanged += ImageCanvas_SizeChanged;
         }
 
         public void LoadImage(string path)
@@ -56,7 +58,7 @@ namespace WpfApp2.UI.Controls
                 _bitmap.CopyPixels(_pixelBuffer, _stride, 0);
 
                 ImageElement.Source = _bitmap;
-                ResetTransform();
+                _pendingFit = !TryFitToCanvas();
                 UpdateInfoText(null);
             }
             catch
@@ -72,6 +74,7 @@ namespace WpfApp2.UI.Controls
             _stride = 0;
             ImageElement.Source = null;
             ResetTransform();
+            _pendingFit = false;
             InfoTextBlock.Text = "--";
         }
 
@@ -81,6 +84,44 @@ namespace WpfApp2.UI.Controls
             _scaleTransform.ScaleY = 1.0;
             _translateTransform.X = 0;
             _translateTransform.Y = 0;
+        }
+
+        private void ImageCanvas_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            if (_pendingFit)
+            {
+                _pendingFit = !TryFitToCanvas();
+            }
+        }
+
+        private bool TryFitToCanvas()
+        {
+            if (_bitmap == null)
+            {
+                return false;
+            }
+
+            double canvasWidth = ImageCanvas.ActualWidth;
+            double canvasHeight = ImageCanvas.ActualHeight;
+            if (canvasWidth <= 1 || canvasHeight <= 1)
+            {
+                return false;
+            }
+
+            double scaleX = canvasWidth / _bitmap.PixelWidth;
+            double scaleY = canvasHeight / _bitmap.PixelHeight;
+            double scale = Math.Min(scaleX, scaleY);
+
+            if (double.IsInfinity(scale) || scale <= 0)
+            {
+                return false;
+            }
+
+            _scaleTransform.ScaleX = scale;
+            _scaleTransform.ScaleY = scale;
+            _translateTransform.X = (canvasWidth - _bitmap.PixelWidth * scale) / 2.0;
+            _translateTransform.Y = (canvasHeight - _bitmap.PixelHeight * scale) / 2.0;
+            return true;
         }
 
         private void ImageCanvas_MouseWheel(object sender, MouseWheelEventArgs e)

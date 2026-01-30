@@ -72,7 +72,7 @@ namespace WpfApp2.UI.Models
         public RealTimeDataExportMode Mode { get; set; } = RealTimeDataExportMode.Default;
 
         [JsonProperty(Order = 2)]
-        public string ActiveTemplateName { get; set; } = "自定义模板1";
+        public string ActiveTemplateName { get; set; } = "Template-Default";
 
         [JsonProperty(Order = 3)]
         public List<RealTimeDataExportTemplate> Templates { get; set; } = new List<RealTimeDataExportTemplate>();
@@ -173,12 +173,12 @@ namespace WpfApp2.UI.Models
             return new RealTimeDataExportConfig
             {
                 Mode = RealTimeDataExportMode.Default,
-                ActiveTemplateName = "自定义模板1",
+                ActiveTemplateName = "Template-Default",
                 Templates = new List<RealTimeDataExportTemplate>
                 {
                     new RealTimeDataExportTemplate
                     {
-                        Name = "自定义模板1",
+                        Name = "Template-Default",
                         Columns = new List<RealTimeDataExportColumn>
                         {
                             new RealTimeDataExportColumn { Kind = RealTimeDataExportColumnKind.Meta, MetaField = RealTimeDataExportMetaField.ImageNumber },
@@ -214,7 +214,7 @@ namespace WpfApp2.UI.Models
 
             if (string.IsNullOrWhiteSpace(config.ActiveTemplateName))
             {
-                config.ActiveTemplateName = config.Templates.FirstOrDefault()?.Name ?? "自定义模板1";
+                config.ActiveTemplateName = config.Templates.FirstOrDefault()?.Name ?? "Template-Default";
             }
 
             if (config.Templates.Count == 0)

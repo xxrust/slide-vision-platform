@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Media;
@@ -1345,6 +1345,40 @@ namespace WpfApp2.UI.Models
         /// 根据样品类型和涂布类型获取步骤配置列表
         /// </summary>
         public static List<StepConfiguration> GetStepConfigurations(SampleType sampleType, CoatingType coatingType = CoatingType.Single)
+        {
+            var profileId = TemplateHierarchyConfig.Instance.ResolveProfileId(sampleType, coatingType);
+            var configurations = GetStepConfigurations(profileId);
+            if (configurations.Count > 0)
+            {
+                return configurations;
+            }
+
+            return GetLegacyStepConfigurations(sampleType, coatingType);
+        }
+
+        public static List<StepConfiguration> GetStepConfigurations(string profileId)
+        {
+            var profile = TemplateHierarchyConfig.Instance.ResolveProfile(profileId);
+            if (profile == null)
+            {
+                return new List<StepConfiguration>();
+            }
+
+            var configurations = new List<StepConfiguration>();
+            var stepTypes = profile.GetStepTypes();
+            foreach (var stepType in stepTypes)
+            {
+                var module = GetModule(stepType);
+                if (module != null)
+                {
+                    configurations.Add(module.ToStepConfiguration());
+                }
+            }
+
+            return configurations;
+        }
+
+        private static List<StepConfiguration> GetLegacyStepConfigurations(SampleType sampleType, CoatingType coatingType)
         {
             var configurations = new List<StepConfiguration>();
 

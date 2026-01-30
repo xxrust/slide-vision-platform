@@ -71,27 +71,9 @@ namespace WpfApp2
         }
 
         /// <summary>
-        /// 根据样品类型创建或更新模板配置页面
+        /// 根据模板档案创建或更新模板配置页面
         /// </summary>
-        /// <param name="sampleType">样品类型</param>
-        /// <returns>模板配置页面实例</returns>
-        public TemplateConfigPage CreateTemplateConfigPage(SampleType sampleType)
-        {
-            // 清理旧的模板配置页面实例（防止内存泄漏）
-            CleanupOldTemplateConfigPage();
-
-            var templateConfigPage = new TemplateConfigPage(sampleType);
-            frame_TemplateConfigPage = new Frame() { Content = templateConfigPage };
-            return templateConfigPage;
-        }
-
-        /// <summary>
-        /// 根据样品类型和涂布类型创建或更新模板配置页面
-        /// </summary>
-        /// <param name="sampleType">样品类型</param>
-        /// <param name="coatingType">涂布类型</param>
-        /// <returns>模板配置页面实例</returns>
-        public TemplateConfigPage CreateTemplateConfigPage(SampleType sampleType, CoatingType coatingType, string algorithmEngineId = null)
+        public TemplateConfigPage CreateTemplateConfigPage(string profileId, string algorithmEngineId = null)
         {
             // 清理旧的模板配置页面实例（防止内存泄漏）
             CleanupOldTemplateConfigPage();
@@ -99,9 +81,32 @@ namespace WpfApp2
             var preferredEngineId = string.IsNullOrWhiteSpace(algorithmEngineId)
                 ? AlgorithmEngineSettingsManager.PreferredEngineId
                 : algorithmEngineId;
-            var templateConfigPage = new TemplateConfigPage(sampleType, coatingType, preferredEngineId);
+            var templateConfigPage = new TemplateConfigPage(profileId, preferredEngineId);
             frame_TemplateConfigPage = new Frame() { Content = templateConfigPage };
             return templateConfigPage;
+        }
+
+        /// <summary>
+        /// 根据样品类型创建或更新模板配置页面（兼容旧版）
+        /// </summary>
+        /// <param name="sampleType">样品类型</param>
+        /// <returns>模板配置页面实例</returns>
+        public TemplateConfigPage CreateTemplateConfigPage(SampleType sampleType)
+        {
+            var profileId = TemplateHierarchyConfig.Instance.ResolveProfileId(sampleType, CoatingType.Single);
+            return CreateTemplateConfigPage(profileId);
+        }
+
+        /// <summary>
+        /// 根据样品类型和涂布类型创建或更新模板配置页面（兼容旧版）
+        /// </summary>
+        /// <param name="sampleType">样品类型</param>
+        /// <param name="coatingType">涂布类型</param>
+        /// <returns>模板配置页面实例</returns>
+        public TemplateConfigPage CreateTemplateConfigPage(SampleType sampleType, CoatingType coatingType, string algorithmEngineId = null)
+        {
+            var profileId = TemplateHierarchyConfig.Instance.ResolveProfileId(sampleType, coatingType);
+            return CreateTemplateConfigPage(profileId, algorithmEngineId);
         }
 
         /// <summary>
@@ -281,11 +286,11 @@ namespace WpfApp2
                     {
                         try
                         {
-                            // 先读取模板以获取样品类型和涂布类型
+                            // 先读取模板以获取模板档案
                             var template = TemplateParameters.LoadFromFile(templateFilePath);
 
-                            // 根据样品类型和涂布类型创建对应的模板配置页面
-                            var templateConfigPage = CreateTemplateConfigPage(template.SampleType, template.CoatingType, template.AlgorithmEngineId);
+                            // 根据模板档案创建对应的模板配置页面
+                            var templateConfigPage = CreateTemplateConfigPage(template.ProfileId, template.AlgorithmEngineId);
 
                             // 自动加载模板（但不自动执行，避免重复执行）
                             templateConfigPage.LoadTemplate(templateFilePath, autoExecute: false);
@@ -326,16 +331,12 @@ namespace WpfApp2
                                 }
                             }), System.Windows.Threading.DispatcherPriority.Background);
 
-                            // 获取样品类型信息用于显示
-                            var sampleTypeInfo = TemplateParameters.GetAllSampleTypes()
-                                .Find(s => s.Type == template.SampleType);
-
                             // 可选：自动切换到模板配置页面
                             //ContentC.Content = frame_TemplateConfigPage;
 
                             //MessageBox.Show($"已自动加载上次使用的模板:\n" +
                             //              $"模板: {template.TemplateName}\n" +
-                            //              $"类型: {sampleTypeInfo?.DisplayName ?? "未知"}");
+                            //              $"档案: {TemplateHierarchyConfig.Instance.ResolveProfile(template.ProfileId)?.DisplayName ?? "未知"}");
                         }
                         catch (Exception ex)
                         {
@@ -344,14 +345,14 @@ namespace WpfApp2
                     }
                     else{
                         // 模板文件不存在时，创建一个默认的模板配置页面
-                        CreateTemplateConfigPage(SampleType.Other);
+                        CreateTemplateConfigPage(TemplateHierarchyConfig.Instance.DefaultProfileId);
                         LogManager.Info("模板文件不存在，已创建默认配置页面");
                     }
                 }
                 else
                 {
                     // 配置文件不存在时，创建一个默认的模板配置页面
-                    CreateTemplateConfigPage(SampleType.Other);
+                    CreateTemplateConfigPage(TemplateHierarchyConfig.Instance.DefaultProfileId);
                     LogManager.Info("配置文件不存在，已创建默认配置页面");
                 }
             }
@@ -361,7 +362,7 @@ namespace WpfApp2
                 // 出错时也创建一个默认的模板配置页面
                 try
                 {
-                    CreateTemplateConfigPage(SampleType.Other);
+                    CreateTemplateConfigPage(TemplateHierarchyConfig.Instance.DefaultProfileId);
                 }
                 catch (Exception createEx)
                 {

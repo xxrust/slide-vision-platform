@@ -35,21 +35,20 @@ using WpfApp2.Rendering;
 namespace WpfApp2.UI
 {
     /// <summary>
-    /// 步骤配置工厂类，根据样品类型提供对应的配置流程
+    /// 步骤配置工厂类，根据模板档案提供对应的配置流程
     /// </summary>
     public static class StepConfigurationFactory
     {
         /// <summary>
-        /// 根据样品类型获取对应的步骤配置列表
+        /// 根据模板档案获取对应的步骤配置列表
         /// 【重构】- 现在委托给 ModuleRegistry.GetStepConfigurations
         /// </summary>
-        /// <param name="sampleType">样品类型</param>
-        /// <param name="coatingType">涂布类型</param>
+        /// <param name="profileId">模板档案ID</param>
         /// <returns>该类型对应的步骤配置列表</returns>
-        public static List<StepConfiguration> GetStepConfigurations(SampleType sampleType, CoatingType coatingType = CoatingType.Single)
+        public static List<StepConfiguration> GetStepConfigurations(string profileId)
         {
             // 直接使用 ModuleRegistry 获取配置
-            return ModuleRegistry.GetStepConfigurations(sampleType, coatingType);
+            return ModuleRegistry.GetStepConfigurations(profileId);
         }
 
         /// <summary>
@@ -275,9 +274,14 @@ namespace WpfApp2.UI
         private bool? _userDataCleanupChoice = false;
 
         /// <summary>
-        /// 当前样品类型
+        /// 当前模板档案ID
         /// </summary>
-        private SampleType currentSampleType = SampleType.Other;
+        private string currentProfileId = string.Empty;
+
+        /// <summary>
+        /// 当前模板档案定义
+        /// </summary>
+        private TemplateProfileDefinition currentProfileDefinition;
 
         /// <summary>
         /// 当前模板文件路径（用于相机参数等需要精确指向当前模板的场景）
@@ -287,9 +291,9 @@ namespace WpfApp2.UI
         public string CurrentAlgorithmEngineId => AlgorithmEngineSettingsManager.PreferredEngineId;
 
         /// <summary>
-        /// 当前涂布类型
+        /// 当前模板档案测量输出通道数
         /// </summary>
-        private CoatingType currentCoatingType = CoatingType.Single;
+        private int CurrentMeasurementOutputCount => currentProfileDefinition?.MeasurementOutputCount ?? 1;
 
         /// <summary>
         /// 飞拍是否作为BLK图像使用
@@ -610,33 +614,8 @@ namespace WpfApp2.UI
         {
             try
             {
-                // 根据当前样品类型设置TYPE全局变量
-                try
-                {
-                    int typeValue = (int)currentSampleType;
-                    AlgorithmGlobalVariables.Set("TYPE", typeValue.ToString());
-                    LogManager.Info($"设置样品类型全局变量 TYPE = {typeValue} ({currentSampleType})", "模板配置");
-                }
-                catch (Exception ex)
-                {
-                    string errorMsg = $"设置样品类型全局变量失败: {ex.Message}";
-                    LogManager.Error(errorMsg, "模板配置");
-                    MessageBox.Show(errorMsg);
-                }
-
-                // 根据当前涂布类型设置涂布数目全局变量
-                try
-                {
-                    int coatingCount = (int)currentCoatingType;
-                    AlgorithmGlobalVariables.Set("涂布数目", coatingCount.ToString());
-                    LogManager.Info($"设置涂布数目全局变量 涂布数目 = {coatingCount} ({currentCoatingType})", "模板配置");
-                }
-                catch (Exception ex)
-                {
-                    string errorMsg = $"设置涂布数目全局变量失败: {ex.Message}";
-                    LogManager.Error(errorMsg, "全局变量设置");
-                    MessageBox.Show(errorMsg);
-                }
+                // 根据当前模板档案设置全局变量
+                SetProfileGlobalVariables();
 
                 // 设置构建缓存全局变量
                 try
@@ -843,59 +822,62 @@ namespace WpfApp2.UI
         // private string _lastLoadedScratchModelPath = string.Empty;
 
         /// <summary>
-        /// 默认构造函数（使用默认样品类型）
+        /// 默认构造函数（使用默认模板档案）
         /// </summary>
         public TemplateConfigPage()
         {
-            // 使用默认的样品类型初始化
-            InitializeWithSampleType(SampleType.Other);
+            InitializeWithProfile(TemplateHierarchyConfig.Instance.DefaultProfileId);
         }
 
         /// <summary>
-        /// 带样品类型参数的构造函数
+        /// 使用模板档案ID初始化页面
         /// </summary>
-        /// <param name="sampleType">样品类型</param>
+        public TemplateConfigPage(string profileId, string algorithmEngineId = null)
+        {
+            InitializeWithProfile(profileId, algorithmEngineId);
+        }
+
+        /// <summary>
+        /// 兼容旧版：使用样品类型初始化页面
+        /// </summary>
         public TemplateConfigPage(SampleType sampleType)
         {
-            InitializeWithSampleType(sampleType);
+            InitializeWithProfile(TemplateHierarchyConfig.Instance.ResolveProfileId(sampleType, CoatingType.Single));
         }
 
         /// <summary>
-        /// 带样品类型与算法引擎参数的构造函数
+        /// 兼容旧版：使用样品类型与算法引擎初始化页面
         /// </summary>
         public TemplateConfigPage(SampleType sampleType, string algorithmEngineId)
         {
-            InitializeWithSampleType(sampleType, CoatingType.Single, algorithmEngineId);
+            InitializeWithProfile(TemplateHierarchyConfig.Instance.ResolveProfileId(sampleType, CoatingType.Single), algorithmEngineId);
         }
 
         /// <summary>
-        /// 带样品类型和涂布类型参数的构造函数
+        /// 兼容旧版：使用样品类型与涂布类型初始化页面
         /// </summary>
-        /// <param name="sampleType">样品类型</param>
-        /// <param name="coatingType">涂布类型</param>
         public TemplateConfigPage(SampleType sampleType, CoatingType coatingType)
         {
-            InitializeWithSampleType(sampleType, coatingType);
+            InitializeWithProfile(TemplateHierarchyConfig.Instance.ResolveProfileId(sampleType, coatingType));
         }
 
         /// <summary>
-        /// 带样品类型、涂布类型与算法引擎参数的构造函数
+        /// 兼容旧版：使用样品类型、涂布类型与算法引擎初始化页面
         /// </summary>
         public TemplateConfigPage(SampleType sampleType, CoatingType coatingType, string algorithmEngineId)
         {
-            InitializeWithSampleType(sampleType, coatingType, algorithmEngineId);
+            InitializeWithProfile(TemplateHierarchyConfig.Instance.ResolveProfileId(sampleType, coatingType), algorithmEngineId);
         }
 
         /// <summary>
-        /// 使用指定样品类型初始化页面
+        /// 使用指定模板档案初始化页面
         /// </summary>
-        /// <param name="sampleType">样品类型</param>
-        /// <param name="coatingType">涂布类型</param>
-        private void InitializeWithSampleType(SampleType sampleType, CoatingType coatingType = CoatingType.Single, string algorithmEngineId = null)
+        private void InitializeWithProfile(string profileId, string algorithmEngineId = null)
         {
-            // 保存样品类型和涂布类型
-            currentSampleType = sampleType;
-            currentCoatingType = coatingType;
+            currentProfileId = string.IsNullOrWhiteSpace(profileId)
+                ? TemplateHierarchyConfig.Instance.DefaultProfileId
+                : profileId;
+            currentProfileDefinition = TemplateHierarchyConfig.Instance.ResolveProfile(currentProfileId);
 
             var preferredEngineId = AlgorithmEngineSettingsManager.PreferredEngineId;
             currentTemplate.AlgorithmEngineId = preferredEngineId;
@@ -903,8 +885,8 @@ namespace WpfApp2.UI
             // 更新相机选择状态，支持飞拍作为BLK的布局调整
             UpdateCameraSelectionFlags();
 
-            // 初始化步骤配置（基于样品类型和涂布类型）
-            stepConfigurations = InitializeStepConfigurations(sampleType, coatingType);
+            // 初始化步骤配置（基于模板档案）
+            stepConfigurations = InitializeStepConfigurations(currentProfileId);
             ApplyCameraSpecificStepLayout();
 
             // 初始化时标记为已保存状态（新建模板未修改）
@@ -930,15 +912,21 @@ namespace WpfApp2.UI
                 Directory.CreateDirectory(templatesDir);
 
             // 设置当前模板的初始属性
-            currentTemplate.SampleType = sampleType; // 设置样品类型
+            currentTemplate.ProfileId = currentProfileId;
             currentTemplate.CreatedTime = DateTime.Now;
             currentTemplate.LastModifiedTime = DateTime.Now;
+
+            if (string.IsNullOrWhiteSpace(currentTemplate.TemplateName) &&
+                !string.IsNullOrWhiteSpace(currentProfileDefinition?.DefaultTemplateName))
+            {
+                currentTemplate.TemplateName = currentProfileDefinition.DefaultTemplateName;
+            }
 
             // 只在第一次时加载VM解决方案，避免重复加载
             TryAutoLoadVmSolution();
             
-            // 设置样品类型全局变量
-            SetSampleTypeGlobalVariable();
+            // 设置模板档案全局变量
+            SetProfileGlobalVariables();
             
             // 初始化配置页面的DataGrid
             InitializeConfigDataGrid();
@@ -951,9 +939,9 @@ namespace WpfApp2.UI
         }
 
         /// <summary>
-        /// 设置样品类型和涂布类型到VM全局变量
+        /// 设置模板档案相关的全局变量
         /// </summary>
-        private void SetSampleTypeGlobalVariable()
+        private void SetProfileGlobalVariables()
         {
             try
             {
@@ -962,19 +950,15 @@ namespace WpfApp2.UI
                     LogManager.Info("VM未加载，改为写入算法全局变量（OpenCV/ONNX）", "初始化");
                 }
 
-                // 设置样品类型 TYPE
-                int typeValue = (int)currentSampleType;
-                AlgorithmGlobalVariables.Set("TYPE", typeValue.ToString());
-                LogManager.Info($"初始化时设置样品类型全局变量 TYPE = {typeValue} ({currentSampleType})", "初始化");
-
-                // 设置涂布数目
-                int coatingCount = (int)currentCoatingType;
-                AlgorithmGlobalVariables.Set("涂布数目", coatingCount.ToString());
-                LogManager.Info($"初始化时设置涂布数目全局变量 涂布数目 = {coatingCount} ({currentCoatingType})", "初始化");
+                var globals = currentProfileDefinition?.GlobalVariables ?? new Dictionary<string, string>();
+                foreach (var entry in globals)
+                {
+                    AlgorithmGlobalVariables.Set(entry.Key, entry.Value ?? string.Empty);
+                }
             }
             catch (Exception ex)
             {
-                string errorMsg = $"设置样品类型或涂布类型全局变量失败: {ex.Message}";
+                string errorMsg = $"设置模板档案全局变量失败: {ex.Message}";
                 LogManager.Error(errorMsg, "初始化");
                 MessageBox.Show(errorMsg);
             }
@@ -1004,15 +988,12 @@ namespace WpfApp2.UI
         }
 
         /// <summary>
-        /// 根据样品类型初始化步骤配置
+        /// 根据模板档案初始化步骤配置
         /// </summary>
-        /// <param name="sampleType">样品类型</param>
-        /// <param name="coatingType">涂布类型</param>
-        /// <returns>配置好的步骤列表</returns>
-        private List<StepConfiguration> InitializeStepConfigurations(SampleType sampleType, CoatingType coatingType = CoatingType.Single)
+        private List<StepConfiguration> InitializeStepConfigurations(string profileId)
         {
             // 使用 ModuleRegistry 获取配置（新的高内聚方式）
-            var configurations = ModuleRegistry.GetStepConfigurations(sampleType, coatingType);
+            var configurations = ModuleRegistry.GetStepConfigurations(profileId);
             
             // 设置事件处理器（因为工厂中的Handler为null）
             AttachActionHandlers(configurations);
@@ -2977,14 +2958,12 @@ namespace WpfApp2.UI
                 return;
             }
 
-            // 设置样品类型和涂布类型
-            currentTemplate.SampleType = currentSampleType;
-            currentTemplate.CoatingType = currentCoatingType;
+            // 设置模板档案ID
+            currentTemplate.ProfileId = currentProfileId;
             currentTemplate.AlgorithmEngineId = AlgorithmEngineSettingsManager.PreferredEngineId;
             
-            // 记录保存的涂布类型信息
-            string coatingTypeDisplay = currentCoatingType == CoatingType.Single ? "单涂布" : "双涂布";
-            PageManager.Page1Instance?.LogUpdate($"保存模板时设置涂布类型: {coatingTypeDisplay}");
+            var profileDisplayName = currentProfileDefinition?.DisplayName ?? currentProfileId;
+            PageManager.Page1Instance?.LogUpdate($"保存模板时设置模板档案: {profileDisplayName}");
 
             // 设置时间戳
             currentTemplate.LastModifiedTime = DateTime.Now;
@@ -3709,17 +3688,14 @@ namespace WpfApp2.UI
                 currentTemplate = TemplateParameters.LoadFromFile(templateFilePath);
                 currentTemplate.AlgorithmEngineId = AlgorithmEngineSettingsManager.PreferredEngineId;
                 
-                // 更新当前样品类型和涂布类型
-                currentSampleType = currentTemplate.SampleType;
-                currentCoatingType = currentTemplate.CoatingType;
-                
-                // 记录涂布类型加载信息
-                string coatingTypeDisplay = currentCoatingType == CoatingType.Single ? "单涂布" : "双涂布";
-                PageManager.Page1Instance?.LogUpdate($"已加载模板涂布类型: {coatingTypeDisplay} (步骤数: {stepConfigurations.Count} -> 即将重新配置)");
+                currentProfileId = currentTemplate.ProfileId;
+                currentProfileDefinition = TemplateHierarchyConfig.Instance.ResolveProfile(currentProfileId);
+                var profileDisplayName = currentProfileDefinition?.DisplayName ?? currentProfileId;
+                PageManager.Page1Instance?.LogUpdate($"已加载模板档案: {profileDisplayName} (步骤数: {stepConfigurations.Count} -> 即将重新配置)");
                 UpdateCameraSelectionFlags();
                 
-                // 重新初始化步骤配置（根据加载的涂布类型）
-                stepConfigurations = InitializeStepConfigurations(currentSampleType, currentCoatingType);
+                // 重新初始化步骤配置（根据加载的模板档案）
+                stepConfigurations = InitializeStepConfigurations(currentProfileId);
                 ApplyCameraSpecificStepLayout();
                 
                 // 记录重新配置后的步骤信息
@@ -3737,13 +3713,7 @@ namespace WpfApp2.UI
                 // 立即设置全局变量（算法层解耦）
                 try
                 {
-                    int typeValue = (int)currentSampleType;
-                    AlgorithmGlobalVariables.Set("TYPE", typeValue.ToString());
-                    PageManager.Page1Instance?.LogUpdate($"已设置样品类型全局变量 TYPE = {typeValue} ({currentSampleType})");
-
-                    int coatingCount = (int)currentCoatingType;
-                    AlgorithmGlobalVariables.Set("涂布数目", coatingCount.ToString());
-                    PageManager.Page1Instance?.LogUpdate($"已设置涂布数目全局变量 涂布数目 = {coatingCount} ({currentCoatingType})");
+                    SetProfileGlobalVariables();
                 }
                 catch (Exception ex)
                 {
@@ -5551,8 +5521,8 @@ namespace WpfApp2.UI
                     LogMessage($"获取out0输出失败: {ex.Message}", LogLevel.Warning);
                 }
                 
-                // 如果是双涂布模板，还需读取"out1"输出
-                if (currentCoatingType == CoatingType.Double)
+                // 根据档案配置决定是否读取"out1"输出
+                if (CurrentMeasurementOutputCount > 1)
                 {
                     try
                     {
@@ -8478,7 +8448,7 @@ namespace WpfApp2.UI
             try
             {
                 // 获取当前模板名
-                string templateName = "DefaultTemplate";
+                string templateName = currentProfileDefinition?.DefaultTemplateName ?? "Template-Default";
                 if (!string.IsNullOrWhiteSpace(currentTemplate.TemplateName))
                 {
                     templateName = currentTemplate.TemplateName;
@@ -9180,7 +9150,7 @@ namespace WpfApp2.UI
 
                 if (string.IsNullOrWhiteSpace(templateName))
                 {
-                    templateName = "DefaultTemplate";
+                    templateName = currentProfileDefinition?.DefaultTemplateName ?? "Template-Default";
                 }
 
                 // 用户需求：复制“当前加载的路径的3D图片所在路径”（即当前图像组的3D目录）
@@ -9223,8 +9193,8 @@ namespace WpfApp2.UI
             }
             catch
             {
-                templateName = templateName ?? "DefaultTemplate";
-                return Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Templates", "DefaultTemplate", "3D");
+                templateName = templateName ?? currentProfileDefinition?.DefaultTemplateName ?? "Template-Default";
+                return Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Templates", templateName, "3D");
             }
         }
 
@@ -10540,3 +10510,4 @@ namespace WpfApp2.UI
 
 
 }
+
