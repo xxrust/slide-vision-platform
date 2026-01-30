@@ -989,9 +989,9 @@ namespace WpfApp2.UI
                     VmRender1 = VmRender1,
                     VmRender2_1 = VmRender2_1,
                     VmRender2_2 = VmRender2_2,
-                    PreviewImage1 = PreviewImage1,
-                    PreviewImage2_1 = PreviewImage2_1,
-                    PreviewImage2_2 = PreviewImage2_2
+                    PreviewViewer1 = PreviewViewer1,
+                    PreviewViewer2_1 = PreviewViewer2_1,
+                    PreviewViewer2_2 = PreviewViewer2_2
                 };
 
                 _imageRenderer = ImageRendererManager.ResolveRenderer(_imageRendererContext);
@@ -3491,6 +3491,7 @@ namespace WpfApp2.UI
                 SingleImageContainer.Visibility = Visibility.Collapsed;
                 MultiImageContainer.Visibility = Visibility.Visible;
 
+                EnsureCurrentImageGroupFromStep(currentStep);
                 _imageRenderer?.DisplayImageGroup(_currentImageGroup);
 
                 PageManager.Page1Instance?.LogUpdate("已切换到多图像显示模式");
@@ -7645,6 +7646,40 @@ namespace WpfApp2.UI
             return (path1, path2_1, path2_2);
         }
 
+        private void EnsureCurrentImageGroupFromStep(int stepIndex)
+        {
+            if (_currentImageGroup != null && _currentImageGroup.IsValid)
+            {
+                return;
+            }
+
+            var (source1, source2_1, source2_2) = GetImagePathsFromStep(stepIndex);
+
+            if (string.IsNullOrWhiteSpace(source1))
+            {
+                source1 = GetParameterValue(stepIndex, "图片路径", "");
+            }
+
+            if (!string.IsNullOrWhiteSpace(source1) && File.Exists(source1))
+            {
+                if (!string.IsNullOrWhiteSpace(source2_1) && !string.IsNullOrWhiteSpace(source2_2))
+                {
+                    var restoredGroup = BuildImageGroupFromPaths(source1, source2_1, source2_2);
+                    if (restoredGroup != null && restoredGroup.IsValid)
+                    {
+                        _currentImageGroup = restoredGroup;
+                        return;
+                    }
+                }
+
+                var matchedGroup = AutoMatchImageGroup(source1);
+                if (matchedGroup != null && matchedGroup.IsValid)
+                {
+                    _currentImageGroup = matchedGroup;
+                }
+            }
+        }
+
 
         /// <summary>
         /// 浏览图片按钮点击事件（增强版：支持多种图片来源选择）
@@ -7961,7 +7996,7 @@ namespace WpfApp2.UI
                         if (templateImageGroup != null)
                         {
                             _currentImageGroup = templateImageGroup;
-                            inputParameterControls[currentStep]["图片路径"].Text = templateImageGroup.Source1Path;
+                            ApplyImageGroupToInputs(_currentImageGroup);
                             
                             string templateName = !string.IsNullOrWhiteSpace(currentTemplate.TemplateName) ? 
                                 currentTemplate.TemplateName : "当前模板";
@@ -7981,7 +8016,7 @@ namespace WpfApp2.UI
                         {
                             // 如果创建模板文件夹失败，使用原始匹配结果
                             _currentImageGroup = matchedGroup;
-                            inputParameterControls[currentStep]["图片路径"].Text = matchedGroup.Source1Path;
+                            ApplyImageGroupToInputs(_currentImageGroup);
                             
                             MessageBox.Show(
                                 "⚠️ 模板文件夹创建失败，使用原始图片路径\n\n" +
@@ -7995,7 +8030,7 @@ namespace WpfApp2.UI
                     {
                         // 直接使用模板文件夹中的图片
                         _currentImageGroup = matchedGroup;
-                        inputParameterControls[currentStep]["图片路径"].Text = matchedGroup.Source1Path;
+                        ApplyImageGroupToInputs(_currentImageGroup);
                         
                         MessageBox.Show(
                             $"✅ 图片加载完成！\n\n" +
@@ -8128,7 +8163,7 @@ namespace WpfApp2.UI
                             _currentImageGroup = templateImageGroup;
                             
                             // 直接写入新路径
-                            inputParameterControls[currentStep]["图片路径"].Text = templateImageGroup.Source1Path;
+                            ApplyImageGroupToInputs(_currentImageGroup);
                             
                             // 弹窗提示用户图片已复制到模板文件夹
                             string templateName = !string.IsNullOrWhiteSpace(currentTemplate.TemplateName) ? 
@@ -8164,6 +8199,7 @@ namespace WpfApp2.UI
                         }
                         
                         _imageRenderer?.DisplayImageGroup(_currentImageGroup);
+                        SaveStepParameters(currentStep);
                         
                         PageManager.Page1Instance?.LogUpdate($"已加载图片组: {_currentImageGroup.BaseName}");
                     }
@@ -8206,6 +8242,19 @@ namespace WpfApp2.UI
             }
         }
 
+        private void ApplyImageGroupToInputs(ImageGroupSet imageGroup)
+        {
+            if (imageGroup == null)
+            {
+                return;
+            }
+
+            SetImagePath("图片路径", imageGroup.Source1Path);
+            SetImagePath("图像源1路径", imageGroup.Source1Path);
+            SetImagePath("图像源2_1路径", imageGroup.Source2_1Path);
+            SetImagePath("图像源2_2路径", imageGroup.Source2_2Path);
+        }
+
         /// <summary>
         /// 自动匹配图片按钮点击事件
         /// </summary>
@@ -8240,7 +8289,7 @@ namespace WpfApp2.UI
                         _currentImageGroup = templateImageGroup;
                         
                         // 更新用户选择的输入框路径为模板文件夹中图像源1的路径
-                        SetImagePath("图像源1路径", templateImageGroup.Source1Path);
+                        ApplyImageGroupToInputs(_currentImageGroup);
                         
                         // 弹窗提示用户图片已复制到模板文件夹
                         string templateName = !string.IsNullOrWhiteSpace(currentTemplate.TemplateName) ? 
@@ -8262,7 +8311,8 @@ namespace WpfApp2.UI
                     else
                     {
                         // 如果创建模板文件夹失败，使用原始匹配结果
-                        SetImagePath("图像源1路径", matchedGroup.Source1Path);
+                        _currentImageGroup = matchedGroup;
+                        ApplyImageGroupToInputs(_currentImageGroup);
                         
                         MessageBox.Show($"自动匹配成功！\n找到了匹配的图片组: {matchedGroup.BaseName}\n\n⚠️ 模板文件夹创建失败，使用原始路径", "自动匹配", MessageBoxButton.OK, MessageBoxImage.Information);
                         PageManager.Page1Instance?.LogUpdate($"已自动匹配图片组: {matchedGroup.BaseName}");
@@ -8270,6 +8320,7 @@ namespace WpfApp2.UI
 
                     // 保存参数
                     SaveStepParameters(currentStep);
+                    _imageRenderer?.DisplayImageGroup(_currentImageGroup);
                     LogMessage($"自动匹配成功: {matchedGroup.BaseName}", LogLevel.Info);
                 }
                 else

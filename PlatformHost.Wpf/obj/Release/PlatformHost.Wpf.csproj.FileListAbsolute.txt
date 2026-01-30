@@ -189,3 +189,5 @@ E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\PlatformHost.Wpf\
 E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\PlatformHost.Wpf\obj\Release\UI\Controls\GenericCameraConfigControl.baml
 E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\PlatformHost.Wpf\obj\Release\UI\Controls\GenericCameraConfigControl.g.cs
 E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\PlatformHost.Wpf\bin\Release\Config\Renderer.json
+E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\PlatformHost.Wpf\obj\Release\UI\Controls\ImageInspectionViewer.baml
+E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\PlatformHost.Wpf\obj\Release\UI\Controls\ImageInspectionViewer.g.cs

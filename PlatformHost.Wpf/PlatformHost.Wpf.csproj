@@ -371,6 +371,9 @@
     <Compile Include="UI\Controls\SmartAnalysisHelpPage.xaml.cs">
       <DependentUpon>SmartAnalysisHelpPage.xaml</DependentUpon>
     </Compile>
+    <Compile Include="UI\Controls\ImageInspectionViewer.xaml.cs">
+      <DependentUpon>ImageInspectionViewer.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UI\Controls\SmartAnalysisAlertPage.xaml.cs">
       <DependentUpon>SmartAnalysisAlertPage.xaml</DependentUpon>
     </Compile>
@@ -550,6 +553,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="UI\Controls\SmartAnalysisSettingsPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\Controls\ImageInspectionViewer.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

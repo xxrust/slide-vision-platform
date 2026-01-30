@@ -77,6 +77,17 @@
     "TemplateName": {
       "模板名称": "abc",
       "备注": ""
+    },
+    "ImageSelection": {
+      "图片路径": "C:\\Users\\liangyuhang\\Documents\\BLK破损\\图像源1\\a_2674.bmp"
+    },
+    "UpperPinDefect": {
+      "引脚瑕疵面积阈值": "100"
+    },
+    "PKGPointDetection": {
+      "缩小检测范围": "3",
+      "拉胶灰度阈值": "100",
+      "拉胶面积阈值": "100"
     }
   },
   "CameraParams": {
@@ -111,8 +122,8 @@
     "DisplayAxis": true
   },
   "TemplateName": "abc",
-  "AlgorithmEngineId": "OpenCV",
+  "AlgorithmEngineId": "OpenCV+ONNX",
   "Remark": "",
   "CreatedTime": "2026-01-30T01:26:43.9571225+08:00",
-  "LastModifiedTime": "2026-01-30T11:21:14.5764618+08:00"
+  "LastModifiedTime": "2026-01-30T13:24:09.4715278+08:00"
 }

@@ -101,9 +101,9 @@ namespace WpfApp2.Rendering
             _context.VmRender2_1.Visibility = Visibility.Visible;
             _context.VmRender2_2.Visibility = Visibility.Visible;
 
-            if (_context.PreviewImage1 != null) _context.PreviewImage1.Visibility = Visibility.Collapsed;
-            if (_context.PreviewImage2_1 != null) _context.PreviewImage2_1.Visibility = Visibility.Collapsed;
-            if (_context.PreviewImage2_2 != null) _context.PreviewImage2_2.Visibility = Visibility.Collapsed;
+            if (_context.PreviewViewer1 != null) _context.PreviewViewer1.Visibility = Visibility.Collapsed;
+            if (_context.PreviewViewer2_1 != null) _context.PreviewViewer2_1.Visibility = Visibility.Collapsed;
+            if (_context.PreviewViewer2_2 != null) _context.PreviewViewer2_2.Visibility = Visibility.Collapsed;
         }
     }
 }

@@ -35,6 +35,7 @@
 - 通用相机接口: `PlatformHost.Wpf/Hardware/`（GenericCameraManager/Models）
 - 通用相机配置文件: `PlatformHost.Wpf/Config/GenericCameraProfiles.json`
 - 图像渲染器: `PlatformHost.Wpf/Rendering/`（项目级选择，Renderer.json）
+- 图像查看器: `PlatformHost.Wpf/UI/Controls/ImageInspectionViewer.*`（缩放/平移/坐标RGB/像素级显示）
 - UI 流程: `PlatformHost.Wpf/UI/`
 - 模板目录: `PlatformHost.Wpf/Templates/`（运行时生成）
 - 配置目录: `PlatformHost.Wpf/Config/`
@@ -61,6 +62,7 @@
 - `PlatformHost.Wpf/Rendering/ImageRendererManager.cs`
 - `PlatformHost.Wpf/Rendering/VmImageRenderer.cs`
 - `PlatformHost.Wpf/Rendering/FileImageRenderer.cs`
+- `PlatformHost.Wpf/UI/Controls/ImageInspectionViewer.xaml(.cs)`
 - `PlatformHost.Wpf/UI/Models/AlgorithmEngineSettings.cs`
   - PreferredEngineId + AlgorithmEngine.json
 
@@ -125,6 +127,8 @@
 - 验证 TemplateConfigPage + Page1 全流程
 - 确认 AlgorithmEngine.json 生效
 - 参数说明与图片映射正确
+- 图片选择 -> 下一项 -> 返回，图像仍显示
+- 图像窗口可缩放/拖拽，鼠标位置显示坐标与 RGB
 - IO/PLC 实机信号正确
 
 ## 备注

@@ -4,6 +4,7 @@
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
       xmlns:local="clr-namespace:WpfApp2.UI"
+      xmlns:controls="clr-namespace:WpfApp2.UI.Controls"
       xmlns:Release="clr-namespace:VMControls.WPF.Release"
       mc:Ignorable="d" 
       d:DesignHeight="1024" d:DesignWidth="1920"
@@ -137,21 +138,21 @@
                         <GroupBox Grid.Row="0" Grid.Column="0" Header="图像源1" FontSize="14" Foreground="DarkBlue" Margin="2">
                             <Grid>
                                 <Release:VmRenderControl x:Name="VmRender1"/>
-                                <Image x:Name="PreviewImage1" Visibility="Collapsed" Stretch="Uniform"/>
+                                <controls:ImageInspectionViewer x:Name="PreviewViewer1" Visibility="Collapsed"/>
                             </Grid>
                         </GroupBox>
                         
                         <GroupBox Grid.Row="0" Grid.Column="1" Header="图像源2_1" FontSize="14" Foreground="DarkBlue" Margin="2">
                             <Grid>
                                 <Release:VmRenderControl x:Name="VmRender2_1"/>
-                                <Image x:Name="PreviewImage2_1" Visibility="Collapsed" Stretch="Uniform"/>
+                                <controls:ImageInspectionViewer x:Name="PreviewViewer2_1" Visibility="Collapsed"/>
                             </Grid>
                         </GroupBox>
                         
                         <GroupBox Grid.Row="1" Grid.Column="0" Header="图像源2_2" FontSize="14" Foreground="DarkBlue" Margin="2">
                             <Grid>
                                 <Release:VmRenderControl x:Name="VmRender2_2"/>
-                                <Image x:Name="PreviewImage2_2" Visibility="Collapsed" Stretch="Uniform"/>
+                                <controls:ImageInspectionViewer x:Name="PreviewViewer2_2" Visibility="Collapsed"/>
                             </Grid>
                         </GroupBox>
                         

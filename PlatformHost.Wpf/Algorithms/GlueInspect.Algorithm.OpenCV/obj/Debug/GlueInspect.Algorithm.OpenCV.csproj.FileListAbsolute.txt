@@ -11,3 +11,8 @@ E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\PlatformHost.Wpf\
 E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\PlatformHost.Wpf\Algorithms\GlueInspect.Algorithm.OpenCV\obj\Debug\GlueInsp.015B4225.Up2Date
 E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\PlatformHost.Wpf\Algorithms\GlueInspect.Algorithm.OpenCV\obj\Debug\GlueInspect.Algorithm.OpenCV.dll
 E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\PlatformHost.Wpf\Algorithms\GlueInspect.Algorithm.OpenCV\obj\Debug\GlueInspect.Algorithm.OpenCV.pdb
+E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\PlatformHost.Wpf\Algorithms\GlueInspect.Algorithm.OpenCV\bin\Debug\OpenCvSharp.dll
+E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\PlatformHost.Wpf\Algorithms\GlueInspect.Algorithm.OpenCV\bin\Debug\System.Buffers.dll
+E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\PlatformHost.Wpf\Algorithms\GlueInspect.Algorithm.OpenCV\bin\Debug\System.Memory.dll
+E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\PlatformHost.Wpf\Algorithms\GlueInspect.Algorithm.OpenCV\bin\Debug\System.Numerics.Vectors.dll
+E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\PlatformHost.Wpf\Algorithms\GlueInspect.Algorithm.OpenCV\bin\Debug\System.Runtime.CompilerServices.Unsafe.dll
