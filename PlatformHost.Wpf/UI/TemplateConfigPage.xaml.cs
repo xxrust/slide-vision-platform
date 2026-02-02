@@ -1070,13 +1070,31 @@ namespace WpfApp2.UI
                     continue;
                 }
 
+                string defaultKey = GetDefaultRenderKey(config.StepType);
                 config.InputParameters.Add(new ParameterConfig
                 {
                     Name = "渲染图Key",
-                    DefaultValue = string.Empty,
+                    DefaultValue = defaultKey,
                     Type = ParamType.Text,
                     Group = "渲染图"
                 });
+            }
+        }
+
+        private static string GetDefaultRenderKey(StepType stepType)
+        {
+            switch (stepType)
+            {
+                case StepType.ImageSelection:
+                    return "Render.Input";
+                case StepType.DemoSetup:
+                    return "Render.Preprocess";
+                case StepType.DemoCalculation:
+                    return "Render.Edge";
+                case StepType.DemoSummary:
+                    return "Render.Composite";
+                default:
+                    return string.Empty;
             }
         }
 
@@ -1586,9 +1604,18 @@ namespace WpfApp2.UI
 
                 // 3. 算法引擎流程
                 _imageRenderer?.DisplayImageGroup(_currentImageGroup);
-                if (PageManager.Page1Instance != null)
+                var page1Instance = PageManager.Page1Instance;
+                if (page1Instance != null)
                 {
-                    await PageManager.Page1Instance.ExecuteAlgorithmPipelineForImageGroup(_currentImageGroup, isTemplateConfig: true);
+                    try
+                    {
+                        page1Instance.SetTemplateOverride(currentTemplate);
+                        await page1Instance.ExecuteAlgorithmPipelineForImageGroup(_currentImageGroup, isTemplateConfig: true);
+                    }
+                    finally
+                    {
+                        page1Instance.ClearTemplateOverride();
+                    }
                 }
                 RefreshConfigDataGrid();
                 if (currentStep >= 0 && currentStep < stepConfigurations.Count)
@@ -3587,6 +3614,20 @@ namespace WpfApp2.UI
                 }
 
                 var boundKey = GetParameterValueByStepType(stepType, "渲染图Key", string.Empty);
+                if (stepType == StepType.ImageSelection && IsInputRenderKey(boundKey))
+                {
+                    string inputKey = string.IsNullOrWhiteSpace(boundKey) ? "Render.Input" : boundKey;
+                    foreach (var key in BuildRenderKeyCandidates(inputKey))
+                    {
+                        if (result.DebugInfo.TryGetValue(key, out var path) && !string.IsNullOrWhiteSpace(path) && File.Exists(path))
+                        {
+                            return path;
+                        }
+                    }
+
+                    return null;
+                }
+
                 if (!string.IsNullOrWhiteSpace(boundKey))
                 {
                     foreach (var key in BuildRenderKeyCandidates(boundKey))
@@ -3927,6 +3968,16 @@ namespace WpfApp2.UI
             }
 
             candidates.Add(key);
+        }
+
+        private static bool IsInputRenderKey(string key)
+        {
+            if (string.IsNullOrWhiteSpace(key))
+            {
+                return true;
+            }
+
+            return key.IndexOf("input", StringComparison.OrdinalIgnoreCase) >= 0;
         }
 
         // 模块切换相关的模板加载逻辑已移除（由算法中间层处理）

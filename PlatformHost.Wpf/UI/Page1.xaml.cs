@@ -84,6 +84,7 @@ namespace WpfApp2.UI
 
         // 算法引擎结果缓存
         private AlgorithmResult _lastAlgorithmResult;
+        private TemplateParameters _templateOverride;
 
         public event EventHandler<AlgorithmResultEventArgs> AlgorithmResultProduced;
 
@@ -93,6 +94,16 @@ namespace WpfApp2.UI
         public UnifiedDetectionManager DetectionManager => _detectionManager;
 
         public AlgorithmResult LastAlgorithmResult => _lastAlgorithmResult;
+
+        public void SetTemplateOverride(TemplateParameters template)
+        {
+            _templateOverride = template;
+        }
+
+        public void ClearTemplateOverride()
+        {
+            _templateOverride = null;
+        }
 
         /// <summary>
         /// 获取当前主界面表格中的检测项目快照（用于导出配置界面）
@@ -7307,7 +7318,7 @@ namespace WpfApp2.UI
                 ImageNumber = GetCurrentImageNumberForRecord()
             };
 
-            var template = TryLoadCurrentTemplateParameters();
+            var template = _templateOverride ?? TryLoadCurrentTemplateParameters();
             if (template != null)
             {
                 var profile = TemplateHierarchyConfig.Instance.ResolveProfile(template.ProfileId);
@@ -7461,7 +7472,7 @@ namespace WpfApp2.UI
                 }
 
                 var result = await engine.ExecuteAsync(input, CancellationToken.None);
-                var template = TryLoadCurrentTemplateParameters();
+                var template = _templateOverride ?? TryLoadCurrentTemplateParameters();
                 var normalizedResult = NormalizeAlgorithmResult(engine, result, template);
                 _lastAlgorithmResult = normalizedResult;
                 ApplyAlgorithmResultTo2DCache(normalizedResult);

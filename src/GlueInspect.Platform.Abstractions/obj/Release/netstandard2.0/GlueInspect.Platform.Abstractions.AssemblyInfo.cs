@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("GlueInspect.Platform.Abstractions")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Release")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+01212024073eb3e4bcbaa2d389145bd3549c976f")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+d06601c6b84fb97b43d040563e5ecd8d907ccd75")]
 [assembly: System.Reflection.AssemblyProductAttribute("GlueInspect.Platform.Abstractions")]
 [assembly: System.Reflection.AssemblyTitleAttribute("GlueInspect.Platform.Abstractions")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
