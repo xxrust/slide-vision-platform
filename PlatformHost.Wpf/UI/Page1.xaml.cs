@@ -7324,12 +7324,45 @@ namespace WpfApp2.UI
             if (imageGroup != null)
             {
                 int requiredSources = GetRequired2DSourceCount();
+                var sources = ImageSourceNaming.GetActiveImageSources();
+                var displayNames = ImageSourceNaming.GetDisplayNames();
+
+                input.Parameters["ImageSourceCount"] = requiredSources.ToString();
+                for (int i = 0; i < requiredSources; i++)
+                {
+                    string name = i < displayNames.Count ? displayNames[i] : null;
+                    if (!string.IsNullOrWhiteSpace(name))
+                    {
+                        input.Parameters[$"ImageSourceName{i + 1}"] = name;
+                    }
+                }
+
                 for (int i = 0; i < requiredSources; i++)
                 {
                     var sourcePath = imageGroup.GetPath(i);
-                    if (!string.IsNullOrWhiteSpace(sourcePath))
+                    if (string.IsNullOrWhiteSpace(sourcePath))
                     {
-                        input.ImagePaths[$"Source{i + 1}"] = sourcePath;
+                        continue;
+                    }
+
+                    input.ImagePaths[$"Source{i + 1}"] = sourcePath;
+
+                    if (i < sources.Count)
+                    {
+                        var id = sources[i]?.Id;
+                        if (!string.IsNullOrWhiteSpace(id) && !input.ImagePaths.ContainsKey(id))
+                        {
+                            input.ImagePaths[id] = sourcePath;
+                        }
+                    }
+
+                    if (i == 0 && !input.ImagePaths.ContainsKey("Image1"))
+                    {
+                        input.ImagePaths["Image1"] = sourcePath;
+                    }
+                    else if (i == 1 && !input.ImagePaths.ContainsKey("Image2"))
+                    {
+                        input.ImagePaths["Image2"] = sourcePath;
                     }
                 }
 
@@ -7430,6 +7463,7 @@ namespace WpfApp2.UI
                 var result = await engine.ExecuteAsync(input, CancellationToken.None);
                 var template = TryLoadCurrentTemplateParameters();
                 var normalizedResult = NormalizeAlgorithmResult(engine, result, template);
+                _lastAlgorithmResult = normalizedResult;
                 ApplyAlgorithmResultTo2DCache(normalizedResult);
             }
             catch (Exception ex)

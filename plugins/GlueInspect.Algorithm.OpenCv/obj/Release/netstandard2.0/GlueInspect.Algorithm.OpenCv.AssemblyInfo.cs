@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("GlueInspect.Algorithm.OpenCv")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Release")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+b3a1a5d03f00d26dc7ed259bf1d072fe795ee9f9")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+01212024073eb3e4bcbaa2d389145bd3549c976f")]
 [assembly: System.Reflection.AssemblyProductAttribute("GlueInspect.Algorithm.OpenCv")]
 [assembly: System.Reflection.AssemblyTitleAttribute("GlueInspect.Algorithm.OpenCv")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

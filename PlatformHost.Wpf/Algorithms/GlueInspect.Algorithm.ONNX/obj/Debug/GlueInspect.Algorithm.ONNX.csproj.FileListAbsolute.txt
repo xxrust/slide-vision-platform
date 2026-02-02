@@ -10,3 +10,4 @@ E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\PlatformHost.Wpf\
 E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\PlatformHost.Wpf\Algorithms\GlueInspect.Algorithm.ONNX\bin\Debug\System.Memory.dll
 E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\PlatformHost.Wpf\Algorithms\GlueInspect.Algorithm.ONNX\bin\Debug\System.Numerics.Vectors.dll
 E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\PlatformHost.Wpf\Algorithms\GlueInspect.Algorithm.ONNX\bin\Debug\System.Runtime.CompilerServices.Unsafe.dll
+E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\out\GlueInspect.Algorithm.ONNX.dll

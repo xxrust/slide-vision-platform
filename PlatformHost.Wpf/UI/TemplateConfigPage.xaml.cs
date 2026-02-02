@@ -980,6 +980,8 @@ namespace WpfApp2.UI
 
             // 为图片选择步骤补齐动态图片路径参数
             EnsureImageSelectionParameters(configurations);
+            // 为各步骤补齐渲染图绑定参数
+            EnsureRenderBindingParameters(configurations);
 
             // 设置特殊处理器
             foreach (var config in configurations)
@@ -1045,6 +1047,36 @@ namespace WpfApp2.UI
                         Group = string.Empty
                     });
                 }
+            }
+        }
+
+        private void EnsureRenderBindingParameters(List<StepConfiguration> configurations)
+        {
+            if (configurations == null)
+            {
+                return;
+            }
+
+            foreach (var config in configurations)
+            {
+                if (config == null)
+                {
+                    continue;
+                }
+
+                bool exists = config.InputParameters.Any(p => string.Equals(p.Name, "渲染图Key", StringComparison.Ordinal));
+                if (exists)
+                {
+                    continue;
+                }
+
+                config.InputParameters.Add(new ParameterConfig
+                {
+                    Name = "渲染图Key",
+                    DefaultValue = string.Empty,
+                    Type = ParamType.Text,
+                    Group = "渲染图"
+                });
             }
         }
 
@@ -3554,12 +3586,44 @@ namespace WpfApp2.UI
                     return null;
                 }
 
+                var boundKey = GetParameterValueByStepType(stepType, "渲染图Key", string.Empty);
+                if (!string.IsNullOrWhiteSpace(boundKey))
+                {
+                    foreach (var key in BuildRenderKeyCandidates(boundKey))
+                    {
+                        if (result.DebugInfo.TryGetValue(key, out var path) && !string.IsNullOrWhiteSpace(path) && File.Exists(path))
+                        {
+                            return path;
+                        }
+                    }
+                }
+
                 foreach (var key in GetRenderKeyCandidates(stepType))
                 {
                     if (result.DebugInfo.TryGetValue(key, out var path) && !string.IsNullOrWhiteSpace(path) && File.Exists(path))
                     {
                         return path;
                     }
+                }
+
+                foreach (var key in GetFallbackRenderKeys())
+                {
+                    if (result.DebugInfo.TryGetValue(key, out var path) && !string.IsNullOrWhiteSpace(path) && File.Exists(path))
+                    {
+                        return path;
+                    }
+                }
+
+                var scannedPath = ResolveRenderPathByScan(stepType, result.DebugInfo);
+                if (!string.IsNullOrWhiteSpace(scannedPath))
+                {
+                    return scannedPath;
+                }
+
+                var directoryPath = ResolveRenderPathFromDirectory(stepType);
+                if (!string.IsNullOrWhiteSpace(directoryPath))
+                {
+                    return directoryPath;
                 }
             }
             catch
@@ -3570,21 +3634,299 @@ namespace WpfApp2.UI
             return null;
         }
 
+        private string ResolveRenderPathByScan(StepType stepType, IDictionary<string, string> debugInfo)
+        {
+            if (debugInfo == null || debugInfo.Count == 0)
+            {
+                return null;
+            }
+
+            var resolved = new List<(string Key, string Path)>();
+            foreach (var entry in debugInfo)
+            {
+                if (string.IsNullOrWhiteSpace(entry.Value))
+                {
+                    continue;
+                }
+
+                var path = TryResolveRenderFile(entry.Value);
+                if (string.IsNullOrWhiteSpace(path))
+                {
+                    continue;
+                }
+
+                resolved.Add((entry.Key ?? string.Empty, path));
+            }
+
+            if (resolved.Count == 0)
+            {
+                return null;
+            }
+
+            var renderCandidates = resolved
+                .Where(item => item.Key.IndexOf("render", StringComparison.OrdinalIgnoreCase) >= 0)
+                .ToList();
+
+            var candidates = renderCandidates.Count > 0 ? renderCandidates : resolved;
+            var preferredTokens = GetPreferredRenderTokens(stepType);
+            if (preferredTokens.Count == 0)
+            {
+                return candidates[0].Path;
+            }
+
+            var ordered = candidates
+                .OrderBy(item =>
+                {
+                    int best = int.MaxValue;
+                    for (int i = 0; i < preferredTokens.Count; i++)
+                    {
+                        if (item.Key.IndexOf(preferredTokens[i], StringComparison.OrdinalIgnoreCase) >= 0)
+                        {
+                            best = i;
+                            break;
+                        }
+                    }
+
+                    return best;
+                })
+                .ToList();
+
+            return ordered[0].Path;
+        }
+
+        private static List<string> GetPreferredRenderTokens(StepType stepType)
+        {
+            switch (stepType)
+            {
+                case StepType.ImageSelection:
+                    return new List<string> { "input" };
+                case StepType.DemoSetup:
+                    return new List<string> { "preprocess" };
+                case StepType.DemoCalculation:
+                    return new List<string> { "edge" };
+                case StepType.DemoSummary:
+                    return new List<string> { "composite" };
+                default:
+                    return new List<string>();
+            }
+        }
+
+        private static string TryResolveRenderFile(string path)
+        {
+            if (string.IsNullOrWhiteSpace(path))
+            {
+                return null;
+            }
+
+            string trimmed = path.Trim();
+            if (File.Exists(trimmed))
+            {
+                return trimmed;
+            }
+
+            string baseDir = AppDomain.CurrentDomain.BaseDirectory;
+            if (!Path.IsPathRooted(trimmed))
+            {
+                var candidate = Path.Combine(baseDir, trimmed);
+                if (File.Exists(candidate))
+                {
+                    return candidate;
+                }
+
+                candidate = Path.Combine(baseDir, "Render", trimmed);
+                if (File.Exists(candidate))
+                {
+                    return candidate;
+                }
+
+                if (string.IsNullOrWhiteSpace(Path.GetExtension(trimmed)))
+                {
+                    foreach (var ext in new[] { ".png", ".jpg", ".jpeg", ".bmp" })
+                    {
+                        candidate = Path.Combine(baseDir, "Render", trimmed + ext);
+                        if (File.Exists(candidate))
+                        {
+                            return candidate;
+                        }
+                    }
+                }
+            }
+
+            return null;
+        }
+
+        private static string ResolveRenderPathFromDirectory(StepType stepType)
+        {
+            try
+            {
+                string baseDir = AppDomain.CurrentDomain.BaseDirectory;
+                string renderDir = Path.Combine(baseDir, "Render");
+                if (!Directory.Exists(renderDir))
+                {
+                    return null;
+                }
+
+                var patterns = GetRenderDirectoryPatterns(stepType);
+                var files = new List<string>();
+                foreach (var pattern in patterns)
+                {
+                    files.AddRange(Directory.GetFiles(renderDir, pattern + ".*"));
+                    files.AddRange(Directory.GetFiles(renderDir, pattern + "_*.*"));
+                }
+
+                if (files.Count == 0)
+                {
+                    files.AddRange(Directory.GetFiles(renderDir, "*.png"));
+                    files.AddRange(Directory.GetFiles(renderDir, "*.jpg"));
+                    files.AddRange(Directory.GetFiles(renderDir, "*.jpeg"));
+                    files.AddRange(Directory.GetFiles(renderDir, "*.bmp"));
+                }
+
+                if (files.Count == 0)
+                {
+                    return null;
+                }
+
+                var latest = files
+                    .Select(path => new FileInfo(path))
+                    .OrderByDescending(info => info.LastWriteTimeUtc)
+                    .FirstOrDefault();
+
+                return latest?.FullName;
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
+        private static List<string> GetRenderDirectoryPatterns(StepType stepType)
+        {
+            switch (stepType)
+            {
+                case StepType.DemoSetup:
+                    return new List<string> { "preprocess" };
+                case StepType.DemoCalculation:
+                    return new List<string> { "edge" };
+                case StepType.DemoSummary:
+                    return new List<string> { "composite" };
+                default:
+                    return new List<string> { "composite", "edge", "preprocess" };
+            }
+        }
+
         private IEnumerable<string> GetRenderKeyCandidates(StepType stepType)
         {
             switch (stepType)
             {
                 case StepType.ImageSelection:
-                    return new[] { "Result.Render.Input", "Render.Input" };
+                    return new[]
+                    {
+                        "Result.Render.Input",
+                        "Render.Input",
+                        "Result.OpenCV.Render.Input",
+                        "OpenCV.Render.Input",
+                        "Result.ONNX.Render.Input",
+                        "ONNX.Render.Input"
+                    };
                 case StepType.DemoSetup:
-                    return new[] { "Result.Render.Preprocess", "Render.Preprocess" };
+                    return new[]
+                    {
+                        "Result.Render.Preprocess",
+                        "Render.Preprocess",
+                        "Result.OpenCV.Render.Preprocess",
+                        "OpenCV.Render.Preprocess",
+                        "Result.ONNX.Render.Preprocess",
+                        "ONNX.Render.Preprocess"
+                    };
                 case StepType.DemoCalculation:
-                    return new[] { "Result.Render.Edge", "Render.Edge" };
+                    return new[]
+                    {
+                        "Result.Render.Edge",
+                        "Render.Edge",
+                        "Result.OpenCV.Render.Edge",
+                        "OpenCV.Render.Edge",
+                        "Result.ONNX.Render.Edge",
+                        "ONNX.Render.Edge"
+                    };
                 case StepType.DemoSummary:
-                    return new[] { "Result.Render.Composite", "Render.Composite" };
+                    return new[]
+                    {
+                        "Result.Render.Composite",
+                        "Render.Composite",
+                        "Result.OpenCV.Render.Composite",
+                        "OpenCV.Render.Composite",
+                        "Result.ONNX.Render.Composite",
+                        "ONNX.Render.Composite"
+                    };
                 default:
                     return Array.Empty<string>();
             }
+        }
+
+        private IEnumerable<string> GetFallbackRenderKeys()
+        {
+            return new[]
+            {
+                "Result.OpenCV.Render.Composite",
+                "OpenCV.Render.Composite",
+                "Result.Render.Composite",
+                "Render.Composite",
+                "Result.ONNX.Render.Composite",
+                "ONNX.Render.Composite",
+                "Result.OpenCV.Render.Edge",
+                "OpenCV.Render.Edge",
+                "Result.Render.Edge",
+                "Render.Edge",
+                "Result.ONNX.Render.Edge",
+                "ONNX.Render.Edge",
+                "Result.OpenCV.Render.Preprocess",
+                "OpenCV.Render.Preprocess",
+                "Result.Render.Preprocess",
+                "Render.Preprocess",
+                "Result.ONNX.Render.Preprocess",
+                "ONNX.Render.Preprocess",
+                "Result.OpenCV.Render.Input",
+                "OpenCV.Render.Input",
+                "Result.Render.Input",
+                "Render.Input",
+                "Result.ONNX.Render.Input",
+                "ONNX.Render.Input"
+            };
+        }
+
+        private IEnumerable<string> BuildRenderKeyCandidates(string boundKey)
+        {
+            var candidates = new List<string>();
+            if (string.IsNullOrWhiteSpace(boundKey))
+            {
+                return candidates;
+            }
+
+            string normalized = boundKey.Trim();
+            if (!normalized.Contains(".") && !normalized.StartsWith("Render", StringComparison.OrdinalIgnoreCase))
+            {
+                normalized = $"Render.{normalized}";
+            }
+
+            AddKeyCandidate(candidates, normalized);
+            AddKeyCandidate(candidates, $"Result.{normalized}");
+            AddKeyCandidate(candidates, $"OpenCV.{normalized}");
+            AddKeyCandidate(candidates, $"ONNX.{normalized}");
+            AddKeyCandidate(candidates, $"Result.OpenCV.{normalized}");
+            AddKeyCandidate(candidates, $"Result.ONNX.{normalized}");
+
+            return candidates;
+        }
+
+        private static void AddKeyCandidate(ICollection<string> candidates, string key)
+        {
+            if (string.IsNullOrWhiteSpace(key) || candidates.Contains(key))
+            {
+                return;
+            }
+
+            candidates.Add(key);
         }
 
         // 模块切换相关的模板加载逻辑已移除（由算法中间层处理）
@@ -6367,7 +6709,39 @@ namespace WpfApp2.UI
         /// </summary>
         private string[] GetCurrentImagePaths()
         {
+            var preferred = GetImagePathsFromImageSelectionStep();
+            if (HasRequired2DPaths(preferred))
+            {
+                return preferred;
+            }
+
             return GetImagePathsFromStep(currentStep);
+        }
+
+        private string[] GetImagePathsFromImageSelectionStep()
+        {
+            int requiredSources = GetRequired2DSourceCount();
+            if (stepConfigurations == null || stepConfigurations.Count == 0)
+            {
+                return new string[requiredSources];
+            }
+
+            int imageSelectionIndex = -1;
+            for (int i = 0; i < stepConfigurations.Count; i++)
+            {
+                if (stepConfigurations[i]?.StepType == StepType.ImageSelection)
+                {
+                    imageSelectionIndex = i;
+                    break;
+                }
+            }
+
+            if (imageSelectionIndex < 0)
+            {
+                return new string[requiredSources];
+            }
+
+            return GetImagePathsFromStep(imageSelectionIndex);
         }
 
         /// <summary>
@@ -6557,6 +6931,14 @@ namespace WpfApp2.UI
             }
 
             var paths = GetImagePathsFromStep(stepIndex);
+            if (!HasRequired2DPaths(paths))
+            {
+                var preferred = GetImagePathsFromImageSelectionStep();
+                if (HasRequired2DPaths(preferred))
+                {
+                    paths = preferred;
+                }
+            }
 
             if (paths.Length > 0 && string.IsNullOrWhiteSpace(paths[0]))
             {

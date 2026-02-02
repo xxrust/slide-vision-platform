@@ -48,12 +48,13 @@
   - 点击“执行”会刷新 DataGrid 并更新预览。
 
 渲染图绑定（当前实现）
-- `TemplateConfigPage` 会尝试读取 `Page1.LastAlgorithmResult.DebugInfo`：
-  - ImageSelection -> `Result.Render.Input`
-  - 预处理(DemoSetup) -> `Result.Render.Preprocess`
-  - 边缘提取(DemoCalculation) -> `Result.Render.Edge`
-  - 测量与判定(DemoSummary) -> `Result.Render.Composite`
-- 扩展其他步骤：在 `TemplateConfigPage.GetRenderKeyCandidates` 里新增映射。
+- `TemplateConfigPage` 会读取 `Page1.LastAlgorithmResult.DebugInfo` 并绑定渲染图。
+- 每个步骤可配置参数：`渲染图Key`（字符串）
+  - 允许值示例：`Render.Composite` / `Render.Edge` / `OpenCV.Render.Preprocess`
+  - 也可以直接写 `Composite/Edge/Preprocess/Input`，系统会自动补 `Render.` 前缀。
+- 未配置 `渲染图Key` 时：
+  - 预设映射：ImageSelection/预处理/边缘/测量 与 Render.Input/Preprocess/Edge/Composite
+  - 其他步骤自动回退到可用的渲染图（优先 Composite）。
 
 目录约定与兼容
 - 推荐目录名：与 `DisplayName` 保持一致。

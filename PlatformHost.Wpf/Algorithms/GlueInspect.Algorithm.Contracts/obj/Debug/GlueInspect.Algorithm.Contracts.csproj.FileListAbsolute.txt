@@ -1,4 +1,5 @@
-E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\PlatformHost.Wpf\Algorithms\GlueInspect.Algorithm.Contracts\bin\Debug\GlueInspect.Algorithm.Contracts.dll
 E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\PlatformHost.Wpf\Algorithms\GlueInspect.Algorithm.Contracts\obj\Debug\GlueInspect.Algorithm.Contracts.csproj.AssemblyReference.cache
 E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\PlatformHost.Wpf\Algorithms\GlueInspect.Algorithm.Contracts\obj\Debug\GlueInspect.Algorithm.Contracts.csproj.CoreCompileInputs.cache
 E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\PlatformHost.Wpf\Algorithms\GlueInspect.Algorithm.Contracts\obj\Debug\GlueInspect.Algorithm.Contracts.dll
+E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\out\GlueInspect.Algorithm.Contracts.dll
+E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\PlatformHost.Wpf\Algorithms\GlueInspect.Algorithm.Contracts\bin\Debug\GlueInspect.Algorithm.Contracts.dll
