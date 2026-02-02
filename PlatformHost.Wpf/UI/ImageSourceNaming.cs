@@ -33,15 +33,6 @@ namespace WpfApp2.UI
                 }
             }
 
-            if (index == 1)
-            {
-                candidates.Add("图像源2_1");
-            }
-            else if (index == 2)
-            {
-                candidates.Add("图像源2_2");
-            }
-
             var fallback = $"图像源{index + 1}";
             if (!candidates.Contains(fallback))
             {

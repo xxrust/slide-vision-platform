@@ -130,31 +130,74 @@
                         <Grid.RowDefinitions>
                             <RowDefinition Height="*"/>
                             <RowDefinition Height="*"/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="*"/>
                         </Grid.RowDefinitions>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
                         
-                        <GroupBox x:Name="Source1Group" Grid.Row="0" Grid.Column="0" Header="图像1" FontSize="14" Foreground="DarkBlue" Margin="2">
+                        <GroupBox x:Name="Source1Group" Grid.Row="0" Grid.Column="0" Header="图像1" FontSize="14" Foreground="Green" Margin="2">
                             <Grid>
                                 <controls:ImageInspectionViewer x:Name="PreviewViewer1"/>
                             </Grid>
                         </GroupBox>
                         
-                        <GroupBox x:Name="Source2Group" Grid.Row="0" Grid.Column="1" Header="图像2" FontSize="14" Foreground="DarkBlue" Margin="2">
+                        <GroupBox x:Name="Source2Group" Grid.Row="0" Grid.Column="1" Header="图像2" FontSize="14" Foreground="Green" Margin="2">
                             <Grid>
                                 <controls:ImageInspectionViewer x:Name="PreviewViewer2"/>
                             </Grid>
                         </GroupBox>
                         
-                        <GroupBox x:Name="Source3Group" Grid.Row="1" Grid.Column="0" Header="图像3" FontSize="14" Foreground="DarkBlue" Margin="2">
+                        <GroupBox x:Name="Source3Group" Grid.Row="1" Grid.Column="0" Header="图像3" FontSize="14" Foreground="Green" Margin="2">
                             <Grid>
                                 <controls:ImageInspectionViewer x:Name="PreviewViewer3"/>
                             </Grid>
                         </GroupBox>
-                        
-                        <!-- 右下角留空 -->
+
+                        <GroupBox x:Name="Source4Group" Grid.Row="1" Grid.Column="1" Header="图像4" FontSize="14" Foreground="Green" Margin="2">
+                            <Grid>
+                                <controls:ImageInspectionViewer x:Name="PreviewViewer4"/>
+                            </Grid>
+                        </GroupBox>
+
+                        <GroupBox x:Name="Source5Group" Grid.Row="2" Grid.Column="0" Header="图像5" FontSize="14" Foreground="Green" Margin="2">
+                            <Grid>
+                                <controls:ImageInspectionViewer x:Name="PreviewViewer5"/>
+                            </Grid>
+                        </GroupBox>
+
+                        <GroupBox x:Name="Source6Group" Grid.Row="2" Grid.Column="1" Header="图像6" FontSize="14" Foreground="Green" Margin="2">
+                            <Grid>
+                                <controls:ImageInspectionViewer x:Name="PreviewViewer6"/>
+                            </Grid>
+                        </GroupBox>
+
+                        <GroupBox x:Name="Source7Group" Grid.Row="3" Grid.Column="0" Header="图像7" FontSize="14" Foreground="Green" Margin="2">
+                            <Grid>
+                                <controls:ImageInspectionViewer x:Name="PreviewViewer7"/>
+                            </Grid>
+                        </GroupBox>
+
+                        <GroupBox x:Name="Source8Group" Grid.Row="3" Grid.Column="1" Header="图像8" FontSize="14" Foreground="Green" Margin="2">
+                            <Grid>
+                                <controls:ImageInspectionViewer x:Name="PreviewViewer8"/>
+                            </Grid>
+                        </GroupBox>
+
+                        <GroupBox x:Name="Source9Group" Grid.Row="4" Grid.Column="0" Header="图像9" FontSize="14" Foreground="Green" Margin="2">
+                            <Grid>
+                                <controls:ImageInspectionViewer x:Name="PreviewViewer9"/>
+                            </Grid>
+                        </GroupBox>
+
+                        <GroupBox x:Name="Source10Group" Grid.Row="4" Grid.Column="1" Header="图像10" FontSize="14" Foreground="Green" Margin="2">
+                            <Grid>
+                                <controls:ImageInspectionViewer x:Name="PreviewViewer10"/>
+                            </Grid>
+                        </GroupBox>
                     </Grid>
 
                     <!-- 3D视图显示区域（3D配置步骤时显示） -->

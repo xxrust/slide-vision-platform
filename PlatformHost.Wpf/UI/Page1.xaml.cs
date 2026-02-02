@@ -4848,13 +4848,14 @@ namespace WpfApp2.UI
                         {
                             savedGroup.Source1Path = await CopyImageFileToSubDirectory(imageGroup.Source1Path, sourceDirs[0], imageGroup.BaseName);
                         }
-                        if (requiredSources > 1 && !string.IsNullOrEmpty(imageGroup.Source2_1Path))
+                        for (int i = 1; i < requiredSources; i++)
                         {
-                            savedGroup.Source2_1Path = await CopyImageFileToSubDirectory(imageGroup.Source2_1Path, sourceDirs[1], imageGroup.BaseName);
-                        }
-                        if (requiredSources > 2 && !string.IsNullOrEmpty(imageGroup.Source2_2Path))
-                        {
-                            savedGroup.Source2_2Path = await CopyImageFileToSubDirectory(imageGroup.Source2_2Path, sourceDirs[2], imageGroup.BaseName);
+                            var sourcePath = imageGroup.GetPath(i);
+                            if (!string.IsNullOrEmpty(sourcePath))
+                            {
+                                var savedPath = await CopyImageFileToSubDirectory(sourcePath, sourceDirs[i], imageGroup.BaseName);
+                                savedGroup.SetSource(i, savedPath);
+                            }
                         }
 
                         // 复制3D图片文件到3D子目录
@@ -5056,8 +5057,6 @@ namespace WpfApp2.UI
                     // 检查图像源文件夹（动态数量）
                     int requiredSources = GetRequired2DSourceCount();
                     string source1Dir = ResolveSourceFolder(sampleDir, 0);
-                    string source2_1Dir = requiredSources > 1 ? ResolveSourceFolder(sampleDir, 1) : null;
-                    string source2_2Dir = requiredSources > 2 ? ResolveSourceFolder(sampleDir, 2) : null;
                     string threeDDir = Path.Combine(sampleDir, "3D");
 
                     // 获取图像源1中的所有图片（按文件名排序）
@@ -5078,28 +5077,23 @@ namespace WpfApp2.UI
                         var imageGroup = new ImageGroupSet
                         {
                             BaseName = $"图号{sampleIndex + 1}_第{cycleIndex + 1}次",
-                            Source1Path = source1File,
                             SampleIndex = sampleIndex,  // 保存样品索引
                             CycleIndex = cycleIndex     // 保存轮次索引
                         };
+                        imageGroup.SetSource(0, source1File);
 
-                        // 查找对应的图像源2_1文件
-                        if (!string.IsNullOrEmpty(source2_1Dir) && Directory.Exists(source2_1Dir))
+                        for (int i = 1; i < requiredSources; i++)
                         {
-                            var source2_1File = Directory.GetFiles(source2_1Dir, $"*{suffix}.bmp").FirstOrDefault();
-                            if (!string.IsNullOrEmpty(source2_1File))
+                            var sourceDir = ResolveSourceFolder(sampleDir, i);
+                            if (string.IsNullOrEmpty(sourceDir) || !Directory.Exists(sourceDir))
                             {
-                                imageGroup.Source2_1Path = source2_1File;
+                                continue;
                             }
-                        }
 
-                        // 查找对应的图像源2_2文件
-                        if (!string.IsNullOrEmpty(source2_2Dir) && Directory.Exists(source2_2Dir))
-                        {
-                            var source2_2File = Directory.GetFiles(source2_2Dir, $"*{suffix}.bmp").FirstOrDefault();
-                            if (!string.IsNullOrEmpty(source2_2File))
+                            var sourceFile = Directory.GetFiles(sourceDir, $"*{suffix}.bmp").FirstOrDefault();
+                            if (!string.IsNullOrEmpty(sourceFile))
                             {
-                                imageGroup.Source2_2Path = source2_2File;
+                                imageGroup.SetSource(i, sourceFile);
                             }
                         }
 
@@ -5653,25 +5647,16 @@ namespace WpfApp2.UI
                             int requiredSources = GetRequired2DSourceCount();
                             var savedGroup = new ImageGroupSet
                             {
-                                BaseName = $"Sample_{sampleGroup.SampleNumber}",
-                                Source1Path = Path.Combine(sampleDir, GetPreferredSourceFolderName(0))
+                                BaseName = $"Sample_{sampleGroup.SampleNumber}"
                             };
 
-                            // 检查其他图像源文件夹
-                            string source2_1Path = requiredSources > 1
-                                ? Path.Combine(sampleDir, GetPreferredSourceFolderName(1))
-                                : null;
-                            if (!string.IsNullOrEmpty(source2_1Path) && Directory.Exists(source2_1Path) && Directory.GetFiles(source2_1Path).Length > 0)
+                            for (int i = 0; i < requiredSources; i++)
                             {
-                                savedGroup.Source2_1Path = source2_1Path;
-                            }
-
-                            string source2_2Path = requiredSources > 2
-                                ? Path.Combine(sampleDir, GetPreferredSourceFolderName(2))
-                                : null;
-                            if (!string.IsNullOrEmpty(source2_2Path) && Directory.Exists(source2_2Path) && Directory.GetFiles(source2_2Path).Length > 0)
-                            {
-                                savedGroup.Source2_2Path = source2_2Path;
+                                string sourceDir = Path.Combine(sampleDir, GetPreferredSourceFolderName(i));
+                                if (Directory.Exists(sourceDir) && Directory.GetFiles(sourceDir).Length > 0)
+                                {
+                                    savedGroup.SetSource(i, sourceDir);
+                                }
                             }
 
                             string threeDPath = Path.Combine(sampleDir, "3D");
@@ -5852,12 +5837,15 @@ namespace WpfApp2.UI
                     var imageGroupSet = new ImageGroupSet
                     {
                         BaseName = $"验机_样本{group.SampleNumber}",
-                        Source1Path = group.ImagePaths.Count > 0 ? group.ImagePaths[0] : null,
-                        Source2_1Path = group.ImagePaths.Count > 1 ? group.ImagePaths[1] : null,
-                        Source2_2Path = group.ImagePaths.Count > 2 ? group.ImagePaths[2] : null,
                         HeightImagePath = group.ImagePaths.Count > 3 ? group.ImagePaths[3] : null,
                         GrayImagePath = group.ImagePaths.Count > 4 ? group.ImagePaths[4] : null
                     };
+
+                    int requiredSources = GetRequired2DSourceCount();
+                    for (int i = 0; i < requiredSources && i < group.ImagePaths.Count; i++)
+                    {
+                        imageGroupSet.SetSource(i, group.ImagePaths[i]);
+                    }
 
                     result.Add(imageGroupSet);
                 }
@@ -6547,36 +6535,21 @@ namespace WpfApp2.UI
                     {
                         // 根据图片路径找到对应的图片组
                         var imageGroup = _imageTestManager.ImageGroups.FirstOrDefault(g => 
-                            g.Source1Path == result.ImagePath || 
-                            g.Source2_1Path == result.ImagePath || 
-                            g.Source2_2Path == result.ImagePath ||
+                            IsImagePathInGroup(g, result.ImagePath) ||
                             g.HeightImagePath == result.ImagePath ||
                             g.GrayImagePath == result.ImagePath);
                         
                         if (imageGroup != null)
                         {
-                            // 复制图像源1
-                            if (!string.IsNullOrEmpty(imageGroup.Source1Path) && File.Exists(imageGroup.Source1Path))
+                            for (int i = 0; i < requiredSources; i++)
                             {
-                                string fileName = Path.GetFileName(imageGroup.Source1Path);
-                                string destPath = Path.Combine(sourceDirs[0], fileName);
-                                File.Copy(imageGroup.Source1Path, destPath, true);
-                            }
-                            
-                            // 复制图像源2_1
-                            if (requiredSources > 1 && !string.IsNullOrEmpty(imageGroup.Source2_1Path) && File.Exists(imageGroup.Source2_1Path))
-                            {
-                                string fileName = Path.GetFileName(imageGroup.Source2_1Path);
-                                string destPath = Path.Combine(sourceDirs[1], fileName);
-                                File.Copy(imageGroup.Source2_1Path, destPath, true);
-                            }
-                            
-                            // 复制图像源2_2
-                            if (requiredSources > 2 && !string.IsNullOrEmpty(imageGroup.Source2_2Path) && File.Exists(imageGroup.Source2_2Path))
-                            {
-                                string fileName = Path.GetFileName(imageGroup.Source2_2Path);
-                                string destPath = Path.Combine(sourceDirs[2], fileName);
-                                File.Copy(imageGroup.Source2_2Path, destPath, true);
+                                var sourcePath = imageGroup.GetPath(i);
+                                if (!string.IsNullOrEmpty(sourcePath) && File.Exists(sourcePath))
+                                {
+                                    string fileName = Path.GetFileName(sourcePath);
+                                    string destPath = Path.Combine(sourceDirs[i], fileName);
+                                    File.Copy(sourcePath, destPath, true);
+                                }
                             }
                             
                             // 🔧 新增：复制3D图片（如果3D使能且图片存在）
@@ -6628,7 +6601,7 @@ namespace WpfApp2.UI
                 count = 1;
             }
 
-            return Math.Min(count, 3);
+            return Math.Min(count, 10);
         }
 
         private IReadOnlyList<string> GetActiveSourceFolderCandidates()
@@ -6664,6 +6637,44 @@ namespace WpfApp2.UI
             return candidates.Any(candidate => string.Equals(folderName, candidate, StringComparison.OrdinalIgnoreCase));
         }
 
+        private bool IsImagePathInGroup(ImageGroupSet group, string path)
+        {
+            if (group == null || string.IsNullOrWhiteSpace(path))
+            {
+                return false;
+            }
+
+            int required = GetRequired2DSourceCount();
+            for (int i = 0; i < required; i++)
+            {
+                if (string.Equals(group.GetPath(i), path, StringComparison.OrdinalIgnoreCase))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        private bool AreSame2DImageGroup(ImageGroupSet left, ImageGroupSet right)
+        {
+            if (left == null || right == null)
+            {
+                return false;
+            }
+
+            int required = GetRequired2DSourceCount();
+            for (int i = 0; i < required; i++)
+            {
+                if (!string.Equals(left.GetPath(i), right.GetPath(i), StringComparison.OrdinalIgnoreCase))
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
         private string ResolveSourceFolder(string parentDir, int index)
         {
             foreach (var candidate in ImageSourceNaming.GetFolderCandidates(index))
@@ -6687,20 +6698,15 @@ namespace WpfApp2.UI
         private bool HasRequired2DImages(ImageGroupSet group)
         {
             var required = GetRequired2DSourceCount();
-            if (required <= 1)
+            for (int i = 0; i < required; i++)
             {
-                return !string.IsNullOrEmpty(group.Source1Path);
+                if (string.IsNullOrEmpty(group.GetPath(i)))
+                {
+                    return false;
+                }
             }
 
-            if (required == 2)
-            {
-                return !string.IsNullOrEmpty(group.Source1Path) &&
-                       !string.IsNullOrEmpty(group.Source2_1Path);
-            }
-
-            return !string.IsNullOrEmpty(group.Source1Path) &&
-                   !string.IsNullOrEmpty(group.Source2_1Path) &&
-                   !string.IsNullOrEmpty(group.Source2_2Path);
+            return required > 0;
         }
 
         /// <summary>
@@ -6848,10 +6854,7 @@ namespace WpfApp2.UI
                         if (imageGroup != null && imageGroup.IsValid)
                         {
                             // 检查是否已经添加过这个组（避免重复）
-                            var existing = imageGroups.FirstOrDefault(g => 
-                                g.Source1Path == imageGroup.Source1Path && 
-                                g.Source2_1Path == imageGroup.Source2_1Path && 
-                                g.Source2_2Path == imageGroup.Source2_2Path);
+                            var existing = imageGroups.FirstOrDefault(g => AreSame2DImageGroup(g, imageGroup));
                             
                             if (existing == null)
                             {
@@ -6906,10 +6909,7 @@ namespace WpfApp2.UI
                         if (imageGroup != null && imageGroup.IsValid)
                         {
                             // 检查是否已经添加过这个组（避免重复）
-                            var existing = imageGroups.FirstOrDefault(g => 
-                                g.Source1Path == imageGroup.Source1Path && 
-                                g.Source2_1Path == imageGroup.Source2_1Path && 
-                                g.Source2_2Path == imageGroup.Source2_2Path);
+                            var existing = imageGroups.FirstOrDefault(g => AreSame2DImageGroup(g, imageGroup));
                             
                             if (existing == null)
                             {
@@ -7323,19 +7323,26 @@ namespace WpfApp2.UI
 
             if (imageGroup != null)
             {
-                if (!string.IsNullOrWhiteSpace(imageGroup.Source1Path))
+                int requiredSources = GetRequired2DSourceCount();
+                if (requiredSources > 0 && !string.IsNullOrWhiteSpace(imageGroup.Source1Path))
                 {
                     input.ImagePaths["Source1"] = imageGroup.Source1Path;
                 }
-
-                if (!string.IsNullOrWhiteSpace(imageGroup.Source2_1Path))
+                if (requiredSources > 1 && !string.IsNullOrWhiteSpace(imageGroup.Source2_1Path))
                 {
                     input.ImagePaths["Source2_1"] = imageGroup.Source2_1Path;
                 }
-
-                if (!string.IsNullOrWhiteSpace(imageGroup.Source2_2Path))
+                if (requiredSources > 2 && !string.IsNullOrWhiteSpace(imageGroup.Source2_2Path))
                 {
                     input.ImagePaths["Source2_2"] = imageGroup.Source2_2Path;
+                }
+                for (int i = 3; i < requiredSources; i++)
+                {
+                    var sourcePath = imageGroup.GetPath(i);
+                    if (!string.IsNullOrWhiteSpace(sourcePath))
+                    {
+                        input.ImagePaths[$"Source{i + 1}"] = sourcePath;
+                    }
                 }
 
                 if (!string.IsNullOrWhiteSpace(imageGroup.HeightImagePath))
@@ -10475,17 +10482,10 @@ namespace WpfApp2.UI
                 }
 
                 int requiredSources = GetRequired2DSourceCount();
-                if (requiredSources > 0)
+                for (int i = 0; i < requiredSources; i++)
                 {
-                    SaveImageToSubDirectory(currentGroup.Source1Path, Path.Combine(saveDirectory, GetPreferredSourceFolderName(0)), imageNumber);
-                }
-                if (requiredSources > 1)
-                {
-                    SaveImageToSubDirectory(currentGroup.Source2_1Path, Path.Combine(saveDirectory, GetPreferredSourceFolderName(1)), imageNumber);
-                }
-                if (requiredSources > 2)
-                {
-                    SaveImageToSubDirectory(currentGroup.Source2_2Path, Path.Combine(saveDirectory, GetPreferredSourceFolderName(2)), imageNumber);
+                    var sourcePath = currentGroup.GetPath(i);
+                    SaveImageToSubDirectory(sourcePath, Path.Combine(saveDirectory, GetPreferredSourceFolderName(i)), imageNumber);
                 }
             }
             catch (Exception ex)
@@ -10874,9 +10874,31 @@ namespace WpfApp2.UI
     /// </summary>
     public class ImageGroupSet
     {
-        public string Source1Path { get; set; }    // 图像源1路径
-        public string Source2_1Path { get; set; }  // 图像源2_1路径
-        public string Source2_2Path { get; set; }  // 图像源2_2路径
+        private readonly string[] _sourcePaths = new string[10];
+
+        public string Source1Path
+        {
+            get => _sourcePaths[0];
+            set => _sourcePaths[0] = value;
+        }
+
+        public string Source2_1Path
+        {
+            get => _sourcePaths[1];
+            set => _sourcePaths[1] = value;
+        }
+
+        public string Source2_2Path
+        {
+            get => _sourcePaths[2];
+            set => _sourcePaths[2] = value;
+        }
+
+        public string Source4Path
+        {
+            get => _sourcePaths[3];
+            set => _sourcePaths[3] = value;
+        }
         public string BaseName { get; set; }       // 基础名称（xx部分）
 
         // 兼容旧字段命名
@@ -10894,33 +10916,22 @@ namespace WpfApp2.UI
 
         public string GetPath(int index)
         {
-            switch (index)
+            if (index < 0 || index >= _sourcePaths.Length)
             {
-                case 0:
-                    return Source1Path;
-                case 1:
-                    return Source2_1Path;
-                case 2:
-                    return Source2_2Path;
-                default:
-                    return null;
+                return null;
             }
+
+            return _sourcePaths[index];
         }
 
         public void SetSource(int index, string path, string id = null, string displayName = null)
         {
-            switch (index)
+            if (index < 0 || index >= _sourcePaths.Length)
             {
-                case 0:
-                    Source1Path = path;
-                    break;
-                case 1:
-                    Source2_1Path = path;
-                    break;
-                case 2:
-                    Source2_2Path = path;
-                    break;
+                return;
             }
+
+            _sourcePaths[index] = path;
         }
 
         // 验机检测用：样品索引和轮次索引
@@ -10943,26 +10954,21 @@ namespace WpfApp2.UI
                 count = 1;
             }
 
-            return Math.Min(count, 3);
+            return Math.Min(count, 10);
         }
 
         private bool HasRequired2DImages()
         {
             var required = GetRequired2DSourceCount();
-            if (required <= 1)
+            for (int i = 0; i < required; i++)
             {
-                return !string.IsNullOrEmpty(Source1Path);
+                if (string.IsNullOrEmpty(GetPath(i)))
+                {
+                    return false;
+                }
             }
 
-            if (required == 2)
-            {
-                return !string.IsNullOrEmpty(Source1Path) &&
-                       !string.IsNullOrEmpty(Source2_1Path);
-            }
-
-            return !string.IsNullOrEmpty(Source1Path) &&
-                   !string.IsNullOrEmpty(Source2_1Path) &&
-                   !string.IsNullOrEmpty(Source2_2Path);
+            return required > 0;
         }
         
         // **修复：支持5张图片索引 - 如果有完整的2D图片或有3D图片，则有效**

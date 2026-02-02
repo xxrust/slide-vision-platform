@@ -948,7 +948,14 @@ namespace WpfApp2.UI
                 {
                     PreviewViewer1 = PreviewViewer1,
                     PreviewViewer2 = PreviewViewer2,
-                    PreviewViewer3 = PreviewViewer3
+                    PreviewViewer3 = PreviewViewer3,
+                    PreviewViewer4 = PreviewViewer4,
+                    PreviewViewer5 = PreviewViewer5,
+                    PreviewViewer6 = PreviewViewer6,
+                    PreviewViewer7 = PreviewViewer7,
+                    PreviewViewer8 = PreviewViewer8,
+                    PreviewViewer9 = PreviewViewer9,
+                    PreviewViewer10 = PreviewViewer10
                 };
 
                 _imageRenderer = ImageRendererManager.ResolveRenderer(_imageRendererContext);
@@ -1387,7 +1394,7 @@ namespace WpfApp2.UI
             // 平台不直接操作算法 SDK，保持空实现
         }
 
-        private void Execute_Click(object sender, RoutedEventArgs e)
+        private async void Execute_Click(object sender, RoutedEventArgs e)
                 {
                     try
                     {
@@ -1402,15 +1409,7 @@ namespace WpfApp2.UI
                 var currentStepConfig = stepConfigurations[currentStep];
 
                 // 统一执行流程：所有步骤都执行相同的流程
-                ExecuteUnifiedFlow(stepName);
-
-                
-                
-                // 执行完成后刷新配置页面的DataGrid
-                Dispatcher.BeginInvoke(new Action(() =>
-                {
-                    RefreshConfigDataGrid();
-                }), DispatcherPriority.Normal); // 使用Normal优先级，确保及时刷新
+                await ExecuteUnifiedFlowAsync(stepName);
                     }
                     catch (Exception ex)
                     {
@@ -1421,7 +1420,7 @@ namespace WpfApp2.UI
         /// <summary>
         /// 自动执行模板 - 在模板加载后自动执行一次
         /// </summary>
-        public void AutoExecuteTemplate()
+        public async void AutoExecuteTemplate()
         {
             try
             {
@@ -1433,13 +1432,7 @@ namespace WpfApp2.UI
                 var currentStepConfig = stepConfigurations[currentStep];
 
                 // 统一执行流程：所有步骤都执行相同的流程
-                ExecuteUnifiedFlow(stepName);
-
-                // 执行完成后刷新配置页面的DataGrid
-                Dispatcher.BeginInvoke(new Action(() =>
-                {
-                    RefreshConfigDataGrid();
-                }), DispatcherPriority.Normal);
+                await ExecuteUnifiedFlowAsync(stepName);
 
                 LogMessage($"自动执行模板完成: {stepName}", LogLevel.Info);
 
@@ -1492,7 +1485,7 @@ namespace WpfApp2.UI
         /// 统一执行完整的"获取路径图像"流程，确保每次都有回调和数据更新
         /// </summary>
         /// <param name="stepName">步骤名称</param>
-        private void ExecuteUnifiedFlow(string stepName)
+        private async Task ExecuteUnifiedFlowAsync(string stepName)
         {
             try
             {
@@ -1527,7 +1520,11 @@ namespace WpfApp2.UI
 
                 // 3. 算法引擎流程
                 _imageRenderer?.DisplayImageGroup(_currentImageGroup);
-                _ = PageManager.Page1Instance?.ExecuteAlgorithmPipelineForImageGroup(_currentImageGroup, isTemplateConfig: true);
+                if (PageManager.Page1Instance != null)
+                {
+                    await PageManager.Page1Instance.ExecuteAlgorithmPipelineForImageGroup(_currentImageGroup, isTemplateConfig: true);
+                }
+                RefreshConfigDataGrid();
                 LogMessage($"已为步骤 {stepName} 执行算法引擎流程", LogLevel.Info);
             }
             catch (Exception ex)
@@ -1545,6 +1542,7 @@ namespace WpfApp2.UI
 
             string parentDir = Path.GetDirectoryName(source1);
             string baseName = Path.GetFileNameWithoutExtension(source1);
+            int requiredSources = GetRequired2DSourceCount();
 
             if (baseName.EndsWith("_1") || baseName.EndsWith("_0"))
             {
@@ -1558,6 +1556,40 @@ namespace WpfApp2.UI
                 Source2_2Path = source2_2,
                 BaseName = baseName
             };
+
+            if (requiredSources > 3)
+            {
+                try
+                {
+                    string suffix = Path.GetFileNameWithoutExtension(source1);
+                    if (suffix.Contains("_"))
+                    {
+                        suffix = suffix.Substring(suffix.LastIndexOf('_'));
+                    }
+
+                    for (int i = 3; i < requiredSources; i++)
+                    {
+                        if (!string.IsNullOrWhiteSpace(imageGroup.GetPath(i)))
+                        {
+                            continue;
+                        }
+
+                        var sourceDir = ResolveSourceFolder(Path.GetDirectoryName(parentDir), i);
+                        if (!string.IsNullOrEmpty(sourceDir) && Directory.Exists(sourceDir))
+                        {
+                            var sourceFile = Directory.GetFiles(sourceDir, $"*{suffix}.bmp").FirstOrDefault();
+                            if (!string.IsNullOrEmpty(sourceFile))
+                            {
+                                imageGroup.SetSource(i, sourceFile);
+                            }
+                        }
+                    }
+                }
+                catch
+                {
+                    // Ignore auto-match failure for additional sources.
+                }
+            }
 
             bool is3DImageEnabled = ThreeDSettings.CurrentDetection3DParams?.Enable3DDetection == true;
             if (is3DImageEnabled)
@@ -3314,18 +3346,37 @@ namespace WpfApp2.UI
 
             if (config.StepType == StepType.ImageSelection)
             {
-                SingleImageContainer.Visibility = Visibility.Collapsed;
-                MultiImageContainer.Visibility = Visibility.Visible;
+                int requiredSources = GetRequired2DSourceCount();
+                if (requiredSources <= 1)
+                {
+                    SingleImageContainer.Visibility = Visibility.Visible;
+                    MultiImageContainer.Visibility = Visibility.Collapsed;
+                }
+                else
+                {
+                    SingleImageContainer.Visibility = Visibility.Collapsed;
+                    MultiImageContainer.Visibility = Visibility.Visible;
+                }
+
                 ThreeDContainer.Visibility = Visibility.Collapsed;
                 UpdateImageSelectionPreviewLayout();
                 EnsureCurrentImageGroupFromStep(currentStep);
-                _imageRenderer?.DisplayImageGroup(_currentImageGroup);
+                if (requiredSources <= 1)
+                {
+                    UpdateSinglePreviewImage();
+                }
+                else
+                {
+                    _imageRenderer?.DisplayImageGroup(_currentImageGroup);
+                }
                 return;
             }
 
             SingleImageContainer.Visibility = Visibility.Visible;
             MultiImageContainer.Visibility = Visibility.Collapsed;
             ThreeDContainer.Visibility = Visibility.Collapsed;
+            EnsureCurrentImageGroupFromStep(currentStep);
+            UpdateSinglePreviewImage();
         }
 
         private void UpdateImageSelectionPreviewLayout()
@@ -3334,6 +3385,13 @@ namespace WpfApp2.UI
             Source1Group.Visibility = requiredSources >= 1 ? Visibility.Visible : Visibility.Collapsed;
             Source2Group.Visibility = requiredSources >= 2 ? Visibility.Visible : Visibility.Collapsed;
             Source3Group.Visibility = requiredSources >= 3 ? Visibility.Visible : Visibility.Collapsed;
+            Source4Group.Visibility = requiredSources >= 4 ? Visibility.Visible : Visibility.Collapsed;
+            Source5Group.Visibility = requiredSources >= 5 ? Visibility.Visible : Visibility.Collapsed;
+            Source6Group.Visibility = requiredSources >= 6 ? Visibility.Visible : Visibility.Collapsed;
+            Source7Group.Visibility = requiredSources >= 7 ? Visibility.Visible : Visibility.Collapsed;
+            Source8Group.Visibility = requiredSources >= 8 ? Visibility.Visible : Visibility.Collapsed;
+            Source9Group.Visibility = requiredSources >= 9 ? Visibility.Visible : Visibility.Collapsed;
+            Source10Group.Visibility = requiredSources >= 10 ? Visibility.Visible : Visibility.Collapsed;
 
             if (Source1Group != null)
             {
@@ -3347,6 +3405,51 @@ namespace WpfApp2.UI
             {
                 Source3Group.Header = ImageSourceNaming.GetDisplayName(2);
             }
+            if (Source4Group != null)
+            {
+                Source4Group.Header = ImageSourceNaming.GetDisplayName(3);
+            }
+            if (Source5Group != null)
+            {
+                Source5Group.Header = ImageSourceNaming.GetDisplayName(4);
+            }
+            if (Source6Group != null)
+            {
+                Source6Group.Header = ImageSourceNaming.GetDisplayName(5);
+            }
+            if (Source7Group != null)
+            {
+                Source7Group.Header = ImageSourceNaming.GetDisplayName(6);
+            }
+            if (Source8Group != null)
+            {
+                Source8Group.Header = ImageSourceNaming.GetDisplayName(7);
+            }
+            if (Source9Group != null)
+            {
+                Source9Group.Header = ImageSourceNaming.GetDisplayName(8);
+            }
+            if (Source10Group != null)
+            {
+                Source10Group.Header = ImageSourceNaming.GetDisplayName(9);
+            }
+        }
+
+        private void UpdateSinglePreviewImage()
+        {
+            if (StepPreviewViewer == null)
+            {
+                return;
+            }
+
+            var path = _currentImageGroup?.Source1Path;
+            if (string.IsNullOrWhiteSpace(path))
+            {
+                StepPreviewViewer.Clear();
+                return;
+            }
+
+            StepPreviewViewer.LoadImage(path);
         }
 
         // 模块切换相关的模板加载逻辑已移除（由算法中间层处理）
@@ -6203,7 +6306,7 @@ namespace WpfApp2.UI
                 count = 1;
             }
 
-            return Math.Min(count, 3);
+            return Math.Min(count, 10);
         }
 
         private string ResolveSourceFolder(string parentDir, int index)
@@ -7118,37 +7221,23 @@ namespace WpfApp2.UI
                 LogMessage($"已创建模板文件夹结构: {baseDir}", LogLevel.Info);
                 
                 // 复制图片文件
-                string newSource1Path = null;
-                string newSource2_1Path = null;
-                string newSource2_2Path = null;
+                var newSourcePaths = new string[requiredSources];
                 string newHeightImagePath = null;
                 string newGrayImagePath = null;
-                
-                // 复制图像源1
-                if (!string.IsNullOrEmpty(originalGroup.Source1Path) && File.Exists(originalGroup.Source1Path))
+
+                for (int i = 0; i < requiredSources; i++)
                 {
-                    string fileName = Path.GetFileName(originalGroup.Source1Path);
-                    newSource1Path = Path.Combine(sourceDirs[0], fileName);
-                    File.Copy(originalGroup.Source1Path, newSource1Path, true);
-                    LogMessage($"已复制{GetPreferredSourceFolderName(0)}: {fileName}", LogLevel.Info);
-                }
-                
-                // 复制图像源2_1
-                if (requiredSources > 1 && !string.IsNullOrEmpty(originalGroup.Source2_1Path) && File.Exists(originalGroup.Source2_1Path))
-                {
-                    string fileName = Path.GetFileName(originalGroup.Source2_1Path);
-                    newSource2_1Path = Path.Combine(sourceDirs[1], fileName);
-                    File.Copy(originalGroup.Source2_1Path, newSource2_1Path, true);
-                    LogMessage($"已复制{GetPreferredSourceFolderName(1)}: {fileName}", LogLevel.Info);
-                }
-                
-                // 复制图像源2_2
-                if (requiredSources > 2 && !string.IsNullOrEmpty(originalGroup.Source2_2Path) && File.Exists(originalGroup.Source2_2Path))
-                {
-                    string fileName = Path.GetFileName(originalGroup.Source2_2Path);
-                    newSource2_2Path = Path.Combine(sourceDirs[2], fileName);
-                    File.Copy(originalGroup.Source2_2Path, newSource2_2Path, true);
-                    LogMessage($"已复制{GetPreferredSourceFolderName(2)}: {fileName}", LogLevel.Info);
+                    var sourcePath = originalGroup.GetPath(i);
+                    if (string.IsNullOrEmpty(sourcePath) || !File.Exists(sourcePath))
+                    {
+                        continue;
+                    }
+
+                    string fileName = Path.GetFileName(sourcePath);
+                    string newPath = Path.Combine(sourceDirs[i], fileName);
+                    File.Copy(sourcePath, newPath, true);
+                    newSourcePaths[i] = newPath;
+                    LogMessage($"已复制{GetPreferredSourceFolderName(i)}: {fileName}", LogLevel.Info);
                 }
                 
                 // 🔧 修正：复制3D图像到统一的3D文件夹（复用现有设计）
@@ -7175,25 +7264,31 @@ namespace WpfApp2.UI
                 }
                 
                 // 验证所有文件都成功复制
-                bool hasAll2D = requiredSources <= 1
-                    ? !string.IsNullOrEmpty(newSource1Path)
-                    : requiredSources == 2
-                        ? !string.IsNullOrEmpty(newSource1Path) && !string.IsNullOrEmpty(newSource2_1Path)
-                        : !string.IsNullOrEmpty(newSource1Path) && !string.IsNullOrEmpty(newSource2_1Path) && !string.IsNullOrEmpty(newSource2_2Path);
+                bool hasAll2D = true;
+                for (int i = 0; i < requiredSources; i++)
+                {
+                    if (string.IsNullOrEmpty(newSourcePaths[i]))
+                    {
+                        hasAll2D = false;
+                        break;
+                    }
+                }
 
                 if (hasAll2D)
                 {
                     // 创建新的图片组对象，使用模板文件夹中的路径
                     var templateImageGroup = new ImageGroupSet
                     {
-                        Source1Path = newSource1Path,
-                        Source2_1Path = requiredSources > 1 ? newSource2_1Path : null,
-                        Source2_2Path = requiredSources > 2 ? newSource2_2Path : null,
                         BaseName = originalGroup.BaseName,
                         // 🔧 新增：包含复制后的3D图像路径
                         HeightImagePath = newHeightImagePath,
                         GrayImagePath = newGrayImagePath
                     };
+
+                    for (int i = 0; i < requiredSources; i++)
+                    {
+                        templateImageGroup.SetSource(i, newSourcePaths[i]);
+                    }
                     
                     LogMessage($"模板图片结构创建成功，所有图片已复制到: {timeStampDir}", LogLevel.Info);
                     
@@ -7570,7 +7665,7 @@ namespace WpfApp2.UI
                 timer.Tick += (s, e) =>
                 {
                     timer.Stop();
-                    ExecuteUnifiedFlow(GetSafeStepName(currentStep));
+                    _ = ExecuteUnifiedFlowAsync(GetSafeStepName(currentStep));
                 };
                 timer.Start();
                 
