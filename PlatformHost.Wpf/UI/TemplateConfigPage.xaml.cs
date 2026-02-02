@@ -3317,6 +3317,7 @@ namespace WpfApp2.UI
                 SingleImageContainer.Visibility = Visibility.Collapsed;
                 MultiImageContainer.Visibility = Visibility.Visible;
                 ThreeDContainer.Visibility = Visibility.Collapsed;
+                UpdateImageSelectionPreviewLayout();
                 EnsureCurrentImageGroupFromStep(currentStep);
                 _imageRenderer?.DisplayImageGroup(_currentImageGroup);
                 return;
@@ -3325,6 +3326,27 @@ namespace WpfApp2.UI
             SingleImageContainer.Visibility = Visibility.Visible;
             MultiImageContainer.Visibility = Visibility.Collapsed;
             ThreeDContainer.Visibility = Visibility.Collapsed;
+        }
+
+        private void UpdateImageSelectionPreviewLayout()
+        {
+            int requiredSources = GetRequired2DSourceCount();
+            Source1Group.Visibility = requiredSources >= 1 ? Visibility.Visible : Visibility.Collapsed;
+            Source2Group.Visibility = requiredSources >= 2 ? Visibility.Visible : Visibility.Collapsed;
+            Source3Group.Visibility = requiredSources >= 3 ? Visibility.Visible : Visibility.Collapsed;
+
+            if (Source1Group != null)
+            {
+                Source1Group.Header = ImageSourceNaming.GetDisplayName(0);
+            }
+            if (Source2Group != null)
+            {
+                Source2Group.Header = ImageSourceNaming.GetDisplayName(1);
+            }
+            if (Source3Group != null)
+            {
+                Source3Group.Header = ImageSourceNaming.GetDisplayName(2);
+            }
         }
 
         // 模块切换相关的模板加载逻辑已移除（由算法中间层处理）

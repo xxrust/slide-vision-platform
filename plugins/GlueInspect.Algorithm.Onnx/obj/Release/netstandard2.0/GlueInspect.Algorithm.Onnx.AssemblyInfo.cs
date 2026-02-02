@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("GlueInspect.Algorithm.Onnx")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Release")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+a5a9b8c0fd0a56a788987ec70ca5bd0e8a11d5da")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+3b7aa1f2012c6c86d8c83b01cd3f9ef4dcb3bccc")]
 [assembly: System.Reflection.AssemblyProductAttribute("GlueInspect.Algorithm.Onnx")]
 [assembly: System.Reflection.AssemblyTitleAttribute("GlueInspect.Algorithm.Onnx")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
