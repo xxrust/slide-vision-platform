@@ -978,6 +978,9 @@ namespace WpfApp2.UI
             // 设置事件处理器（因为工厂中的Handler为null）
             AttachActionHandlers(configurations);
 
+            // 为图片选择步骤补齐动态图片路径参数
+            EnsureImageSelectionParameters(configurations);
+
             // 设置特殊处理器
             foreach (var config in configurations)
             {
@@ -1012,6 +1015,37 @@ namespace WpfApp2.UI
             }
 
             return configurations;
+        }
+
+        private void EnsureImageSelectionParameters(List<StepConfiguration> configurations)
+        {
+            var imageSelectionConfig = configurations?.FirstOrDefault(c => c.StepType == StepType.ImageSelection);
+            if (imageSelectionConfig == null)
+            {
+                return;
+            }
+
+            int requiredSources = GetRequired2DSourceCount();
+            if (requiredSources <= 0)
+            {
+                requiredSources = 1;
+            }
+
+            for (int i = 0; i < requiredSources; i++)
+            {
+                string paramName = GetSourcePathParameterName(i);
+                bool exists = imageSelectionConfig.InputParameters.Any(p => string.Equals(p.Name, paramName, StringComparison.Ordinal));
+                if (!exists)
+                {
+                    imageSelectionConfig.InputParameters.Add(new ParameterConfig
+                    {
+                        Name = paramName,
+                        DefaultValue = string.Empty,
+                        Type = ParamType.Text,
+                        Group = string.Empty
+                    });
+                }
+            }
         }
 
         /// <summary>
@@ -1503,8 +1537,8 @@ namespace WpfApp2.UI
                 // 2. 生成当前图像组
                 try
                 {
-                    var (source1, source2_1, source2_2) = GetCurrentImagePaths();
-                    _currentImageGroup = BuildImageGroupFromPaths(source1, source2_1, source2_2);
+                    var imagePaths = GetCurrentImagePaths();
+                    _currentImageGroup = BuildImageGroupFromPaths(imagePaths);
 
                     if (_currentImageGroup == null)
                     {
@@ -1525,6 +1559,10 @@ namespace WpfApp2.UI
                     await PageManager.Page1Instance.ExecuteAlgorithmPipelineForImageGroup(_currentImageGroup, isTemplateConfig: true);
                 }
                 RefreshConfigDataGrid();
+                if (currentStep >= 0 && currentStep < stepConfigurations.Count)
+                {
+                    UpdatePreviewLayoutForStep(stepConfigurations[currentStep]);
+                }
                 LogMessage($"已为步骤 {stepName} 执行算法引擎流程", LogLevel.Info);
             }
             catch (Exception ex)
@@ -1533,31 +1571,33 @@ namespace WpfApp2.UI
             }
         }
 
-        private ImageGroupSet BuildImageGroupFromPaths(string source1, string source2_1, string source2_2)
+        private ImageGroupSet BuildImageGroupFromPaths(IReadOnlyList<string> sourcePaths)
         {
-            if (string.IsNullOrWhiteSpace(source1))
+            if (sourcePaths == null || sourcePaths.Count == 0 || string.IsNullOrWhiteSpace(sourcePaths[0]))
             {
                 return null;
             }
 
+            string source1 = sourcePaths[0];
             string parentDir = Path.GetDirectoryName(source1);
             string baseName = Path.GetFileNameWithoutExtension(source1);
             int requiredSources = GetRequired2DSourceCount();
 
-            if (baseName.EndsWith("_1") || baseName.EndsWith("_0"))
-            {
-                baseName = baseName.Substring(0, baseName.LastIndexOf('_'));
-            }
-
             var imageGroup = new ImageGroupSet
             {
-                Source1Path = source1,
-                Source2_1Path = source2_1,
-                Source2_2Path = source2_2,
                 BaseName = baseName
             };
 
-            if (requiredSources > 3)
+            int filledSources = Math.Min(requiredSources, sourcePaths.Count);
+            for (int i = 0; i < filledSources; i++)
+            {
+                if (!string.IsNullOrWhiteSpace(sourcePaths[i]))
+                {
+                    imageGroup.SetSource(i, sourcePaths[i]);
+                }
+            }
+
+            if (requiredSources > 1)
             {
                 try
                 {
@@ -1567,14 +1607,20 @@ namespace WpfApp2.UI
                         suffix = suffix.Substring(suffix.LastIndexOf('_'));
                     }
 
-                    for (int i = 3; i < requiredSources; i++)
+                    string rootDir = string.IsNullOrWhiteSpace(parentDir) ? null : Path.GetDirectoryName(parentDir);
+                    for (int i = 1; i < requiredSources; i++)
                     {
                         if (!string.IsNullOrWhiteSpace(imageGroup.GetPath(i)))
                         {
                             continue;
                         }
 
-                        var sourceDir = ResolveSourceFolder(Path.GetDirectoryName(parentDir), i);
+                        if (string.IsNullOrWhiteSpace(rootDir))
+                        {
+                            continue;
+                        }
+
+                        var sourceDir = ResolveSourceFolder(rootDir, i);
                         if (!string.IsNullOrEmpty(sourceDir) && Directory.Exists(sourceDir))
                         {
                             var sourceFile = Directory.GetFiles(sourceDir, $"*{suffix}.bmp").FirstOrDefault();
@@ -1600,7 +1646,11 @@ namespace WpfApp2.UI
                     suffix = suffix.Substring(suffix.LastIndexOf('_'));
                 }
 
-                Page1.FindAndSet3DImagesForGroup(Path.GetDirectoryName(parentDir), suffix, imageGroup, enableLogging: true);
+                string rootDir = string.IsNullOrWhiteSpace(parentDir) ? null : Path.GetDirectoryName(parentDir);
+                if (!string.IsNullOrWhiteSpace(rootDir))
+                {
+                    Page1.FindAndSet3DImagesForGroup(rootDir, suffix, imageGroup, enableLogging: true);
+                }
                 LogMessage("已为图像组添加3D图像路径", LogLevel.Info);
             }
 
@@ -2114,6 +2164,18 @@ namespace WpfApp2.UI
             string name = param.Name;
             StackPanel panel = new StackPanel { Orientation = Orientation.Horizontal, Margin = new Thickness(5) };
             panel.Children.Add(new TextBlock { Text = name, Width = 250, VerticalAlignment = VerticalAlignment.Center });
+
+            if (ShouldHideImageSourceParameter(name))
+            {
+                var hiddenTextBox = new TextBox { Text = defaultValue, Visibility = Visibility.Collapsed };
+                panel.Children.Clear();
+                panel.Children.Add(hiddenTextBox);
+                panel.Visibility = Visibility.Collapsed;
+                panel.Margin = new Thickness(0);
+                inputParameterControls[currentStep][name] = hiddenTextBox;
+                container.Children.Add(panel);
+                return;
+            }
 
             // 根据参数类型创建对应的控件
             if (name == "启用3D检测")
@@ -2961,6 +3023,18 @@ namespace WpfApp2.UI
             StackPanel panel = new StackPanel { Orientation = Orientation.Horizontal, Margin = new Thickness(5) };
             panel.Children.Add(new TextBlock { Text = name, Width = 250, VerticalAlignment = VerticalAlignment.Center });
 
+            if (ShouldHideImageSourceParameter(name))
+            {
+                var hiddenTextBox = new TextBox { Text = defaultValue, Visibility = Visibility.Collapsed };
+                panel.Children.Clear();
+                panel.Children.Add(hiddenTextBox);
+                panel.Visibility = Visibility.Collapsed;
+                panel.Margin = new Thickness(0);
+                inputParameterControls[currentStep][name] = hiddenTextBox;
+                InputParametersPanel.Children.Add(panel);
+                return;
+            }
+
             // 根据参数名判断类型，如果是"启用3D检测"则使用CheckBox
             if (name == "启用3D检测")
             {
@@ -3393,6 +3467,17 @@ namespace WpfApp2.UI
             Source9Group.Visibility = requiredSources >= 9 ? Visibility.Visible : Visibility.Collapsed;
             Source10Group.Visibility = requiredSources >= 10 ? Visibility.Visible : Visibility.Collapsed;
 
+            if (MultiImageContainer != null)
+            {
+                int visibleRows = Math.Max(1, (requiredSources + 1) / 2);
+                for (int i = 0; i < MultiImageContainer.RowDefinitions.Count; i++)
+                {
+                    MultiImageContainer.RowDefinitions[i].Height = i < visibleRows
+                        ? new GridLength(1, GridUnitType.Star)
+                        : new GridLength(0);
+                }
+            }
+
             if (Source1Group != null)
             {
                 Source1Group.Header = ImageSourceNaming.GetDisplayName(0);
@@ -3442,14 +3527,64 @@ namespace WpfApp2.UI
                 return;
             }
 
-            var path = _currentImageGroup?.Source1Path;
-            if (string.IsNullOrWhiteSpace(path))
+            var renderPath = ResolveStepRenderPath();
+            var path = !string.IsNullOrWhiteSpace(renderPath) ? renderPath : _currentImageGroup?.GetPath(0);
+            if (string.IsNullOrWhiteSpace(path) || !File.Exists(path))
             {
                 StepPreviewViewer.Clear();
                 return;
             }
 
             StepPreviewViewer.LoadImage(path);
+        }
+
+        private string ResolveStepRenderPath()
+        {
+            try
+            {
+                if (stepConfigurations == null || currentStep < 0 || currentStep >= stepConfigurations.Count)
+                {
+                    return null;
+                }
+
+                var stepType = stepConfigurations[currentStep].StepType;
+                var result = PageManager.Page1Instance?.LastAlgorithmResult;
+                if (result?.DebugInfo == null)
+                {
+                    return null;
+                }
+
+                foreach (var key in GetRenderKeyCandidates(stepType))
+                {
+                    if (result.DebugInfo.TryGetValue(key, out var path) && !string.IsNullOrWhiteSpace(path) && File.Exists(path))
+                    {
+                        return path;
+                    }
+                }
+            }
+            catch
+            {
+                return null;
+            }
+
+            return null;
+        }
+
+        private IEnumerable<string> GetRenderKeyCandidates(StepType stepType)
+        {
+            switch (stepType)
+            {
+                case StepType.ImageSelection:
+                    return new[] { "Result.Render.Input", "Render.Input" };
+                case StepType.DemoSetup:
+                    return new[] { "Result.Render.Preprocess", "Render.Preprocess" };
+                case StepType.DemoCalculation:
+                    return new[] { "Result.Render.Edge", "Render.Edge" };
+                case StepType.DemoSummary:
+                    return new[] { "Result.Render.Composite", "Render.Composite" };
+                default:
+                    return Array.Empty<string>();
+            }
         }
 
         // 模块切换相关的模板加载逻辑已移除（由算法中间层处理）
@@ -3621,40 +3756,33 @@ namespace WpfApp2.UI
                     }), DispatcherPriority.Background);
                 }
 
-                // 添加: 检查并应用图片路径参数（兼容性：支持旧的单图片和新的3图片）
+                // 添加: 检查并应用图片路径参数（兼容性：支持旧的单图片与多图）
                 if (currentTemplate.InputParameters.ContainsKey(StepType.ImageSelection))
                 {
                     var stepParams = currentTemplate.InputParameters[StepType.ImageSelection];
                     
-                    // 优先检查新的3张图片路径格式
-                    if (stepParams.ContainsKey("图像源1路径") ||
-                        stepParams.ContainsKey("图像源2_1路径") ||
-                        stepParams.ContainsKey("图像源2_2路径"))
+                    // 优先检查新的多图路径格式
+                    if (stepParams.Keys.Any(IsImageSourcePathParameter))
                     {
                         try
                         {
-                            // 获取3张图片路径
                             var imagePaths = GetCurrentImagePaths();
                             int requiredSources = GetRequired2DSourceCount();
-                            bool allPathsValid = !string.IsNullOrWhiteSpace(imagePaths.Item1) && File.Exists(imagePaths.Item1);
-                            if (requiredSources > 1)
+                            bool allPathsValid = true;
+                            for (int i = 0; i < requiredSources; i++)
                             {
-                                allPathsValid = allPathsValid &&
-                                                !string.IsNullOrWhiteSpace(imagePaths.Item2) && File.Exists(imagePaths.Item2);
-                            }
-                            if (requiredSources > 2)
-                            {
-                                allPathsValid = allPathsValid &&
-                                                !string.IsNullOrWhiteSpace(imagePaths.Item3) && File.Exists(imagePaths.Item3);
+                                var path = i < imagePaths.Length ? imagePaths[i] : null;
+                                if (string.IsNullOrWhiteSpace(path) || !File.Exists(path))
+                                {
+                                    allPathsValid = false;
+                                    break;
+                                }
                             }
                             
                             if (allPathsValid)
                             {
                                 // 创建ImageGroupSet并保存
-                                _currentImageGroup = BuildImageGroupFromPaths(
-                                    imagePaths.Item1,
-                                    requiredSources > 1 ? imagePaths.Item2 : null,
-                                    requiredSources > 2 ? imagePaths.Item3 : null);
+                                _currentImageGroup = BuildImageGroupFromPaths(imagePaths);
                                 _imageRenderer?.DisplayImageGroup(_currentImageGroup);
                                 
                                 PageManager.Page1Instance?.LogUpdate($"已从模板加载完整的{requiredSources}张图片组: {_currentImageGroup.BaseName}");
@@ -3664,12 +3792,14 @@ namespace WpfApp2.UI
                             {
                                 // 部分图片缺失或不存在，弹窗告警
                                 var missingFiles = new List<string>();
-                                if (string.IsNullOrWhiteSpace(imagePaths.Item1) || !File.Exists(imagePaths.Item1))
-                                    missingFiles.Add($"{GetPreferredSourceFolderName(0)}: {imagePaths.Item1 ?? "未设置"}");
-                                if (requiredSources > 1 && (string.IsNullOrWhiteSpace(imagePaths.Item2) || !File.Exists(imagePaths.Item2)))
-                                    missingFiles.Add($"{GetPreferredSourceFolderName(1)}: {imagePaths.Item2 ?? "未设置"}");
-                                if (requiredSources > 2 && (string.IsNullOrWhiteSpace(imagePaths.Item3) || !File.Exists(imagePaths.Item3)))
-                                    missingFiles.Add($"{GetPreferredSourceFolderName(2)}: {imagePaths.Item3 ?? "未设置"}");
+                                for (int i = 0; i < requiredSources; i++)
+                                {
+                                    var path = i < imagePaths.Length ? imagePaths[i] : null;
+                                    if (string.IsNullOrWhiteSpace(path) || !File.Exists(path))
+                                    {
+                                        missingFiles.Add($"{GetPreferredSourceFolderName(i)}: {path ?? "未设置"}");
+                                    }
+                                }
                                 
                                 string errorMsg = $"模板加载错误：部分图片文件缺失或不存在！\n\n" +
                                                 $"缺失的文件：\n{string.Join("\n", missingFiles)}\n\n" +
@@ -6233,59 +6363,75 @@ namespace WpfApp2.UI
         }
 
         /// <summary>
-        /// 获取当前步骤的3个图像路径
+        /// 获取当前步骤的图像路径集合
         /// </summary>
-        /// <returns>三个图像路径的元组</returns>
-        private (string, string, string) GetCurrentImagePaths()
+        private string[] GetCurrentImagePaths()
         {
             return GetImagePathsFromStep(currentStep);
         }
 
         /// <summary>
-        /// 获取指定步骤的3个图像路径
+        /// 获取指定步骤的图像路径集合
         /// </summary>
-        /// <param name="stepIndex">步骤索引</param>
-        /// <returns>三个图像路径的元组</returns>
-        private (string, string, string) GetImagePathsFromStep(int stepIndex)
+        private string[] GetImagePathsFromStep(int stepIndex)
         {
-            string path1 = "";
-            string path2_1 = "";
-            string path2_2 = "";
+            int requiredSources = GetRequired2DSourceCount();
+            var paths = new string[requiredSources];
 
             try
             {
-                // 从指定步骤的输入控件获取路径
                 if (inputParameterControls.ContainsKey(stepIndex))
                 {
-                    if (inputParameterControls[stepIndex].ContainsKey("图像源1路径"))
-                        path1 = inputParameterControls[stepIndex]["图像源1路径"].Text;
-                    if (inputParameterControls[stepIndex].ContainsKey("图像源2_1路径"))
-                        path2_1 = inputParameterControls[stepIndex]["图像源2_1路径"].Text;
-                    if (inputParameterControls[stepIndex].ContainsKey("图像源2_2路径"))
-                        path2_2 = inputParameterControls[stepIndex]["图像源2_2路径"].Text;
+                    var controls = inputParameterControls[stepIndex];
+                    for (int i = 0; i < requiredSources; i++)
+                    {
+                        string paramName = GetSourcePathParameterName(i);
+                        if (controls.TryGetValue(paramName, out var textBox))
+                        {
+                            paths[i] = textBox.Text;
+                        }
+                    }
+
+                    if (string.IsNullOrWhiteSpace(paths[0]) &&
+                        controls.TryGetValue("图片路径", out var legacyBox))
+                    {
+                        paths[0] = legacyBox.Text;
+                    }
                 }
 
-                // 如果指定步骤的控件中没有值，尝试从模板参数中获取
-                int requiredSources = GetRequired2DSourceCount();
-                bool needsFallback = string.IsNullOrWhiteSpace(path1) ||
-                                     (requiredSources > 1 && string.IsNullOrWhiteSpace(path2_1)) ||
-                                     (requiredSources > 2 && string.IsNullOrWhiteSpace(path2_2));
-                if (needsFallback)
+                if (stepIndex >= 0 && stepIndex < stepConfigurations.Count)
                 {
-                    // 将步骤索引转换为StepType
-                    if (stepIndex >= 0 && stepIndex < stepConfigurations.Count)
+                    var stepType = stepConfigurations[stepIndex].StepType;
+                    if (currentTemplate.InputParameters.ContainsKey(stepType))
                     {
-                        var stepType = stepConfigurations[stepIndex].StepType;
-                        if (currentTemplate.InputParameters.ContainsKey(stepType))
+                        var stepParams = currentTemplate.InputParameters[stepType];
+                        for (int i = 0; i < requiredSources; i++)
                         {
-                            var stepParams = currentTemplate.InputParameters[stepType];
-                            
-                            if (string.IsNullOrWhiteSpace(path1) && stepParams.ContainsKey("图像源1路径"))
-                                path1 = stepParams["图像源1路径"];
-                            if (string.IsNullOrWhiteSpace(path2_1) && stepParams.ContainsKey("图像源2_1路径"))
-                                path2_1 = stepParams["图像源2_1路径"];
-                            if (string.IsNullOrWhiteSpace(path2_2) && stepParams.ContainsKey("图像源2_2路径"))
-                                path2_2 = stepParams["图像源2_2路径"];
+                            if (!string.IsNullOrWhiteSpace(paths[i]))
+                            {
+                                continue;
+                            }
+
+                            string paramName = GetSourcePathParameterName(i);
+                            if (stepParams.TryGetValue(paramName, out var storedPath))
+                            {
+                                paths[i] = storedPath;
+                                continue;
+                            }
+
+                            if (i == 1 && stepParams.TryGetValue("图像源2_1路径", out var legacy2_1))
+                            {
+                                paths[i] = legacy2_1;
+                            }
+                            else if (i == 2 && stepParams.TryGetValue("图像源2_2路径", out var legacy2_2))
+                            {
+                                paths[i] = legacy2_2;
+                            }
+                        }
+
+                        if (string.IsNullOrWhiteSpace(paths[0]) && stepParams.TryGetValue("图片路径", out var legacyPath))
+                        {
+                            paths[0] = legacyPath;
                         }
                     }
                 }
@@ -6295,7 +6441,7 @@ namespace WpfApp2.UI
                 LogMessage($"获取步骤{stepIndex}的图像路径失败: {ex.Message}", LogLevel.Error);
             }
 
-            return (path1, path2_1, path2_2);
+            return paths;
         }
 
         private int GetRequired2DSourceCount()
@@ -6307,6 +6453,48 @@ namespace WpfApp2.UI
             }
 
             return Math.Min(count, 10);
+        }
+
+        private static string GetSourcePathParameterName(int index)
+        {
+            return $"图像源{index + 1}路径";
+        }
+
+        private static bool IsImageSourcePathParameter(string parameterName)
+        {
+            if (string.IsNullOrWhiteSpace(parameterName))
+            {
+                return false;
+            }
+
+            if (string.Equals(parameterName, "图像源2_1路径", StringComparison.Ordinal) ||
+                string.Equals(parameterName, "图像源2_2路径", StringComparison.Ordinal))
+            {
+                return true;
+            }
+
+            return parameterName.StartsWith("图像源", StringComparison.Ordinal) &&
+                   parameterName.EndsWith("路径", StringComparison.Ordinal);
+        }
+
+        private bool ShouldHideImageSourceParameter(string parameterName)
+        {
+            if (string.Equals(parameterName, "图片路径", StringComparison.Ordinal))
+            {
+                return false;
+            }
+
+            if (!IsImageSourcePathParameter(parameterName))
+            {
+                return false;
+            }
+
+            if (stepConfigurations == null || currentStep < 0 || currentStep >= stepConfigurations.Count)
+            {
+                return false;
+            }
+
+            return stepConfigurations[currentStep].StepType == StepType.ImageSelection;
         }
 
         private string ResolveSourceFolder(string parentDir, int index)
@@ -6342,23 +6530,23 @@ namespace WpfApp2.UI
             return string.Join("\n", lines);
         }
 
-        private bool HasRequired2DPaths(string source1, string source2_1, string source2_2)
+        private bool HasRequired2DPaths(IReadOnlyList<string> paths)
         {
             int required = GetRequired2DSourceCount();
-            if (required <= 1)
+            if (paths == null || paths.Count < required)
             {
-                return !string.IsNullOrWhiteSpace(source1);
+                return false;
             }
 
-            if (required == 2)
+            for (int i = 0; i < required; i++)
             {
-                return !string.IsNullOrWhiteSpace(source1) &&
-                       !string.IsNullOrWhiteSpace(source2_1);
+                if (string.IsNullOrWhiteSpace(paths[i]))
+                {
+                    return false;
+                }
             }
 
-            return !string.IsNullOrWhiteSpace(source1) &&
-                   !string.IsNullOrWhiteSpace(source2_1) &&
-                   !string.IsNullOrWhiteSpace(source2_2);
+            return true;
         }
 
         private void EnsureCurrentImageGroupFromStep(int stepIndex)
@@ -6368,18 +6556,18 @@ namespace WpfApp2.UI
                 return;
             }
 
-            var (source1, source2_1, source2_2) = GetImagePathsFromStep(stepIndex);
+            var paths = GetImagePathsFromStep(stepIndex);
 
-            if (string.IsNullOrWhiteSpace(source1))
+            if (paths.Length > 0 && string.IsNullOrWhiteSpace(paths[0]))
             {
-                source1 = GetParameterValue(stepIndex, "图片路径", "");
+                paths[0] = GetParameterValue(stepIndex, "图片路径", "");
             }
 
-            if (!string.IsNullOrWhiteSpace(source1) && File.Exists(source1))
+            if (paths.Length > 0 && !string.IsNullOrWhiteSpace(paths[0]) && File.Exists(paths[0]))
             {
-                if (HasRequired2DPaths(source1, source2_1, source2_2))
+                if (HasRequired2DPaths(paths))
                 {
-                    var restoredGroup = BuildImageGroupFromPaths(source1, source2_1, source2_2);
+                    var restoredGroup = BuildImageGroupFromPaths(paths);
                     if (restoredGroup != null && restoredGroup.IsValid)
                     {
                         _currentImageGroup = restoredGroup;
@@ -6387,7 +6575,7 @@ namespace WpfApp2.UI
                     }
                 }
 
-                var matchedGroup = AutoMatchImageGroup(source1);
+                var matchedGroup = AutoMatchImageGroup(paths[0]);
                 if (matchedGroup != null && matchedGroup.IsValid)
                 {
                     _currentImageGroup = matchedGroup;
@@ -6962,10 +7150,17 @@ namespace WpfApp2.UI
                 return;
             }
 
-            SetImagePath("图片路径", imageGroup.Source1Path);
-            SetImagePath("图像源1路径", imageGroup.Source1Path);
-            SetImagePath("图像源2_1路径", imageGroup.Source2_1Path);
-            SetImagePath("图像源2_2路径", imageGroup.Source2_2Path);
+            int requiredSources = GetRequired2DSourceCount();
+            if (requiredSources <= 0)
+            {
+                requiredSources = 1;
+            }
+
+            SetImagePath("图片路径", imageGroup.GetPath(0));
+            for (int i = 0; i < requiredSources; i++)
+            {
+                SetImagePath(GetSourcePathParameterName(i), imageGroup.GetPath(i));
+            }
         }
 
         /// <summary>
@@ -6975,13 +7170,8 @@ namespace WpfApp2.UI
         {
             try
             {
-                // 获取当前图像源1的路径
-                string source1Path = "";
-                if (inputParameterControls.ContainsKey(currentStep) &&
-                    inputParameterControls[currentStep].ContainsKey("图像源1路径"))
-                {
-                    source1Path = inputParameterControls[currentStep]["图像源1路径"].Text;
-                }
+                var imagePaths = GetCurrentImagePaths();
+                string source1Path = imagePaths.Length > 0 ? imagePaths[0] : string.Empty;
 
                 if (string.IsNullOrWhiteSpace(source1Path) || !File.Exists(source1Path))
                 {

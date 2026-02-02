@@ -25,8 +25,8 @@ namespace WpfApp2.Rendering
             ShowPreviewImages();
 
             SetImageSource(_context.PreviewViewer1, group?.GetPath(0));
-            SetImageSource(_context.PreviewViewer2, group?.Source2Path);
-            SetImageSource(_context.PreviewViewer3, group?.Source3Path);
+            SetImageSource(_context.PreviewViewer2, group?.GetPath(1));
+            SetImageSource(_context.PreviewViewer3, group?.GetPath(2));
             SetImageSource(_context.PreviewViewer4, group?.GetPath(3));
             SetImageSource(_context.PreviewViewer5, group?.GetPath(4));
             SetImageSource(_context.PreviewViewer6, group?.GetPath(5));

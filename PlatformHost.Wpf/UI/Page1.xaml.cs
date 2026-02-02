@@ -7324,19 +7324,7 @@ namespace WpfApp2.UI
             if (imageGroup != null)
             {
                 int requiredSources = GetRequired2DSourceCount();
-                if (requiredSources > 0 && !string.IsNullOrWhiteSpace(imageGroup.Source1Path))
-                {
-                    input.ImagePaths["Source1"] = imageGroup.Source1Path;
-                }
-                if (requiredSources > 1 && !string.IsNullOrWhiteSpace(imageGroup.Source2_1Path))
-                {
-                    input.ImagePaths["Source2_1"] = imageGroup.Source2_1Path;
-                }
-                if (requiredSources > 2 && !string.IsNullOrWhiteSpace(imageGroup.Source2_2Path))
-                {
-                    input.ImagePaths["Source2_2"] = imageGroup.Source2_2Path;
-                }
-                for (int i = 3; i < requiredSources; i++)
+                for (int i = 0; i < requiredSources; i++)
                 {
                     var sourcePath = imageGroup.GetPath(i);
                     if (!string.IsNullOrWhiteSpace(sourcePath))
