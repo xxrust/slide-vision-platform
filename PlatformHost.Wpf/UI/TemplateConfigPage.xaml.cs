@@ -3586,15 +3586,163 @@ namespace WpfApp2.UI
                 return;
             }
 
-            var renderPath = ResolveStepRenderPath();
-            var path = !string.IsNullOrWhiteSpace(renderPath) ? renderPath : _currentImageGroup?.GetPath(0);
-            if (string.IsNullOrWhiteSpace(path) || !File.Exists(path))
+            if (TryResolveStepRenderImage(out var imageBytes, out var imagePath))
             {
-                StepPreviewViewer.Clear();
-                return;
+                if (imageBytes != null && imageBytes.Length > 0)
+                {
+                    StepPreviewViewer.LoadImage(imageBytes);
+                    return;
+                }
+
+                if (!string.IsNullOrWhiteSpace(imagePath) && File.Exists(imagePath))
+                {
+                    StepPreviewViewer.LoadImage(imagePath);
+                    return;
+                }
             }
 
-            StepPreviewViewer.LoadImage(path);
+            StepPreviewViewer.Clear();
+        }
+
+        private bool TryResolveStepRenderImage(out byte[] imageBytes, out string imagePath)
+        {
+            imageBytes = null;
+            imagePath = null;
+
+            try
+            {
+                if (stepConfigurations == null || currentStep < 0 || currentStep >= stepConfigurations.Count)
+                {
+                    return false;
+                }
+
+                var stepType = stepConfigurations[currentStep].StepType;
+                var result = PageManager.Page1Instance?.LastAlgorithmResult;
+                if (result == null)
+                {
+                    return false;
+                }
+
+                var boundKey = GetParameterValueByStepType(stepType, "渲染图Key", string.Empty);
+                if (stepType == StepType.ImageSelection && IsInputRenderKey(boundKey))
+                {
+                    string inputKey = string.IsNullOrWhiteSpace(boundKey) ? "Render.Input" : boundKey;
+                    if (TryGetRenderBytes(result, BuildRenderKeyCandidates(inputKey), out imageBytes))
+                    {
+                        return true;
+                    }
+
+                    imagePath = _currentImageGroup?.GetPath(0);
+                    return !string.IsNullOrWhiteSpace(imagePath);
+                }
+
+                if (!string.IsNullOrWhiteSpace(boundKey))
+                {
+                    if (TryGetRenderBytes(result, BuildRenderKeyCandidates(boundKey), out imageBytes))
+                    {
+                        return true;
+                    }
+
+                    if (TryGetRenderPathFromDebugInfo(result, BuildRenderKeyCandidates(boundKey), out imagePath))
+                    {
+                        return true;
+                    }
+                }
+
+                foreach (var key in GetRenderKeyCandidates(stepType))
+                {
+                    if (TryGetRenderBytes(result, BuildRenderKeyCandidates(key), out imageBytes))
+                    {
+                        return true;
+                    }
+
+                    if (TryGetRenderPathFromDebugInfo(result, BuildRenderKeyCandidates(key), out imagePath))
+                    {
+                        return true;
+                    }
+                }
+
+                foreach (var key in GetFallbackRenderKeys())
+                {
+                    if (TryGetRenderBytes(result, BuildRenderKeyCandidates(key), out imageBytes))
+                    {
+                        return true;
+                    }
+
+                    if (TryGetRenderPathFromDebugInfo(result, BuildRenderKeyCandidates(key), out imagePath))
+                    {
+                        return true;
+                    }
+                }
+
+                imagePath = ResolveRenderPathByScan(stepType, result.DebugInfo);
+                if (!string.IsNullOrWhiteSpace(imagePath))
+                {
+                    return true;
+                }
+
+                imagePath = ResolveRenderPathFromDirectory(stepType);
+                if (!string.IsNullOrWhiteSpace(imagePath))
+                {
+                    return true;
+                }
+            }
+            catch
+            {
+                return false;
+            }
+
+            return false;
+        }
+
+        private static bool TryGetRenderBytes(AlgorithmResult result, IEnumerable<string> keys, out byte[] bytes)
+        {
+            bytes = null;
+            if (result?.RenderImages == null || keys == null)
+            {
+                return false;
+            }
+
+            foreach (var key in keys)
+            {
+                if (key == null)
+                {
+                    continue;
+                }
+
+                if (result.RenderImages.TryGetValue(key, out var value) && value != null && value.Length > 0)
+                {
+                    bytes = value;
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        private static bool TryGetRenderPathFromDebugInfo(AlgorithmResult result, IEnumerable<string> keys, out string path)
+        {
+            path = null;
+            if (result?.DebugInfo == null || keys == null)
+            {
+                return false;
+            }
+
+            foreach (var key in keys)
+            {
+                if (key == null)
+                {
+                    continue;
+                }
+
+                if (result.DebugInfo.TryGetValue(key, out var value) && !string.IsNullOrWhiteSpace(value))
+                {
+                    path = value;
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         private string ResolveStepRenderPath()

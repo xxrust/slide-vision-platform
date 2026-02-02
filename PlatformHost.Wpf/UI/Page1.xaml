@@ -459,7 +459,7 @@
 
                         <!-- 左上：大渲染界面 -->
                         <Grid Grid.Column="0">
-                            <StackPanel Margin="3">
+                            <Border Margin="3">
                                 <Grid>
                                     <controls:ImageInspectionViewer x:Name="RenderPreviewMain"/>
                                     <Border Background="#80000000" CornerRadius="4" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="6" Panel.ZIndex="10">
@@ -467,18 +467,18 @@
                                                   Width="180"
                                                   Height="26"
                                                   FontSize="12"
-                                                  Foreground="White"
-                                                  Background="#66000000"
+                                                  Foreground="Black"
+                                                  Background="#CCFFFFFF"
                                                   BorderBrush="#80FFFFFF"
                                                   SelectionChanged="RenderMainSelector_SelectionChanged"/>
                                     </Border>
                                 </Grid>
-                            </StackPanel>
+                            </Border>
                         </Grid>
 
                         <!-- 右上：小渲染界面 -->
                         <Grid Grid.Column="1">
-                            <StackPanel Margin="3">
+                            <Border Margin="3">
                                 <Grid>
                                     <controls:ImageInspectionViewer x:Name="RenderPreviewStep"/>
                                     <Border Background="#80000000" CornerRadius="4" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="6" Panel.ZIndex="10">
@@ -486,13 +486,13 @@
                                                   Width="180"
                                                   Height="26"
                                                   FontSize="12"
-                                                  Foreground="White"
-                                                  Background="#66000000"
+                                                  Foreground="Black"
+                                                  Background="#CCFFFFFF"
                                                   BorderBrush="#80FFFFFF"
                                                   SelectionChanged="RenderStepSelector_SelectionChanged"/>
                                     </Border>
                                 </Grid>
-                            </StackPanel>
+                            </Border>
                         </Grid>
                     </Grid>
 

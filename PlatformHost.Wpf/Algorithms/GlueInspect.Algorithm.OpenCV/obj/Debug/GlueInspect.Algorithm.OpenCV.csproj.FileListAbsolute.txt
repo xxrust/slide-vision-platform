@@ -19,3 +19,12 @@ E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\out\dll\x86\openc
 E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\out\dll\x64\OpenCvSharpExtern.dll
 E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\out\dll\x64\opencv_videoio_ffmpeg4100_64.dll
 E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\out\GlueInspect.Algorithm.OpenCV.dll
+E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\PlatformHost.Wpf\Algorithms\GlueInspect.Algorithm.OpenCV\bin\Debug\GlueInspect.Algorithm.OpenCV.pdb
+E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\PlatformHost.Wpf\Algorithms\GlueInspect.Algorithm.OpenCV\bin\Debug\GlueInspect.Algorithm.Contracts.pdb
+E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\PlatformHost.Wpf\Algorithms\GlueInspect.Algorithm.OpenCV\obj\Debug\GlueInspect.Algorithm.OpenCV.pdb
+E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\out\build\dll\x86\OpenCvSharpExtern.dll
+E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\out\build\dll\x86\opencv_videoio_ffmpeg4100.dll
+E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\out\build\dll\x64\OpenCvSharpExtern.dll
+E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\out\build\dll\x64\opencv_videoio_ffmpeg4100_64.dll
+E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\out\build\GlueInspect.Algorithm.OpenCV.dll
+E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\out\build\GlueInspect.Algorithm.OpenCV.pdb

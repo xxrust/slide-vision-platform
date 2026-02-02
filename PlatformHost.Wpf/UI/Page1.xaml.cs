@@ -84,6 +84,7 @@ namespace WpfApp2.UI
 
         // 算法引擎结果缓存
         private AlgorithmResult _lastAlgorithmResult;
+        private AlgorithmResult _lastRenderResult;
         private TemplateParameters _templateOverride;
         private ImageGroupSet _lastExecutedImageGroup;
         private readonly List<RenderSelectionOption> _renderSelectionOptions = new List<RenderSelectionOption>();
@@ -7486,6 +7487,7 @@ namespace WpfApp2.UI
                 var result = await engine.ExecuteAsync(input, CancellationToken.None);
                 var template = _templateOverride ?? TryLoadCurrentTemplateParameters();
                 var normalizedResult = NormalizeAlgorithmResult(engine, result, template);
+                _lastRenderResult = normalizedResult;
                 _lastAlgorithmResult = normalizedResult;
                 ApplyAlgorithmResultTo2DCache(normalizedResult);
             }
@@ -7551,9 +7553,11 @@ namespace WpfApp2.UI
             }
 
             _renderSelectionOptions.Clear();
+            var usedKeys = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
             var displayNames = ImageSourceNaming.GetDisplayNames();
-            if (_lastExecutedImageGroup != null)
+            var previewGroup = ResolvePreviewImageGroup();
+            if (previewGroup != null)
             {
                 int count = ImageSourceNaming.GetActiveSourceCount();
                 if (count <= 0)
@@ -7564,17 +7568,13 @@ namespace WpfApp2.UI
                 for (int i = 0; i < count; i++)
                 {
                     string name = i < displayNames.Count ? displayNames[i] : $"图像{i + 1}";
-                    string path = _lastExecutedImageGroup.GetPath(i);
+                    string path = previewGroup.GetPath(i);
                     if (string.IsNullOrWhiteSpace(path))
                     {
                         continue;
                     }
 
-                    _renderSelectionOptions.Add(new RenderSelectionOption
-                    {
-                        Key = $"Original.{i}",
-                        DisplayName = $"原图-{name}"
-                    });
+                    AddRenderSelectionOption(usedKeys, $"Original.{i}", $"原图-{name}");
                 }
             }
 
@@ -7592,17 +7592,43 @@ namespace WpfApp2.UI
                         continue;
                     }
 
-                    _renderSelectionOptions.Add(new RenderSelectionOption
+                    var normalizedKey = NormalizeRenderSelectionKey(entry.Key);
+                    if (string.IsNullOrWhiteSpace(normalizedKey))
                     {
-                        Key = entry.Key,
-                        DisplayName = entry.Key
-                    });
+                        continue;
+                    }
+
+                    AddRenderSelectionOption(usedKeys, normalizedKey, normalizedKey);
+                }
+            }
+
+            if (_lastAlgorithmResult?.RenderImages != null)
+            {
+                foreach (var entry in _lastAlgorithmResult.RenderImages)
+                {
+                    if (string.IsNullOrWhiteSpace(entry.Key))
+                    {
+                        continue;
+                    }
+
+                    if (entry.Value == null || entry.Value.Length == 0)
+                    {
+                        continue;
+                    }
+
+                    var normalizedKey = NormalizeRenderSelectionKey(entry.Key);
+                    if (string.IsNullOrWhiteSpace(normalizedKey))
+                    {
+                        continue;
+                    }
+
+                    AddRenderSelectionOption(usedKeys, normalizedKey, normalizedKey);
                 }
             }
 
             if (_renderSelectionOptions.Count == 0)
             {
-                _renderSelectionOptions.Add(new RenderSelectionOption { Key = "Render.Composite", DisplayName = "Render.Composite" });
+                AddRenderSelectionOption(usedKeys, "Render.Composite", "Render.Composite");
             }
 
             _renderMainSelectionKey = ResolveSelectionKey(_renderMainSelectionKey, "Render.Composite");
@@ -7618,6 +7644,65 @@ namespace WpfApp2.UI
             RenderStepSelector.SelectedValuePath = nameof(RenderSelectionOption.Key);
             RenderStepSelector.SelectedValue = _renderStepSelectionKey;
         }
+
+        private void AddRenderSelectionOption(ISet<string> usedKeys, string key, string displayName)
+        {
+            if (string.IsNullOrWhiteSpace(key) || usedKeys.Contains(key))
+            {
+                return;
+            }
+
+            usedKeys.Add(key);
+            _renderSelectionOptions.Add(new RenderSelectionOption
+            {
+                Key = key,
+                DisplayName = displayName
+            });
+        }
+
+        private static string NormalizeRenderSelectionKey(string key)
+        {
+            if (string.IsNullOrWhiteSpace(key))
+            {
+                return null;
+            }
+
+            string normalized = key.Trim();
+            bool changed;
+            do
+            {
+                changed = false;
+                if (normalized.StartsWith("Result.", StringComparison.OrdinalIgnoreCase))
+                {
+                    normalized = normalized.Substring("Result.".Length);
+                    changed = true;
+                }
+                if (normalized.StartsWith("OpenCV.", StringComparison.OrdinalIgnoreCase))
+                {
+                    normalized = normalized.Substring("OpenCV.".Length);
+                    changed = true;
+                }
+                if (normalized.StartsWith("ONNX.", StringComparison.OrdinalIgnoreCase))
+                {
+                    normalized = normalized.Substring("ONNX.".Length);
+                    changed = true;
+                }
+            }
+            while (changed);
+
+            if (string.IsNullOrWhiteSpace(normalized))
+            {
+                return null;
+            }
+
+            if (!normalized.Contains(".") && !normalized.StartsWith("Render", StringComparison.OrdinalIgnoreCase))
+            {
+                normalized = $"Render.{normalized}";
+            }
+
+            return normalized;
+        }
+
 
         private string ResolveSelectionKey(string currentKey, string fallbackKey)
         {
@@ -7643,6 +7728,13 @@ namespace WpfApp2.UI
                 return;
             }
 
+            var bytes = ResolveRenderBytes(selectionKey);
+            if (bytes != null && bytes.Length > 0)
+            {
+                viewer.LoadImage(bytes);
+                return;
+            }
+
             var path = ResolveRenderPath(selectionKey);
             if (string.IsNullOrWhiteSpace(path) || !File.Exists(path))
             {
@@ -7651,6 +7743,35 @@ namespace WpfApp2.UI
             }
 
             viewer.LoadImage(path);
+        }
+
+        private byte[] ResolveRenderBytes(string selectionKey)
+        {
+            if (string.IsNullOrWhiteSpace(selectionKey))
+            {
+                return null;
+            }
+
+            if (selectionKey.StartsWith("Original.", StringComparison.OrdinalIgnoreCase))
+            {
+                return null;
+            }
+
+            if (_lastAlgorithmResult?.RenderImages == null)
+            {
+                return null;
+            }
+
+            var normalizedKey = NormalizeRenderSelectionKey(selectionKey) ?? selectionKey;
+            foreach (var key in BuildRenderKeyCandidates(normalizedKey))
+            {
+                if (_lastAlgorithmResult.RenderImages.TryGetValue(key, out var bytes) && bytes != null && bytes.Length > 0)
+                {
+                    return bytes;
+                }
+            }
+
+            return null;
         }
 
         private string ResolveRenderPath(string selectionKey)
@@ -7662,7 +7783,8 @@ namespace WpfApp2.UI
 
             if (selectionKey.StartsWith("Original.", StringComparison.OrdinalIgnoreCase))
             {
-                if (_lastExecutedImageGroup == null)
+                var previewGroup = ResolvePreviewImageGroup();
+                if (previewGroup == null)
                 {
                     return null;
                 }
@@ -7670,7 +7792,7 @@ namespace WpfApp2.UI
                 var parts = selectionKey.Split('.');
                 if (parts.Length == 2 && int.TryParse(parts[1], out int index))
                 {
-                    return _lastExecutedImageGroup.GetPath(index);
+                    return previewGroup.GetPath(index);
                 }
             }
 
@@ -7679,7 +7801,8 @@ namespace WpfApp2.UI
                 return null;
             }
 
-            foreach (var key in BuildRenderKeyCandidates(selectionKey))
+            var normalizedKey = NormalizeRenderSelectionKey(selectionKey) ?? selectionKey;
+            foreach (var key in BuildRenderKeyCandidates(normalizedKey))
             {
                 if (_lastAlgorithmResult.DebugInfo.TryGetValue(key, out var path))
                 {
@@ -7716,6 +7839,22 @@ namespace WpfApp2.UI
             AddRenderKeyCandidate(candidates, $"Result.ONNX.{normalized}");
 
             return candidates;
+        }
+
+        private ImageGroupSet ResolvePreviewImageGroup()
+        {
+            if (_lastExecutedImageGroup != null)
+            {
+                return _lastExecutedImageGroup;
+            }
+
+            var currentGroup = _imageTestManager?.CurrentGroup;
+            if (currentGroup != null)
+            {
+                return currentGroup;
+            }
+
+            return GetLastTestImageGroup();
         }
 
         private static void AddRenderKeyCandidate(ICollection<string> candidates, string key)
@@ -7816,6 +7955,19 @@ namespace WpfApp2.UI
                     }
 
                     normalized.DebugInfo[$"Result.{entry.Key}"] = entry.Value ?? string.Empty;
+                }
+            }
+
+            if (result?.RenderImages != null)
+            {
+                foreach (var entry in result.RenderImages)
+                {
+                    if (entry.Key == null)
+                    {
+                        continue;
+                    }
+
+                    normalized.RenderImages[$"Result.{entry.Key}"] = entry.Value;
                 }
             }
 
@@ -10526,8 +10678,69 @@ namespace WpfApp2.UI
                 return;
             }
 
+            MergeRenderPayload(result, _lastRenderResult ?? _lastAlgorithmResult);
             _lastAlgorithmResult = result;
             AlgorithmResultProduced?.Invoke(this, new AlgorithmResultEventArgs(result));
+        }
+
+        private static void MergeRenderPayload(AlgorithmResult target, AlgorithmResult source)
+        {
+            if (target == null || source == null)
+            {
+                return;
+            }
+
+            if (source.RenderImages != null && source.RenderImages.Count > 0)
+            {
+                if (target.RenderImages == null)
+                {
+                    target.RenderImages = new Dictionary<string, byte[]>(StringComparer.OrdinalIgnoreCase);
+                }
+
+                foreach (var entry in source.RenderImages)
+                {
+                    if (string.IsNullOrWhiteSpace(entry.Key))
+                    {
+                        continue;
+                    }
+
+                    if (entry.Value == null || entry.Value.Length == 0)
+                    {
+                        continue;
+                    }
+
+                    if (!target.RenderImages.ContainsKey(entry.Key))
+                    {
+                        target.RenderImages[entry.Key] = entry.Value;
+                    }
+                }
+            }
+
+            if (source.DebugInfo != null && source.DebugInfo.Count > 0)
+            {
+                if (target.DebugInfo == null)
+                {
+                    target.DebugInfo = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+                }
+
+                foreach (var entry in source.DebugInfo)
+                {
+                    if (string.IsNullOrWhiteSpace(entry.Key))
+                    {
+                        continue;
+                    }
+
+                    if (entry.Key.IndexOf("render", StringComparison.OrdinalIgnoreCase) < 0)
+                    {
+                        continue;
+                    }
+
+                    if (!target.DebugInfo.ContainsKey(entry.Key))
+                    {
+                        target.DebugInfo[entry.Key] = entry.Value ?? string.Empty;
+                    }
+                }
+            }
         }
 
         /// <summary>

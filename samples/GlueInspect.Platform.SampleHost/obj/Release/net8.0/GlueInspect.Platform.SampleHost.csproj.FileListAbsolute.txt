@@ -18,3 +18,12 @@ E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\out\GlueInspect.P
 E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\out\GlueInspect.Platform.SampleHost.deps.json
 E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\out\GlueInspect.Platform.SampleHost.runtimeconfig.json
 E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\out\GlueInspect.Platform.SampleHost.dll
+E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\samples\GlueInspect.Platform.SampleHost\bin\Release\net8.0\GlueInspect.Platform.SampleHost.pdb
+E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\samples\GlueInspect.Platform.SampleHost\bin\Release\net8.0\GlueInspect.Platform.Runtime.pdb
+E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\samples\GlueInspect.Platform.SampleHost\bin\Release\net8.0\GlueInspect.Platform.Abstractions.pdb
+E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\samples\GlueInspect.Platform.SampleHost\obj\Release\net8.0\GlueInspect.Platform.SampleHost.pdb
+E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\out\build\GlueInspect.Platform.SampleHost.exe
+E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\out\build\GlueInspect.Platform.SampleHost.deps.json
+E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\out\build\GlueInspect.Platform.SampleHost.runtimeconfig.json
+E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\out\build\GlueInspect.Platform.SampleHost.dll
+E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\out\build\GlueInspect.Platform.SampleHost.pdb

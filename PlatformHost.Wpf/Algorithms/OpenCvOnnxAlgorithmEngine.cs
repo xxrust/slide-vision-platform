@@ -105,6 +105,8 @@ namespace WpfApp2.Algorithms
 
             AppendDebugInfo(result, "OpenCV", openCvResult);
             AppendDebugInfo(result, "ONNX", onnxResult);
+            AppendRenderImages(result, "OpenCV", openCvResult);
+            AppendRenderImages(result, "ONNX", onnxResult);
 
             return result;
         }
@@ -217,6 +219,29 @@ namespace WpfApp2.Algorithms
                 }
 
                 target.DebugInfo[$"{prefix}.{entry.Key}"] = entry.Value ?? string.Empty;
+            }
+        }
+
+        private static void AppendRenderImages(AlgorithmResult target, string prefix, AlgorithmResult source)
+        {
+            if (target == null || source?.RenderImages == null)
+            {
+                return;
+            }
+
+            foreach (var entry in source.RenderImages)
+            {
+                if (entry.Key == null)
+                {
+                    continue;
+                }
+
+                if (entry.Value == null || entry.Value.Length == 0)
+                {
+                    continue;
+                }
+
+                target.RenderImages[$"{prefix}.{entry.Key}"] = entry.Value;
             }
         }
     }

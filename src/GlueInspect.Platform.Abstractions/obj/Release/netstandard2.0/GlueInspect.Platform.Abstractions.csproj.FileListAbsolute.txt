@@ -8,3 +8,8 @@ E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\src\GlueInspect.P
 E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\out\GlueInspect.Platform.Abstractions.deps.json
 E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\out\GlueInspect.Platform.Abstractions.dll
 E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\src\GlueInspect.Platform.Abstractions\bin\Release\netstandard2.0\GlueInspect.Platform.Abstractions.dll
+E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\src\GlueInspect.Platform.Abstractions\bin\Release\netstandard2.0\GlueInspect.Platform.Abstractions.pdb
+E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\src\GlueInspect.Platform.Abstractions\obj\Release\netstandard2.0\GlueInspect.Platform.Abstractions.pdb
+E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\out\build\GlueInspect.Platform.Abstractions.deps.json
+E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\out\build\GlueInspect.Platform.Abstractions.dll
+E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\out\build\GlueInspect.Platform.Abstractions.pdb

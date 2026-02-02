@@ -10,3 +10,9 @@ E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\plugins\GlueInspe
 E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\plugins\GlueInspect.Algorithm.OpenCv\obj\Release\netstandard2.0\GlueInspect.Algorithm.OpenCv.dll
 E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\out\GlueInspect.Algorithm.OpenCv.deps.json
 E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\out\GlueInspect.Algorithm.OpenCv.dll
+E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\plugins\GlueInspect.Algorithm.OpenCv\bin\Release\netstandard2.0\GlueInspect.Algorithm.OpenCv.pdb
+E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\plugins\GlueInspect.Algorithm.OpenCv\bin\Release\netstandard2.0\GlueInspect.Platform.Abstractions.pdb
+E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\plugins\GlueInspect.Algorithm.OpenCv\obj\Release\netstandard2.0\GlueInspect.Algorithm.OpenCv.pdb
+E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\out\build\GlueInspect.Algorithm.OpenCv.deps.json
+E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\out\build\GlueInspect.Algorithm.OpenCv.dll
+E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\out\build\GlueInspect.Algorithm.OpenCv.pdb

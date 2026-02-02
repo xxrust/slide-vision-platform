@@ -68,7 +68,8 @@ namespace GlueInspect.Algorithm.Contracts
         public string ErrorMessage { get; set; }
         public DateTime Timestamp { get; set; } = DateTime.Now;
         public List<AlgorithmMeasurement> Measurements { get; set; } = new List<AlgorithmMeasurement>();
-        public Dictionary<string, string> DebugInfo { get; set; } = new Dictionary<string, string>();
+        public Dictionary<string, string> DebugInfo { get; set; } = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        public Dictionary<string, byte[]> RenderImages { get; set; } = new Dictionary<string, byte[]>(StringComparer.OrdinalIgnoreCase);
     }
 
     public interface IAlgorithmEngine

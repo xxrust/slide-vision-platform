@@ -82,25 +82,46 @@ namespace GlueInspect.Algorithm.OpenCV
                     secondary = ProcessImage(secondaryPath, useGray, blurKernel, blurSigma, cannyLow, cannyHigh, dilateIterations);
                 }
 
-                var renderDir = EnsureRenderDirectory();
-                string stamp = DateTime.Now.ToString("yyyyMMdd_HHmmss_fff");
-                string preprocessPath = Path.Combine(renderDir, $"preprocess_{stamp}.png");
-                string edgePath = Path.Combine(renderDir, $"edge_{stamp}.png");
-                string compositePath = Path.Combine(renderDir, $"composite_{stamp}.png");
-
                 using (var preprocess = CombineSideBySide(primary.Preprocess, secondary?.Preprocess))
                 using (var edges = CombineSideBySide(primary.Edges, secondary?.Edges))
                 using (var composite = CombineSideBySide(primary.Composite, secondary?.Composite))
                 {
-                    Cv2.ImWrite(preprocessPath, preprocess);
-                    Cv2.ImWrite(edgePath, edges);
-                    Cv2.ImWrite(compositePath, composite);
+                    var preprocessBytes = EncodePng(preprocess);
+                    if (preprocessBytes != null && preprocessBytes.Length > 0)
+                    {
+                        result.RenderImages["Render.Preprocess"] = preprocessBytes;
+                    }
+
+                    var edgeBytes = EncodePng(edges);
+                    if (edgeBytes != null && edgeBytes.Length > 0)
+                    {
+                        result.RenderImages["Render.Edge"] = edgeBytes;
+                    }
+
+                    var compositeBytes = EncodePng(composite);
+                    if (compositeBytes != null && compositeBytes.Length > 0)
+                    {
+                        result.RenderImages["Render.Composite"] = compositeBytes;
+                    }
                 }
 
                 result.DebugInfo["Render.Input"] = primaryPath;
-                result.DebugInfo["Render.Preprocess"] = preprocessPath;
-                result.DebugInfo["Render.Edge"] = edgePath;
-                result.DebugInfo["Render.Composite"] = compositePath;
+                result.DebugInfo["Render.Preprocess"] = "[memory]";
+                result.DebugInfo["Render.Edge"] = "[memory]";
+                result.DebugInfo["Render.Composite"] = "[memory]";
+
+                try
+                {
+                    var inputBytes = File.ReadAllBytes(primaryPath);
+                    if (inputBytes != null && inputBytes.Length > 0)
+                    {
+                        result.RenderImages["Render.Input"] = inputBytes;
+                    }
+                }
+                catch
+                {
+                    // Ignore input read failures
+                }
 
                 var measurements = new List<AlgorithmMeasurement>();
                 int toolIndex = 1;
@@ -204,6 +225,94 @@ namespace GlueInspect.Algorithm.OpenCV
                 Edges?.Dispose();
                 Composite?.Dispose();
             }
+        }
+
+        private static byte[] EncodePng(Mat mat)
+        {
+            if (mat == null || mat.Empty())
+            {
+                return null;
+            }
+
+            if (TryEncode(mat, ".png", out var bytes))
+            {
+                return bytes;
+            }
+
+            Mat converted = null;
+            Mat bgr = null;
+
+            try
+            {
+                Mat working = mat;
+                if (mat.Depth() != MatType.CV_8U)
+                {
+                    converted = new Mat();
+                    mat.ConvertTo(converted, MatType.CV_8U);
+                    working = converted;
+                }
+
+                if (working.Channels() == 1)
+                {
+                    bgr = new Mat();
+                    Cv2.CvtColor(working, bgr, ColorConversionCodes.GRAY2BGR);
+                }
+                else if (working.Channels() == 4)
+                {
+                    bgr = new Mat();
+                    Cv2.CvtColor(working, bgr, ColorConversionCodes.BGRA2BGR);
+                }
+
+                if (bgr != null && TryEncode(bgr, ".png", out bytes))
+                {
+                    return bytes;
+                }
+
+                if (TryEncode(working, ".bmp", out bytes))
+                {
+                    return bytes;
+                }
+
+                if (bgr != null && TryEncode(bgr, ".bmp", out bytes))
+                {
+                    return bytes;
+                }
+            }
+            catch
+            {
+                // Ignore encode fallback failures
+            }
+            finally
+            {
+                bgr?.Dispose();
+                converted?.Dispose();
+            }
+
+            return null;
+        }
+
+        private static bool TryEncode(Mat mat, string ext, out byte[] bytes)
+        {
+            bytes = null;
+            if (mat == null || mat.Empty())
+            {
+                return false;
+            }
+
+            try
+            {
+                if (Cv2.ImEncode(ext, mat, out bytes) && bytes != null && bytes.Length > 0)
+                {
+                    return true;
+                }
+            }
+            catch
+            {
+                // Ignore encode failures
+            }
+
+            bytes = null;
+            return false;
         }
 
         private static ProcessedImage ProcessImage(string imagePath, bool useGray, int blurKernel, double blurSigma, double cannyLow, double cannyHigh, int dilateIterations)

@@ -3,3 +3,7 @@ E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\PlatformHost.Wpf\
 E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\PlatformHost.Wpf\Algorithms\GlueInspect.Algorithm.Contracts\obj\Debug\GlueInspect.Algorithm.Contracts.dll
 E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\out\GlueInspect.Algorithm.Contracts.dll
 E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\PlatformHost.Wpf\Algorithms\GlueInspect.Algorithm.Contracts\bin\Debug\GlueInspect.Algorithm.Contracts.dll
+E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\PlatformHost.Wpf\Algorithms\GlueInspect.Algorithm.Contracts\bin\Debug\GlueInspect.Algorithm.Contracts.pdb
+E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\PlatformHost.Wpf\Algorithms\GlueInspect.Algorithm.Contracts\obj\Debug\GlueInspect.Algorithm.Contracts.pdb
+E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\out\build\GlueInspect.Algorithm.Contracts.dll
+E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\out\build\GlueInspect.Algorithm.Contracts.pdb

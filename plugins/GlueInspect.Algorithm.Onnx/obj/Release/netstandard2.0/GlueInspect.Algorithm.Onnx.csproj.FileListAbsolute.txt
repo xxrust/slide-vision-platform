@@ -10,3 +10,9 @@ E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\plugins\GlueInspe
 E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\plugins\GlueInspect.Algorithm.Onnx\obj\Release\netstandard2.0\GlueInspect.Algorithm.Onnx.dll
 E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\out\GlueInspect.Algorithm.Onnx.deps.json
 E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\out\GlueInspect.Algorithm.Onnx.dll
+E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\plugins\GlueInspect.Algorithm.Onnx\bin\Release\netstandard2.0\GlueInspect.Algorithm.Onnx.pdb
+E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\plugins\GlueInspect.Algorithm.Onnx\bin\Release\netstandard2.0\GlueInspect.Platform.Abstractions.pdb
+E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\plugins\GlueInspect.Algorithm.Onnx\obj\Release\netstandard2.0\GlueInspect.Algorithm.Onnx.pdb
+E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\out\build\GlueInspect.Algorithm.Onnx.deps.json
+E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\out\build\GlueInspect.Algorithm.Onnx.dll
+E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\out\build\GlueInspect.Algorithm.Onnx.pdb

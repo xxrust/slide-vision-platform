@@ -5,6 +5,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using System.Linq;
 
 namespace WpfApp2.UI.Controls
 {
@@ -60,6 +61,43 @@ namespace WpfApp2.UI.Controls
                 ImageElement.Source = _bitmap;
                 _pendingFit = !TryFitToCanvas();
                 UpdateInfoText(null);
+            }
+            catch
+            {
+                Clear();
+            }
+        }
+
+        public void LoadImage(byte[] imageBytes)
+        {
+            if (imageBytes == null || imageBytes.Length == 0)
+            {
+                Clear();
+                return;
+            }
+
+            try
+            {
+                using (var stream = new MemoryStream(imageBytes, writable: false))
+                {
+                    var decoder = BitmapDecoder.Create(stream, BitmapCreateOptions.PreservePixelFormat, BitmapCacheOption.OnLoad);
+                    var frame = decoder.Frames.FirstOrDefault();
+                    if (frame == null)
+                    {
+                        Clear();
+                        return;
+                    }
+
+                    frame.Freeze();
+                    _bitmap = new FormatConvertedBitmap(frame, PixelFormats.Bgra32, null, 0);
+                    _stride = _bitmap.PixelWidth * 4;
+                    _pixelBuffer = new byte[_stride * _bitmap.PixelHeight];
+                    _bitmap.CopyPixels(_pixelBuffer, _stride, 0);
+
+                    ImageElement.Source = _bitmap;
+                    _pendingFit = !TryFitToCanvas();
+                    UpdateInfoText(null);
+                }
             }
             catch
             {
