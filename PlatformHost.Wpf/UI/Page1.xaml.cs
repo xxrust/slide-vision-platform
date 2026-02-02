@@ -7578,30 +7578,6 @@ namespace WpfApp2.UI
                 }
             }
 
-            if (_lastAlgorithmResult?.DebugInfo != null)
-            {
-                foreach (var entry in _lastAlgorithmResult.DebugInfo)
-                {
-                    if (string.IsNullOrWhiteSpace(entry.Key))
-                    {
-                        continue;
-                    }
-
-                    if (entry.Key.IndexOf("render", StringComparison.OrdinalIgnoreCase) < 0)
-                    {
-                        continue;
-                    }
-
-                    var normalizedKey = NormalizeRenderSelectionKey(entry.Key);
-                    if (string.IsNullOrWhiteSpace(normalizedKey))
-                    {
-                        continue;
-                    }
-
-                    AddRenderSelectionOption(usedKeys, normalizedKey, normalizedKey);
-                }
-            }
-
             if (_lastAlgorithmResult?.RenderImages != null)
             {
                 foreach (var entry in _lastAlgorithmResult.RenderImages)
@@ -7796,24 +7772,6 @@ namespace WpfApp2.UI
                 }
             }
 
-            if (_lastAlgorithmResult?.DebugInfo == null)
-            {
-                return null;
-            }
-
-            var normalizedKey = NormalizeRenderSelectionKey(selectionKey) ?? selectionKey;
-            foreach (var key in BuildRenderKeyCandidates(normalizedKey))
-            {
-                if (_lastAlgorithmResult.DebugInfo.TryGetValue(key, out var path))
-                {
-                    var resolved = TryResolveRenderFile(path);
-                    if (!string.IsNullOrWhiteSpace(resolved))
-                    {
-                        return resolved;
-                    }
-                }
-            }
-
             return null;
         }
 
@@ -7867,49 +7825,6 @@ namespace WpfApp2.UI
             candidates.Add(key);
         }
 
-        private static string TryResolveRenderFile(string path)
-        {
-            if (string.IsNullOrWhiteSpace(path))
-            {
-                return null;
-            }
-
-            string trimmed = path.Trim();
-            if (File.Exists(trimmed))
-            {
-                return trimmed;
-            }
-
-            string baseDir = AppDomain.CurrentDomain.BaseDirectory;
-            if (!Path.IsPathRooted(trimmed))
-            {
-                var candidate = Path.Combine(baseDir, trimmed);
-                if (File.Exists(candidate))
-                {
-                    return candidate;
-                }
-
-                candidate = Path.Combine(baseDir, "Render", trimmed);
-                if (File.Exists(candidate))
-                {
-                    return candidate;
-                }
-
-                if (string.IsNullOrWhiteSpace(Path.GetExtension(trimmed)))
-                {
-                    foreach (var ext in new[] { ".png", ".jpg", ".jpeg", ".bmp" })
-                    {
-                        candidate = Path.Combine(baseDir, "Render", trimmed + ext);
-                        if (File.Exists(candidate))
-                        {
-                            return candidate;
-                        }
-                    }
-                }
-            }
-
-            return null;
-        }
 
         private void RenderMainSelector_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {

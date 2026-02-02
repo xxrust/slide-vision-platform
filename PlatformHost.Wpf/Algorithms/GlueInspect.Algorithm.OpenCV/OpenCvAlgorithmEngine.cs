@@ -196,18 +196,6 @@ namespace GlueInspect.Algorithm.OpenCV
             return result;
         }
 
-        private static string EnsureRenderDirectory()
-        {
-            string baseDir = AppDomain.CurrentDomain.BaseDirectory;
-            string renderDir = Path.Combine(baseDir, "Render");
-            if (!Directory.Exists(renderDir))
-            {
-                Directory.CreateDirectory(renderDir);
-            }
-
-            return renderDir;
-        }
-
         private sealed class ProcessedImage
         {
             public Mat Preprocess { get; set; }

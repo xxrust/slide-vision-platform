@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("GlueInspect.Platform.SampleHost")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Release")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+ee24b14ab7cdb26c2faa342f25bb0ba68ccf85fa")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+e078f9d3fd3377d59ca13521780718800ad525d0")]
 [assembly: System.Reflection.AssemblyProductAttribute("GlueInspect.Platform.SampleHost")]
 [assembly: System.Reflection.AssemblyTitleAttribute("GlueInspect.Platform.SampleHost")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
