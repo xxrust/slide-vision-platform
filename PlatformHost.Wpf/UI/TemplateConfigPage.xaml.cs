@@ -8288,6 +8288,7 @@ namespace WpfApp2.UI
                 timer.Tick += (s, e) =>
                 {
                     timer.Stop();
+                    SaveStepParameters(currentStep);
                     _ = ExecuteUnifiedFlowAsync(GetSafeStepName(currentStep));
                 };
                 timer.Start();

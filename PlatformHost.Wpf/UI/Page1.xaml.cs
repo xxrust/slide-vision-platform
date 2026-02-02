@@ -85,6 +85,10 @@ namespace WpfApp2.UI
         // 算法引擎结果缓存
         private AlgorithmResult _lastAlgorithmResult;
         private TemplateParameters _templateOverride;
+        private ImageGroupSet _lastExecutedImageGroup;
+        private readonly List<RenderSelectionOption> _renderSelectionOptions = new List<RenderSelectionOption>();
+        private string _renderMainSelectionKey;
+        private string _renderStepSelectionKey;
 
         public event EventHandler<AlgorithmResultEventArgs> AlgorithmResultProduced;
 
@@ -94,6 +98,12 @@ namespace WpfApp2.UI
         public UnifiedDetectionManager DetectionManager => _detectionManager;
 
         public AlgorithmResult LastAlgorithmResult => _lastAlgorithmResult;
+
+        private sealed class RenderSelectionOption
+        {
+            public string Key { get; set; }
+            public string DisplayName { get; set; }
+        }
 
         public void SetTemplateOverride(TemplateParameters template)
         {
@@ -7162,6 +7172,7 @@ namespace WpfApp2.UI
             
             try
             {
+                _lastExecutedImageGroup = imageGroup;
                 // 清空缓存
                 Clear2DDataCache();
                 Clear3DDataCache();
@@ -7293,6 +7304,7 @@ namespace WpfApp2.UI
 
             try
             {
+                _lastExecutedImageGroup = imageGroup;
                 var engine = ResolveAlgorithmEngine();
                 var algorithmInput = BuildAlgorithmInput(imageGroup);
                 TrackAlgorithmExecution(engine, algorithmInput);
@@ -7507,6 +7519,275 @@ namespace WpfApp2.UI
             SetCached2DItems(items);
 
             LogUpdate($"算法引擎检测完成: {result.EngineId} - {(result.IsOk ? "OK" : "NG")} - {result.DefectType}");
+
+            RefreshRenderPreviews();
+        }
+
+        private void RefreshRenderPreviews()
+        {
+            try
+            {
+                if (!Dispatcher.CheckAccess())
+                {
+                    Dispatcher.Invoke(RefreshRenderPreviews);
+                    return;
+                }
+
+                UpdateRenderSelectionOptions();
+                UpdateRenderPreview(RenderPreviewMain, _renderMainSelectionKey);
+                UpdateRenderPreview(RenderPreviewStep, _renderStepSelectionKey);
+            }
+            catch (Exception ex)
+            {
+                LogUpdate($"刷新渲染预览失败: {ex.Message}");
+            }
+        }
+
+        private void UpdateRenderSelectionOptions()
+        {
+            if (RenderMainSelector == null || RenderStepSelector == null)
+            {
+                return;
+            }
+
+            _renderSelectionOptions.Clear();
+
+            var displayNames = ImageSourceNaming.GetDisplayNames();
+            if (_lastExecutedImageGroup != null)
+            {
+                int count = ImageSourceNaming.GetActiveSourceCount();
+                if (count <= 0)
+                {
+                    count = 1;
+                }
+
+                for (int i = 0; i < count; i++)
+                {
+                    string name = i < displayNames.Count ? displayNames[i] : $"图像{i + 1}";
+                    string path = _lastExecutedImageGroup.GetPath(i);
+                    if (string.IsNullOrWhiteSpace(path))
+                    {
+                        continue;
+                    }
+
+                    _renderSelectionOptions.Add(new RenderSelectionOption
+                    {
+                        Key = $"Original.{i}",
+                        DisplayName = $"原图-{name}"
+                    });
+                }
+            }
+
+            if (_lastAlgorithmResult?.DebugInfo != null)
+            {
+                foreach (var entry in _lastAlgorithmResult.DebugInfo)
+                {
+                    if (string.IsNullOrWhiteSpace(entry.Key))
+                    {
+                        continue;
+                    }
+
+                    if (entry.Key.IndexOf("render", StringComparison.OrdinalIgnoreCase) < 0)
+                    {
+                        continue;
+                    }
+
+                    _renderSelectionOptions.Add(new RenderSelectionOption
+                    {
+                        Key = entry.Key,
+                        DisplayName = entry.Key
+                    });
+                }
+            }
+
+            if (_renderSelectionOptions.Count == 0)
+            {
+                _renderSelectionOptions.Add(new RenderSelectionOption { Key = "Render.Composite", DisplayName = "Render.Composite" });
+            }
+
+            _renderMainSelectionKey = ResolveSelectionKey(_renderMainSelectionKey, "Render.Composite");
+            _renderStepSelectionKey = ResolveSelectionKey(_renderStepSelectionKey, "Render.Preprocess");
+
+            RenderMainSelector.ItemsSource = _renderSelectionOptions;
+            RenderMainSelector.DisplayMemberPath = nameof(RenderSelectionOption.DisplayName);
+            RenderMainSelector.SelectedValuePath = nameof(RenderSelectionOption.Key);
+            RenderMainSelector.SelectedValue = _renderMainSelectionKey;
+
+            RenderStepSelector.ItemsSource = _renderSelectionOptions;
+            RenderStepSelector.DisplayMemberPath = nameof(RenderSelectionOption.DisplayName);
+            RenderStepSelector.SelectedValuePath = nameof(RenderSelectionOption.Key);
+            RenderStepSelector.SelectedValue = _renderStepSelectionKey;
+        }
+
+        private string ResolveSelectionKey(string currentKey, string fallbackKey)
+        {
+            if (!string.IsNullOrWhiteSpace(currentKey) &&
+                _renderSelectionOptions.Any(o => string.Equals(o.Key, currentKey, StringComparison.OrdinalIgnoreCase)))
+            {
+                return currentKey;
+            }
+
+            if (!string.IsNullOrWhiteSpace(fallbackKey) &&
+                _renderSelectionOptions.Any(o => string.Equals(o.Key, fallbackKey, StringComparison.OrdinalIgnoreCase)))
+            {
+                return fallbackKey;
+            }
+
+            return _renderSelectionOptions.FirstOrDefault()?.Key;
+        }
+
+        private void UpdateRenderPreview(WpfApp2.UI.Controls.ImageInspectionViewer viewer, string selectionKey)
+        {
+            if (viewer == null)
+            {
+                return;
+            }
+
+            var path = ResolveRenderPath(selectionKey);
+            if (string.IsNullOrWhiteSpace(path) || !File.Exists(path))
+            {
+                viewer.Clear();
+                return;
+            }
+
+            viewer.LoadImage(path);
+        }
+
+        private string ResolveRenderPath(string selectionKey)
+        {
+            if (string.IsNullOrWhiteSpace(selectionKey))
+            {
+                return null;
+            }
+
+            if (selectionKey.StartsWith("Original.", StringComparison.OrdinalIgnoreCase))
+            {
+                if (_lastExecutedImageGroup == null)
+                {
+                    return null;
+                }
+
+                var parts = selectionKey.Split('.');
+                if (parts.Length == 2 && int.TryParse(parts[1], out int index))
+                {
+                    return _lastExecutedImageGroup.GetPath(index);
+                }
+            }
+
+            if (_lastAlgorithmResult?.DebugInfo == null)
+            {
+                return null;
+            }
+
+            foreach (var key in BuildRenderKeyCandidates(selectionKey))
+            {
+                if (_lastAlgorithmResult.DebugInfo.TryGetValue(key, out var path))
+                {
+                    var resolved = TryResolveRenderFile(path);
+                    if (!string.IsNullOrWhiteSpace(resolved))
+                    {
+                        return resolved;
+                    }
+                }
+            }
+
+            return null;
+        }
+
+        private IEnumerable<string> BuildRenderKeyCandidates(string selectionKey)
+        {
+            var candidates = new List<string>();
+            if (string.IsNullOrWhiteSpace(selectionKey))
+            {
+                return candidates;
+            }
+
+            string normalized = selectionKey.Trim();
+            if (!normalized.Contains(".") && !normalized.StartsWith("Render", StringComparison.OrdinalIgnoreCase))
+            {
+                normalized = $"Render.{normalized}";
+            }
+
+            AddRenderKeyCandidate(candidates, normalized);
+            AddRenderKeyCandidate(candidates, $"Result.{normalized}");
+            AddRenderKeyCandidate(candidates, $"OpenCV.{normalized}");
+            AddRenderKeyCandidate(candidates, $"ONNX.{normalized}");
+            AddRenderKeyCandidate(candidates, $"Result.OpenCV.{normalized}");
+            AddRenderKeyCandidate(candidates, $"Result.ONNX.{normalized}");
+
+            return candidates;
+        }
+
+        private static void AddRenderKeyCandidate(ICollection<string> candidates, string key)
+        {
+            if (string.IsNullOrWhiteSpace(key) || candidates.Contains(key))
+            {
+                return;
+            }
+
+            candidates.Add(key);
+        }
+
+        private static string TryResolveRenderFile(string path)
+        {
+            if (string.IsNullOrWhiteSpace(path))
+            {
+                return null;
+            }
+
+            string trimmed = path.Trim();
+            if (File.Exists(trimmed))
+            {
+                return trimmed;
+            }
+
+            string baseDir = AppDomain.CurrentDomain.BaseDirectory;
+            if (!Path.IsPathRooted(trimmed))
+            {
+                var candidate = Path.Combine(baseDir, trimmed);
+                if (File.Exists(candidate))
+                {
+                    return candidate;
+                }
+
+                candidate = Path.Combine(baseDir, "Render", trimmed);
+                if (File.Exists(candidate))
+                {
+                    return candidate;
+                }
+
+                if (string.IsNullOrWhiteSpace(Path.GetExtension(trimmed)))
+                {
+                    foreach (var ext in new[] { ".png", ".jpg", ".jpeg", ".bmp" })
+                    {
+                        candidate = Path.Combine(baseDir, "Render", trimmed + ext);
+                        if (File.Exists(candidate))
+                        {
+                            return candidate;
+                        }
+                    }
+                }
+            }
+
+            return null;
+        }
+
+        private void RenderMainSelector_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (RenderMainSelector?.SelectedValue is string key)
+            {
+                _renderMainSelectionKey = key;
+                UpdateRenderPreview(RenderPreviewMain, _renderMainSelectionKey);
+            }
+        }
+
+        private void RenderStepSelector_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (RenderStepSelector?.SelectedValue is string key)
+            {
+                _renderStepSelectionKey = key;
+                UpdateRenderPreview(RenderPreviewStep, _renderStepSelectionKey);
+            }
         }
 
         private AlgorithmResult NormalizeAlgorithmResult(IAlgorithmEngine engine, AlgorithmResult result, TemplateParameters template)

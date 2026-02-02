@@ -462,6 +462,16 @@
                             <StackPanel Margin="3">
                                 <Grid>
                                     <controls:ImageInspectionViewer x:Name="RenderPreviewMain"/>
+                                    <Border Background="#80000000" CornerRadius="4" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="6" Panel.ZIndex="10">
+                                        <ComboBox x:Name="RenderMainSelector"
+                                                  Width="180"
+                                                  Height="26"
+                                                  FontSize="12"
+                                                  Foreground="White"
+                                                  Background="#66000000"
+                                                  BorderBrush="#80FFFFFF"
+                                                  SelectionChanged="RenderMainSelector_SelectionChanged"/>
+                                    </Border>
                                 </Grid>
                             </StackPanel>
                         </Grid>
@@ -471,6 +481,16 @@
                             <StackPanel Margin="3">
                                 <Grid>
                                     <controls:ImageInspectionViewer x:Name="RenderPreviewStep"/>
+                                    <Border Background="#80000000" CornerRadius="4" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="6" Panel.ZIndex="10">
+                                        <ComboBox x:Name="RenderStepSelector"
+                                                  Width="180"
+                                                  Height="26"
+                                                  FontSize="12"
+                                                  Foreground="White"
+                                                  Background="#66000000"
+                                                  BorderBrush="#80FFFFFF"
+                                                  SelectionChanged="RenderStepSelector_SelectionChanged"/>
+                                    </Border>
                                 </Grid>
                             </StackPanel>
                         </Grid>
