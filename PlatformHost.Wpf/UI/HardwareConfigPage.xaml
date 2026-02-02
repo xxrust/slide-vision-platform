@@ -140,57 +140,73 @@
         <!-- 主内容区域 -->
         <Grid Grid.Row="1" Margin="20">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="15"/>
-                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="2*"/>
                 <ColumnDefinition Width="15"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
 
-            <!-- 左侧：飞拍相机配置 -->
-            <Border Grid.Column="0" Background="#FF34495E" CornerRadius="10" Padding="20">
-                <Border.Effect>
-                    <DropShadowEffect Color="Black" Direction="315" ShadowDepth="3" Opacity="0.3"/>
-                </Border.Effect>
-                
-                <StackPanel>
-                    <StackPanel Orientation="Horizontal" Margin="0,0,0,20">
-                        <TextBlock Text="📷 飞拍相机" FontSize="18" FontWeight="Bold" Foreground="White" VerticalAlignment="Center"/>
-                        <Button x:Name="RefreshFlyingCameraButton" Content="🔄" Width="30" Height="30" Margin="10,0,0,0"
-                                Background="#FF3498DB" Foreground="White" FontSize="12" FontWeight="Bold"
-                                Click="RefreshFlyingCameraButton_Click" VerticalAlignment="Center"/>
-                    </StackPanel>
-                    
-                    <!-- 飞拍相机配置控件 -->
-                    <Border Background="#FF2C3E50" CornerRadius="8" Padding="15">
-                        <controls:GenericCameraConfigControl x:Name="FlyingCameraControl" Height="800" HorizontalAlignment="Stretch"/>
-                    </Border>
-                </StackPanel>
-            </Border>
+            <!-- 左侧：相机配置列表（支持分页） -->
+            <Grid Grid.Column="0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
 
-            <!-- 中间：定拍相机配置 -->
-            <Border Grid.Column="2" Background="#FF34495E" CornerRadius="10" Padding="20">
-                <Border.Effect>
-                    <DropShadowEffect Color="Black" Direction="315" ShadowDepth="3" Opacity="0.3"/>
-                </Border.Effect>
-                
-                <StackPanel>
-                    <StackPanel Orientation="Horizontal" Margin="0,0,0,20">
-                        <TextBlock Text="📷 定拍相机" FontSize="18" FontWeight="Bold" Foreground="White" VerticalAlignment="Center"/>
-                        <Button x:Name="RefreshFixedCameraButton" Content="🔄" Width="30" Height="30" Margin="10,0,0,0"
-                                Background="#FF3498DB" Foreground="White" FontSize="12" FontWeight="Bold"
-                                Click="RefreshFixedCameraButton_Click" VerticalAlignment="Center"/>
-                    </StackPanel>
-                    
-                    <!-- 定拍相机配置控件 -->
-                    <Border Background="#FF2C3E50" CornerRadius="8" Padding="15">
-                        <controls:GenericCameraConfigControl x:Name="FixedCameraControl" Height="800" HorizontalAlignment="Stretch"/>
-                    </Border>
+                <ItemsControl x:Name="CameraItemsControl" Grid.Row="0">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <UniformGrid Columns="2"/>
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemContainerStyle>
+                        <Style TargetType="ContentPresenter">
+                            <Setter Property="Margin" Value="0,0,15,15"/>
+                        </Style>
+                    </ItemsControl.ItemContainerStyle>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Border Background="#FF34495E" CornerRadius="10" Padding="20">
+                                <Border.Effect>
+                                    <DropShadowEffect Color="Black" Direction="315" ShadowDepth="3" Opacity="0.3"/>
+                                </Border.Effect>
+
+                                <StackPanel>
+                                    <Grid Margin="0,0,0,20">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <StackPanel Orientation="Horizontal" Grid.Column="0">
+                                            <TextBlock Text="📷" FontSize="18" Foreground="White" VerticalAlignment="Center" Margin="0,0,6,0"/>
+                                            <TextBlock Text="{Binding Name}" FontSize="18" FontWeight="Bold" Foreground="White" VerticalAlignment="Center"/>
+                                        </StackPanel>
+                                        <Button Grid.Column="1" Content="🔄" Width="30" Height="30" Margin="10,0,0,0"
+                                                Background="#FF3498DB" Foreground="White" FontSize="12" FontWeight="Bold"
+                                                Click="RefreshCameraButton_Click" VerticalAlignment="Center"/>
+                                    </Grid>
+
+                                    <Border Background="#FF2C3E50" CornerRadius="8" Padding="15">
+                                        <controls:GenericCameraConfigControl CameraId="{Binding Id}" DisplayName="{Binding Name}" Height="800" HorizontalAlignment="Stretch"/>
+                                    </Border>
+                                </StackPanel>
+                            </Border>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+
+                <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,10,0,0">
+                    <Button x:Name="PrevCameraPageButton" Content="← 上一页"
+                            Background="#FF3498DB" Foreground="White" Padding="14,6" Margin="0,0,12,0"
+                            Click="PrevCameraPageButton_Click"/>
+                    <TextBlock x:Name="CameraPageTextBlock" Text="第 1 / 1 页" Foreground="White" VerticalAlignment="Center" FontSize="14"/>
+                    <Button x:Name="NextCameraPageButton" Content="下一页 →"
+                            Background="#FF3498DB" Foreground="White" Padding="14,6" Margin="12,0,0,0"
+                            Click="NextCameraPageButton_Click"/>
                 </StackPanel>
-            </Border>
+            </Grid>
 
             <!-- 右侧：IO控制 -->
-            <Border Grid.Column="4" Background="#FF34495E" CornerRadius="10" Padding="20">
+            <Border Grid.Column="2" Background="#FF34495E" CornerRadius="10" Padding="20">
                 <Border.Effect>
                     <DropShadowEffect Color="Black" Direction="315" ShadowDepth="3" Opacity="0.3"/>
                 </Border.Effect>

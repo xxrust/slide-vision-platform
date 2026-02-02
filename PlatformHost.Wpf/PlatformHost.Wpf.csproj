@@ -244,6 +244,7 @@
     <Compile Include="Rendering\FileImageRenderer.cs" />
     <Compile Include="Hardware\GenericCameraModels.cs" />
     <Compile Include="Hardware\GenericCameraManager.cs" />
+    <Compile Include="Hardware\CameraCatalog.cs" />
     <Compile Include="UI\Models\Class1.cs" />
     <Compile Include="UI\Models\ChipHeightAnalysisSnapshot.cs" />
     <Compile Include="UI\Models\AlertSettings.cs" />
@@ -618,6 +619,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="Config\Renderer.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Config\CameraCatalog.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="Config\ParameterConfigs.json">

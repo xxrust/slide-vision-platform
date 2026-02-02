@@ -1,6 +1,8 @@
 [
   {
     "Role": 0,
+    "CameraId": "Flying",
+    "DisplayName": "飞拍相机",
     "Vendor": "Hikvision",
     "Model": "FlyingCam",
     "SerialNumber": "",
@@ -14,6 +16,8 @@
   },
   {
     "Role": 1,
+    "CameraId": "Fixed",
+    "DisplayName": "定拍相机",
     "Vendor": "Hikvision",
     "Model": "FixedCam",
     "SerialNumber": "",

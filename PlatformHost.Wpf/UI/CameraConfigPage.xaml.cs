@@ -5,6 +5,7 @@ using WpfApp2.Algorithms;
 using static WpfApp2.UI.Page1;
 using WpfApp2.Models;
 using WpfApp2.UI.Models;
+using WpfApp2.Hardware;
 using System.IO;
 using Microsoft.Win32;
 using System.Windows.Forms;
@@ -51,6 +52,8 @@ namespace WpfApp2.UI
             optController = new OPTControllerAPI(); // 初始化环形光源控制器
             coaxialOptController = new OPTControllerAPI(); // 初始化同轴光源控制器
 
+            ApplyCameraCatalogToUI();
+
             // 渲染控件绑定延后到页面加载完成后执行
             InitializeCameraParameters();
             InitializeLightController(); // 初始化环形光源控制器
@@ -73,6 +76,48 @@ namespace WpfApp2.UI
                 BindRenderControls();
                 UpdateButtonStates();
             }), System.Windows.Threading.DispatcherPriority.Background);
+        }
+
+        private void ApplyCameraCatalogToUI()
+        {
+            try
+            {
+                var cameras = CameraCatalogManager.GetCameras();
+
+                if (cameras.Count >= 1 && FlyingCameraTitle != null)
+                {
+                    FlyingCameraTitle.Text = cameras[0].Name;
+                    FlyingCameraPanel.Visibility = Visibility.Visible;
+                }
+                else if (FlyingCameraPanel != null)
+                {
+                    FlyingCameraPanel.Visibility = Visibility.Collapsed;
+                }
+
+                if (cameras.Count >= 2 && FixedCamera1Title != null)
+                {
+                    FixedCamera1Title.Text = cameras[1].Name;
+                    FixedCamera1Panel.Visibility = Visibility.Visible;
+                }
+                else if (FixedCamera1Panel != null)
+                {
+                    FixedCamera1Panel.Visibility = Visibility.Collapsed;
+                }
+
+                if (cameras.Count >= 3 && FixedCamera2Title != null)
+                {
+                    FixedCamera2Title.Text = cameras[2].Name;
+                    FixedCamera2Panel.Visibility = Visibility.Visible;
+                }
+                else if (FixedCamera2Panel != null)
+                {
+                    FixedCamera2Panel.Visibility = Visibility.Collapsed;
+                }
+            }
+            catch (Exception ex)
+            {
+                LogMessage($"应用相机配置到界面失败: {ex.Message}");
+            }
         }
 
         /// <summary>

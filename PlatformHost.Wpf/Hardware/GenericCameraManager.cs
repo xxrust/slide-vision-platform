@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using Newtonsoft.Json;
@@ -9,7 +9,7 @@ namespace WpfApp2.Hardware
     {
         private static readonly string ConfigDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Config");
         private static readonly string ConfigFile = Path.Combine(ConfigDir, "GenericCameraProfiles.json");
-        private static Dictionary<CameraRole, GenericCameraProfile> _profiles;
+        private static Dictionary<string, GenericCameraProfile> _profiles;
 
         private static readonly string[] VendorList =
         {
@@ -23,18 +23,33 @@ namespace WpfApp2.Hardware
 
         public static IReadOnlyList<string> SupportedVendors => VendorList;
 
-        public static GenericCameraProfile GetProfile(CameraRole role)
+        public static GenericCameraProfile GetProfile(string cameraId, string displayName = null)
         {
             EnsureLoaded();
 
-            if (!_profiles.TryGetValue(role, out var profile) || profile == null)
+            if (string.IsNullOrWhiteSpace(cameraId))
             {
-                profile = CreateDefaultProfile(role);
-                _profiles[role] = profile;
+                cameraId = CameraRole.Flying.ToString();
+            }
+
+            if (!_profiles.TryGetValue(cameraId, out var profile) || profile == null)
+            {
+                profile = CreateDefaultProfile(cameraId, displayName);
+                _profiles[cameraId] = profile;
+                SaveInternal();
+            }
+            else if (!string.IsNullOrWhiteSpace(displayName) && !string.Equals(profile.DisplayName, displayName, StringComparison.Ordinal))
+            {
+                profile.DisplayName = displayName;
                 SaveInternal();
             }
 
             return CloneProfile(profile);
+        }
+
+        public static GenericCameraProfile GetProfile(CameraRole role)
+        {
+            return GetProfile(role.ToString(), role.ToString());
         }
 
         public static void SaveProfile(GenericCameraProfile profile)
@@ -45,7 +60,15 @@ namespace WpfApp2.Hardware
             }
 
             EnsureLoaded();
-            _profiles[profile.Role] = profile;
+
+            var key = profile.CameraId;
+            if (string.IsNullOrWhiteSpace(key))
+            {
+                key = profile.Role.ToString();
+                profile.CameraId = key;
+            }
+
+            _profiles[key] = profile;
             SaveInternal();
         }
 
@@ -59,7 +82,7 @@ namespace WpfApp2.Hardware
             _profiles = LoadInternal();
         }
 
-        private static Dictionary<CameraRole, GenericCameraProfile> LoadInternal()
+        private static Dictionary<string, GenericCameraProfile> LoadInternal()
         {
             try
             {
@@ -67,7 +90,7 @@ namespace WpfApp2.Hardware
                 {
                     var json = File.ReadAllText(ConfigFile);
                     var profiles = JsonConvert.DeserializeObject<List<GenericCameraProfile>>(json) ?? new List<GenericCameraProfile>();
-                    var map = new Dictionary<CameraRole, GenericCameraProfile>();
+                    var map = new Dictionary<string, GenericCameraProfile>(StringComparer.OrdinalIgnoreCase);
                     foreach (var profile in profiles)
                     {
                         if (profile == null)
@@ -75,7 +98,17 @@ namespace WpfApp2.Hardware
                             continue;
                         }
 
-                        map[profile.Role] = profile;
+                        if (string.IsNullOrWhiteSpace(profile.CameraId))
+                        {
+                            profile.CameraId = profile.Role.ToString();
+                        }
+
+                        if (string.IsNullOrWhiteSpace(profile.DisplayName))
+                        {
+                            profile.DisplayName = profile.CameraId;
+                        }
+
+                        map[profile.CameraId] = profile;
                     }
 
                     return map;
@@ -86,10 +119,10 @@ namespace WpfApp2.Hardware
                 // 忽略读取异常，转为默认配置
             }
 
-            return new Dictionary<CameraRole, GenericCameraProfile>
+            return new Dictionary<string, GenericCameraProfile>(StringComparer.OrdinalIgnoreCase)
             {
-                { CameraRole.Flying, CreateDefaultProfile(CameraRole.Flying) },
-                { CameraRole.Fixed, CreateDefaultProfile(CameraRole.Fixed) }
+                { CameraRole.Flying.ToString(), CreateDefaultProfile(CameraRole.Flying.ToString(), "飞拍相机") },
+                { CameraRole.Fixed.ToString(), CreateDefaultProfile(CameraRole.Fixed.ToString(), "定拍相机") }
             };
         }
 
@@ -112,11 +145,14 @@ namespace WpfApp2.Hardware
             }
         }
 
-        private static GenericCameraProfile CreateDefaultProfile(CameraRole role)
+        private static GenericCameraProfile CreateDefaultProfile(string cameraId, string displayName)
         {
+            var role = cameraId == CameraRole.Fixed.ToString() ? CameraRole.Fixed : CameraRole.Flying;
             return new GenericCameraProfile
             {
                 Role = role,
+                CameraId = cameraId ?? CameraRole.Flying.ToString(),
+                DisplayName = displayName ?? string.Empty,
                 Vendor = "Generic",
                 Model = role == CameraRole.Flying ? "FlyingCam" : "FixedCam",
                 SerialNumber = string.Empty,
@@ -134,6 +170,8 @@ namespace WpfApp2.Hardware
             return new GenericCameraProfile
             {
                 Role = profile.Role,
+                CameraId = profile.CameraId,
+                DisplayName = profile.DisplayName,
                 Vendor = profile.Vendor,
                 Model = profile.Model,
                 SerialNumber = profile.SerialNumber,

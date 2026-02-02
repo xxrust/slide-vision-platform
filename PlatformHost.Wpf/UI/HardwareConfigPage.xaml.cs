@@ -7,6 +7,7 @@ using System.Windows.Media;
 using System.Windows.Threading;
 using WpfApp2.SMTGPIO;
 using WpfApp2.Hardware;
+using WpfApp2.UI.Controls;
 using WpfApp2.UI.Models;
 using System.Threading.Tasks;
 
@@ -22,6 +23,10 @@ namespace WpfApp2.UI
         
         // PLC状态监控定时器
         private DispatcherTimer _plcStatusTimer;
+
+        private const int CamerasPerPage = 2;
+        private int _cameraPageIndex = 0;
+        private List<CameraDefinition> _cameraCatalog = new List<CameraDefinition>();
 
         public HardwareConfigPage()
         {
@@ -63,14 +68,104 @@ namespace WpfApp2.UI
         {
             try
             {
-                FlyingCameraControl?.LoadProfile(CameraRole.Flying);
-                FixedCameraControl?.LoadProfile(CameraRole.Fixed);
+                _cameraCatalog = CameraCatalogManager.GetCameras().ToList();
+                _cameraPageIndex = 0;
+                UpdateCameraPage();
                 LogMessage("通用相机配置已加载");
             }
             catch (Exception ex)
             {
                 LogMessage($"初始化通用相机配置失败: {ex.Message}", LogLevel.Warning);
             }
+        }
+
+        private void UpdateCameraPage()
+        {
+            if (CameraItemsControl == null)
+            {
+                return;
+            }
+
+            var totalPages = Math.Max(1, (int)Math.Ceiling(_cameraCatalog.Count / (double)CamerasPerPage));
+            _cameraPageIndex = Math.Max(0, Math.Min(_cameraPageIndex, totalPages - 1));
+
+            var pageItems = _cameraCatalog
+                .Skip(_cameraPageIndex * CamerasPerPage)
+                .Take(CamerasPerPage)
+                .ToList();
+
+            CameraItemsControl.ItemsSource = pageItems;
+            UpdateCameraPageButtons(totalPages);
+        }
+
+        private void UpdateCameraPageButtons(int totalPages)
+        {
+            var showPaging = totalPages > 1;
+            if (CameraPageTextBlock != null)
+            {
+                CameraPageTextBlock.Text = $"第 {_cameraPageIndex + 1} / {totalPages} 页";
+                CameraPageTextBlock.Visibility = showPaging ? Visibility.Visible : Visibility.Collapsed;
+            }
+
+            if (PrevCameraPageButton != null)
+            {
+                PrevCameraPageButton.IsEnabled = _cameraPageIndex > 0;
+                PrevCameraPageButton.Opacity = PrevCameraPageButton.IsEnabled ? 1.0 : 0.5;
+                PrevCameraPageButton.Visibility = showPaging ? Visibility.Visible : Visibility.Collapsed;
+            }
+
+            if (NextCameraPageButton != null)
+            {
+                NextCameraPageButton.IsEnabled = _cameraPageIndex < totalPages - 1;
+                NextCameraPageButton.Opacity = NextCameraPageButton.IsEnabled ? 1.0 : 0.5;
+                NextCameraPageButton.Visibility = showPaging ? Visibility.Visible : Visibility.Collapsed;
+            }
+        }
+
+        private void SaveCurrentPageProfiles()
+        {
+            if (CameraItemsControl == null)
+            {
+                return;
+            }
+
+            foreach (var item in CameraItemsControl.Items)
+            {
+                var container = CameraItemsControl.ItemContainerGenerator.ContainerFromItem(item) as ContentPresenter;
+                if (container == null)
+                {
+                    continue;
+                }
+
+                var control = FindVisualChild<GenericCameraConfigControl>(container);
+                control?.SaveProfile();
+            }
+        }
+
+        private static T FindVisualChild<T>(DependencyObject parent) where T : DependencyObject
+        {
+            if (parent == null)
+            {
+                return null;
+            }
+
+            int count = VisualTreeHelper.GetChildrenCount(parent);
+            for (int i = 0; i < count; i++)
+            {
+                var child = VisualTreeHelper.GetChild(parent, i);
+                if (child is T typedChild)
+                {
+                    return typedChild;
+                }
+
+                var result = FindVisualChild<T>(child);
+                if (result != null)
+                {
+                    return result;
+                }
+            }
+
+            return null;
         }
 
         /// <summary>
@@ -595,35 +690,49 @@ namespace WpfApp2.UI
 
         #endregion
 
-        /// <summary>
-        /// 刷新飞拍相机模块按钮点击事件
-        /// </summary>
-        private void RefreshFlyingCameraButton_Click(object sender, RoutedEventArgs e)
+        private void RefreshCameraButton_Click(object sender, RoutedEventArgs e)
         {
             try
             {
-                LogMessage("手动刷新飞拍相机配置...");
-                FlyingCameraControl?.LoadProfile(CameraRole.Flying);
+                if (sender is FrameworkElement element && element.DataContext is CameraDefinition camera)
+                {
+                    var container = CameraItemsControl?.ItemContainerGenerator.ContainerFromItem(camera) as ContentPresenter;
+                    var control = container == null ? null : FindVisualChild<GenericCameraConfigControl>(container);
+                    control?.LoadProfile(camera.Id, camera.Name);
+                    LogMessage($"手动刷新相机配置: {camera.Name}");
+                }
             }
             catch (Exception ex)
             {
-                LogMessage($"手动刷新飞拍相机配置失败: {ex.Message}", LogLevel.Warning);
+                LogMessage($"手动刷新相机配置失败: {ex.Message}", LogLevel.Warning);
             }
         }
 
-        /// <summary>
-        /// 刷新定拍相机模块按钮点击事件
-        /// </summary>
-        private void RefreshFixedCameraButton_Click(object sender, RoutedEventArgs e)
+        private void PrevCameraPageButton_Click(object sender, RoutedEventArgs e)
         {
             try
             {
-                LogMessage("手动刷新定拍相机配置...");
-                FixedCameraControl?.LoadProfile(CameraRole.Fixed);
+                SaveCurrentPageProfiles();
+                _cameraPageIndex = Math.Max(0, _cameraPageIndex - 1);
+                UpdateCameraPage();
             }
             catch (Exception ex)
             {
-                LogMessage($"手动刷新定拍相机配置失败: {ex.Message}", LogLevel.Warning);
+                LogMessage($"切换上一页失败: {ex.Message}", LogLevel.Warning);
+            }
+        }
+
+        private void NextCameraPageButton_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                SaveCurrentPageProfiles();
+                _cameraPageIndex++;
+                UpdateCameraPage();
+            }
+            catch (Exception ex)
+            {
+                LogMessage($"切换下一页失败: {ex.Message}", LogLevel.Warning);
             }
         }
 
@@ -733,29 +842,7 @@ namespace WpfApp2.UI
             {
                 LogMessage("正在保存相机参数...");
 
-                // 保存飞拍相机参数
-                try
-                {
-                    FlyingCameraControl?.SaveProfile();
-                    LogMessage("✓ 飞拍相机参数已保存");
-                    LogManager.Info("飞拍相机参数已保存");
-                }
-                catch (Exception ex)
-                {
-                    LogMessage($"保存飞拍相机参数失败: {ex.Message}", LogLevel.Warning);
-                }
-
-                // 保存定拍相机参数
-                try
-                {
-                    FixedCameraControl?.SaveProfile();
-                    LogMessage("✓ 定拍相机参数已保存");
-                    LogManager.Info("定拍相机参数已保存");
-                }
-                catch (Exception ex)
-                {
-                    LogMessage($"保存定拍相机参数失败: {ex.Message}", LogLevel.Warning);
-                }
+                SaveCurrentPageProfiles();
 
                 LogMessage("相机参数保存操作完成");
             }

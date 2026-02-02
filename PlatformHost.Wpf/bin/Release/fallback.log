@@ -62,3 +62,6 @@
 [26-02-02 21:15:59.255] [FALLBACK] 模板配置模式：跳过图片保存
 [26-02-02 21:16:04.771] [FALLBACK] [初始化] 算法引擎未就绪，先写入算法全局变量
 [26-02-02 21:39:03.671] [FALLBACK] 已加载模板: Template-Standard (档案: Standard Template)
+[26-02-02 22:00:33.430] [FALLBACK] [检测管理器] 检测模式: Full
+[26-02-02 22:00:33.451] [FALLBACK] 实时数据记录器：切换到LOT LOT_error，主文件路径：E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\PlatformHost.Wpf\bin\Release\RealTimeData\LOT_error\LOT_error_20260202_全部数据.csv
+[26-02-02 22:39:22.389] [FALLBACK] [检测管理器] 开始新的检测周期 - 3D启用: False (raw=False, shield=False)

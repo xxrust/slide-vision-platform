@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Globalization;
 using System.Windows;
 using System.Windows.Controls;
@@ -12,6 +12,26 @@ namespace WpfApp2.UI.Controls
         private CameraRole _role = CameraRole.Flying;
         private GenericCameraProfile _profile;
 
+        public static readonly DependencyProperty CameraIdProperty =
+            DependencyProperty.Register(nameof(CameraId), typeof(string), typeof(GenericCameraConfigControl),
+                new PropertyMetadata(string.Empty));
+
+        public static readonly DependencyProperty DisplayNameProperty =
+            DependencyProperty.Register(nameof(DisplayName), typeof(string), typeof(GenericCameraConfigControl),
+                new PropertyMetadata(string.Empty));
+
+        public string CameraId
+        {
+            get => (string)GetValue(CameraIdProperty);
+            set => SetValue(CameraIdProperty, value);
+        }
+
+        public string DisplayName
+        {
+            get => (string)GetValue(DisplayNameProperty);
+            set => SetValue(DisplayNameProperty, value);
+        }
+
         public GenericCameraConfigControl()
         {
             InitializeComponent();
@@ -23,15 +43,33 @@ namespace WpfApp2.UI.Controls
             EnsureLists();
             if (_profile == null)
             {
-                LoadProfile(_role);
+                var cameraId = !string.IsNullOrWhiteSpace(CameraId) ? CameraId : _role.ToString();
+                LoadProfile(cameraId, DisplayName);
             }
         }
 
         public void LoadProfile(CameraRole role)
         {
             _role = role;
+            LoadProfile(role.ToString(), role.ToString());
+        }
+
+        public void LoadProfile(string cameraId, string displayName = null)
+        {
             EnsureLists();
-            _profile = GenericCameraManager.GetProfile(role);
+            if (string.IsNullOrWhiteSpace(cameraId))
+            {
+                cameraId = CameraRole.Flying.ToString();
+            }
+            _role = cameraId == CameraRole.Fixed.ToString() ? CameraRole.Fixed : CameraRole.Flying;
+
+            if (!string.IsNullOrWhiteSpace(displayName))
+            {
+                DisplayName = displayName;
+            }
+
+            CameraId = cameraId;
+            _profile = GenericCameraManager.GetProfile(cameraId, displayName);
 
             VendorComboBox.SelectedItem = _profile.Vendor;
             ModelTextBox.Text = _profile.Model ?? string.Empty;
@@ -52,6 +90,8 @@ namespace WpfApp2.UI.Controls
             _profile.Vendor = VendorComboBox.SelectedItem?.ToString() ?? _profile.Vendor;
             _profile.Model = ModelTextBox.Text?.Trim() ?? string.Empty;
             _profile.SerialNumber = SerialTextBox.Text?.Trim() ?? string.Empty;
+            _profile.CameraId = CameraId;
+            _profile.DisplayName = DisplayName;
             _profile.Settings.ExposureTimeUs = ParseDouble(ExposureTextBox.Text, _profile.Settings.ExposureTimeUs);
             _profile.Settings.Gain = ParseDouble(GainTextBox.Text, _profile.Settings.Gain);
             _profile.Settings.TriggerEnabled = TriggerEnableCheckBox.IsChecked == true;
@@ -64,7 +104,8 @@ namespace WpfApp2.UI.Controls
 
             GenericCameraManager.SaveProfile(_profile);
             StatusTextBlock.Text = "配置已保存";
-            LogManager.Info($"[相机配置] {_role} 相机参数已保存");
+            var cameraLabel = !string.IsNullOrWhiteSpace(DisplayName) ? DisplayName : CameraId;
+            LogManager.Info($"[相机配置] {cameraLabel} 相机参数已保存");
         }
 
         private void ApplyButton_Click(object sender, RoutedEventArgs e)
@@ -96,7 +137,8 @@ namespace WpfApp2.UI.Controls
         {
             if (_profile == null)
             {
-                _profile = GenericCameraManager.GetProfile(_role);
+                var cameraId = !string.IsNullOrWhiteSpace(CameraId) ? CameraId : _role.ToString();
+                _profile = GenericCameraManager.GetProfile(cameraId, DisplayName);
             }
         }
 

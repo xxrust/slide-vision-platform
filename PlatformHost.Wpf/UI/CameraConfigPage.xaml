@@ -76,7 +76,7 @@
             </Grid.ColumnDefinitions>
 
             <!-- 飞拍相机配置区域 -->
-            <Border Grid.Column="0" 
+            <Border x:Name="FlyingCameraPanel" Grid.Column="0" 
                     Background="#FF2A2A2A" 
                     CornerRadius="10" 
                     BorderBrush="#FF444444" 
@@ -90,7 +90,7 @@
                     </Grid.RowDefinitions>
 
                     <!-- 飞拍相机标题 -->
-                    <TextBlock Grid.Row="0" 
+                    <TextBlock x:Name="FlyingCameraTitle" Grid.Row="0" 
                                Text="飞拍相机" 
                                FontSize="24" 
                                FontWeight="Bold" 
@@ -265,7 +265,7 @@
             </Border>
 
             <!-- 定拍相机1配置区域 -->
-            <Border Grid.Column="2" 
+            <Border x:Name="FixedCamera1Panel" Grid.Column="2" 
                     Background="#FF2A2A2A" 
                     CornerRadius="10" 
                     BorderBrush="#FF444444" 
@@ -279,7 +279,7 @@
                     </Grid.RowDefinitions>
 
                     <!-- 定拍相机1标题 -->
-                    <TextBlock Grid.Row="0" 
+                    <TextBlock x:Name="FixedCamera1Title" Grid.Row="0" 
                                Text="定拍相机 参数1" 
                                FontSize="24" 
                                FontWeight="Bold" 
@@ -408,7 +408,7 @@
             </Border>
 
             <!-- 定拍相机2配置区域 -->
-            <Border Grid.Column="4" 
+            <Border x:Name="FixedCamera2Panel" Grid.Column="4" 
                     Background="#FF2A2A2A" 
                     CornerRadius="10" 
                     BorderBrush="#FF444444" 
@@ -422,7 +422,7 @@
                     </Grid.RowDefinitions>
 
                     <!-- 定拍相机2标题 -->
-                    <TextBlock Grid.Row="0" 
+                    <TextBlock x:Name="FixedCamera2Title" Grid.Row="0" 
                                Text="定拍相机 参数2" 
                                FontSize="24" 
                                FontWeight="Bold" 

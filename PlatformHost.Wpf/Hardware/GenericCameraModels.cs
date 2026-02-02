@@ -26,6 +26,8 @@ namespace WpfApp2.Hardware
     public sealed class GenericCameraProfile
     {
         public CameraRole Role { get; set; } = CameraRole.Flying;
+        public string CameraId { get; set; } = string.Empty;
+        public string DisplayName { get; set; } = string.Empty;
         public string Vendor { get; set; } = "Generic";
         public string Model { get; set; } = string.Empty;
         public string SerialNumber { get; set; } = string.Empty;
