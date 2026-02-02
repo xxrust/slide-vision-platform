@@ -9,6 +9,7 @@
       "Steps": [
         "ImageSelection",
         "DemoSetup",
+        "DemoCalculation",
         "DemoSummary",
         "TemplateName"
       ],
@@ -17,7 +18,13 @@
         "PIPELINE": "quick"
       },
       "DefaultTemplateName": "Template-Basic",
-      "MeasurementOutputCount": 1
+      "MeasurementOutputCount": 1,
+      "ImageSources": [
+        {
+          "Id": "Image1",
+          "DisplayName": "图像1"
+        }
+      ]
     },
     {
       "Id": "profile-standard",
@@ -35,7 +42,13 @@
         "PIPELINE": "default"
       },
       "DefaultTemplateName": "Template-Standard",
-      "MeasurementOutputCount": 1
+      "MeasurementOutputCount": 1,
+      "ImageSources": [
+        {
+          "Id": "Image1",
+          "DisplayName": "图像1"
+        }
+      ]
     },
     {
       "Id": "profile-3d",
@@ -54,7 +67,13 @@
         "PIPELINE": "extended"
       },
       "DefaultTemplateName": "Template-3D",
-      "MeasurementOutputCount": 1
+      "MeasurementOutputCount": 1,
+      "ImageSources": [
+        {
+          "Id": "Image1",
+          "DisplayName": "图像1"
+        }
+      ]
     }
   ]
 }

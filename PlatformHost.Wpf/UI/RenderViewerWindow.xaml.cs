@@ -10,10 +10,8 @@ using WpfApp2.UI.Models;
 using LjdSampleWrapper;
 using Keyence.LjDev3dView;
 using Keyence.LjDevMeasure;
-using ImageSourceModuleCs;
 using Newtonsoft.Json;
 using System.Threading.Tasks;
-using VM.Core;
 using Keyence.LjDevCommon;
 using LjDevExt;
 
@@ -33,7 +31,6 @@ namespace WpfApp2.UI
         private List<RenderImageItem> _filteredRenderImageItems = new List<RenderImageItem>(); // 过滤后的渲染图项目
         private int _currentIndex = 0;
         private Ljd3DViewEx _View3D;
-        private ImageSourceModuleTool _imageSource2D;
 
         // 项目选择相关
         private List<string> _allProjects = new List<string>(); // 所有项目名称
@@ -81,15 +78,9 @@ namespace WpfApp2.UI
                 _View3D = new Ljd3DViewEx();
                 _3DViewHost.Child = _View3D;
                 
-                // 初始化2D图像源 - 使用"渲染图显示.图像源1"
-                _imageSource2D = VM.Core.VmSolution.Instance["渲染图显示.图像源1"] as ImageSourceModuleCs.ImageSourceModuleTool;
-                if (_imageSource2D != null)
+                if (Render2DViewer != null)
                 {
-                    VmRender2D.ModuleSource = _imageSource2D;
-                }
-                else
-                {
-                    LogManager.Warning("未找到'渲染图显示.图像源1'模块");
+                    Render2DViewer.Clear();
                 }
 
                 // 【修复】仅在3D使能时初始化静态实例
@@ -846,28 +837,17 @@ namespace WpfApp2.UI
             try
             {
                 LogManager.Info($"[2D显示调试] 开始显示2D图像: {item.RenderImagePath}");
-                LogManager.Info($"[2D显示调试] 文件存在: {File.Exists(item.RenderImagePath)}, 图像源模块: {(_imageSource2D != null ? "已初始化" : "未初始化")}");
-                
+
                 if (File.Exists(item.RenderImagePath))
                 {
-                    // 使用SDK正确的方法设置图像路径显示
-                    if (_imageSource2D != null)
+                    if (Render2DViewer != null)
                     {
-                        _imageSource2D.SetImagePath(item.RenderImagePath);
-                        var imagePathProcedure = VmSolution.Instance["渲染图显示"] as VmProcedure;
-                        if (imagePathProcedure != null)
-                        {
-                            imagePathProcedure.Run();
-                            LogManager.Info($"[2D显示调试] ✅ 已设置2D渲染图路径并执行VM流程: {item.RenderImagePath}");
-                        }
-                        else
-                        {
-                            LogManager.Warning("[2D显示调试] ❌ VM流程'渲染图显示'未找到");
-                        }
+                        Render2DViewer.LoadImage(item.RenderImagePath);
+                        LogManager.Info($"[2D显示调试] ✅ 已显示2D渲染图: {item.RenderImagePath}");
                     }
                     else
                     {
-                        LogManager.Warning("[2D显示调试] ❌ 2D图像源模块未初始化");
+                        LogManager.Warning("[2D显示调试] ❌ 2D渲染控件未初始化");
                     }
                 }
                 else
@@ -1246,7 +1226,6 @@ namespace WpfApp2.UI
 
                 // 清理视图资源（不需要清理静态3D实例，它会被其他窗口复用）
                 _View3D?.Dispose();
-                _imageSource2D = null;
 
                 LogManager.Info("渲染图查看器已关闭，视图资源已清理（静态3D实例保留）");
             }

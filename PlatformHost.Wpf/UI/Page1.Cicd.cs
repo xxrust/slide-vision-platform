@@ -68,8 +68,9 @@ namespace WpfApp2.UI
                     var groups = await Task.Run(() => DiscoverCicdGroupSourcesFromFiles(selectedFiles));
                     if (groups.Count == 0)
                     {
-                        LogUpdate("CICD图片集制作失败：未找到任何图片组（请确认包含“图像源1”等目录）");
-                        MessageBox.Show("未找到任何图片组（请确认包含“图像源1”等目录）", "提示", MessageBoxButton.OK, MessageBoxImage.Information);
+                        var sourceHint = ImageSourceNaming.BuildDisplayNameList();
+                        LogUpdate($"CICD图片集制作失败：未找到任何图片组（请确认包含{sourceHint}等目录）");
+                        MessageBox.Show($"未找到任何图片组（请确认包含{sourceHint}等目录）", "提示", MessageBoxButton.OK, MessageBoxImage.Information);
                         return;
                     }
 
@@ -820,7 +821,8 @@ namespace WpfApp2.UI
                     return Path.GetDirectoryName(dir);
                 }
 
-                if (Directory.Exists(Path.Combine(dir, "图像源1")))
+                string primaryName = ImageSourceNaming.GetDisplayName(0);
+                if (Directory.Exists(Path.Combine(dir, primaryName)))
                 {
                     return dir;
                 }
@@ -834,7 +836,7 @@ namespace WpfApp2.UI
                         break;
                     }
 
-                    if (Directory.Exists(Path.Combine(parent, "图像源1")))
+                    if (Directory.Exists(Path.Combine(parent, primaryName)))
                     {
                         return parent;
                     }
@@ -857,10 +859,13 @@ namespace WpfApp2.UI
                 return false;
             }
 
-            return string.Equals(folderName, "图像源1", StringComparison.OrdinalIgnoreCase)
-                   || string.Equals(folderName, "图像源2_1", StringComparison.OrdinalIgnoreCase)
-                   || string.Equals(folderName, "图像源2_2", StringComparison.OrdinalIgnoreCase)
-                   || string.Equals(folderName, "3D", StringComparison.OrdinalIgnoreCase);
+            var names = ImageSourceNaming.GetDisplayNames();
+            if (names.Any(name => string.Equals(folderName, name, StringComparison.OrdinalIgnoreCase)))
+            {
+                return true;
+            }
+
+            return string.Equals(folderName, "3D", StringComparison.OrdinalIgnoreCase);
         }
 
         private string ResolveCicdSource1File(string groupRoot, string selectedFilePath)
@@ -872,7 +877,7 @@ namespace WpfApp2.UI
                     return null;
                 }
 
-                string source1Dir = Path.Combine(groupRoot, "图像源1");
+                string source1Dir = Path.Combine(groupRoot, ImageSourceNaming.GetDisplayName(0));
                 if (!Directory.Exists(source1Dir))
                 {
                     return null;
@@ -904,6 +909,7 @@ namespace WpfApp2.UI
             var roots = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
             var pending = new Queue<string>();
             pending.Enqueue(rootFolder);
+            string primaryName = ImageSourceNaming.GetDisplayName(0);
 
             while (pending.Count > 0)
             {
@@ -916,7 +922,7 @@ namespace WpfApp2.UI
                 try
                 {
                     string name = Path.GetFileName(current);
-                    if (string.Equals(name, "图像源1", StringComparison.OrdinalIgnoreCase))
+                    if (string.Equals(name, primaryName, StringComparison.OrdinalIgnoreCase))
                     {
                         string parent = Path.GetDirectoryName(current);
                         if (!string.IsNullOrWhiteSpace(parent) && Directory.Exists(parent))
@@ -949,8 +955,9 @@ namespace WpfApp2.UI
                     return imageGroups;
                 }
 
-                string source2_1Dir = Path.Combine(groupRoot, "图像源2_1");
-                string source2_2Dir = Path.Combine(groupRoot, "图像源2_2");
+                var sourceNames = ImageSourceNaming.GetDisplayNames();
+                string primaryName = sourceNames.Count > 0 ? sourceNames[0] : ImageSourceNaming.GetDisplayName(0);
+                var secondaryNames = sourceNames.Skip(1).ToList();
                 string threeDDir = Path.Combine(groupRoot, "3D");
 
                 var orderedSource1Files = selectedSource1Files
@@ -967,18 +974,20 @@ namespace WpfApp2.UI
 
                     var imageGroup = new ImageGroupSet
                     {
-                        BaseName = $"{groupName}_第{i + 1}组",
-                        Source1Path = source1File
+                        BaseName = $"{groupName}_第{i + 1}组"
                     };
 
-                    if (Directory.Exists(source2_1Dir))
-                    {
-                        imageGroup.Source2_1Path = FindFirstFileInFolder(source2_1Dir, $"*{suffix}");
-                    }
+                    imageGroup.SetSource(0, source1File, displayName: primaryName);
 
-                    if (Directory.Exists(source2_2Dir))
+                    for (int sourceIndex = 0; sourceIndex < secondaryNames.Count; sourceIndex++)
                     {
-                        imageGroup.Source2_2Path = FindFirstFileInFolder(source2_2Dir, $"*{suffix}");
+                        string secondaryName = secondaryNames[sourceIndex];
+                        string secondaryDir = Path.Combine(groupRoot, secondaryName);
+                        if (Directory.Exists(secondaryDir))
+                        {
+                            string path = FindFirstFileInFolder(secondaryDir, $"*{suffix}");
+                            imageGroup.SetSource(sourceIndex + 1, path, displayName: secondaryName);
+                        }
                     }
 
                     if (Directory.Exists(threeDDir))
@@ -1006,9 +1015,10 @@ namespace WpfApp2.UI
             var imageGroups = new List<ImageGroupSet>();
             try
             {
-                string source1Dir = Path.Combine(groupRoot, "图像源1");
-                string source2_1Dir = Path.Combine(groupRoot, "图像源2_1");
-                string source2_2Dir = Path.Combine(groupRoot, "图像源2_2");
+                var sourceNames = ImageSourceNaming.GetDisplayNames();
+                string primaryName = sourceNames.Count > 0 ? sourceNames[0] : ImageSourceNaming.GetDisplayName(0);
+                var secondaryNames = sourceNames.Skip(1).ToList();
+                string source1Dir = Path.Combine(groupRoot, primaryName);
                 string threeDDir = Path.Combine(groupRoot, "3D");
 
                 if (!Directory.Exists(source1Dir))
@@ -1028,18 +1038,20 @@ namespace WpfApp2.UI
 
                     var imageGroup = new ImageGroupSet
                     {
-                        BaseName = $"{groupName}_第{i + 1}组",
-                        Source1Path = source1File
+                        BaseName = $"{groupName}_第{i + 1}组"
                     };
 
-                    if (Directory.Exists(source2_1Dir))
-                    {
-                        imageGroup.Source2_1Path = FindFirstFileInFolder(source2_1Dir, $"*{suffix}");
-                    }
+                    imageGroup.SetSource(0, source1File, displayName: primaryName);
 
-                    if (Directory.Exists(source2_2Dir))
+                    for (int sourceIndex = 0; sourceIndex < secondaryNames.Count; sourceIndex++)
                     {
-                        imageGroup.Source2_2Path = FindFirstFileInFolder(source2_2Dir, $"*{suffix}");
+                        string secondaryName = secondaryNames[sourceIndex];
+                        string secondaryDir = Path.Combine(groupRoot, secondaryName);
+                        if (Directory.Exists(secondaryDir))
+                        {
+                            string path = FindFirstFileInFolder(secondaryDir, $"*{suffix}");
+                            imageGroup.SetSource(sourceIndex + 1, path, displayName: secondaryName);
+                        }
                     }
 
                     if (Directory.Exists(threeDDir))
@@ -1096,7 +1108,10 @@ namespace WpfApp2.UI
         {
             Directory.CreateDirectory(targetGroupFolder);
 
-            foreach (var folderName in new[] { "图像源1", "图像源2_1", "图像源2_2", "3D" })
+            var sourceNames = ImageSourceNaming.GetDisplayNames();
+            var folderNames = sourceNames.Concat(new[] { "3D" });
+
+            foreach (var folderName in folderNames)
             {
                 string src = Path.Combine(sourceRoot, folderName);
                 if (!Directory.Exists(src))
@@ -1119,22 +1134,26 @@ namespace WpfApp2.UI
         {
             Directory.CreateDirectory(targetGroupFolder);
 
-            string dstSource1Dir = Path.Combine(targetGroupFolder, "图像源1");
-            string dstSource2_1Dir = Path.Combine(targetGroupFolder, "图像源2_1");
-            string dstSource2_2Dir = Path.Combine(targetGroupFolder, "图像源2_2");
-            string dst3DDir = Path.Combine(targetGroupFolder, "3D");
+            var sourceNames = ImageSourceNaming.GetDisplayNames();
+            var sourceDirs = new List<string>();
+            for (int i = 0; i < sourceNames.Count; i++)
+            {
+                string dir = Path.Combine(targetGroupFolder, sourceNames[i]);
+                Directory.CreateDirectory(dir);
+                sourceDirs.Add(dir);
+            }
 
-            Directory.CreateDirectory(dstSource1Dir);
-            Directory.CreateDirectory(dstSource2_1Dir);
-            Directory.CreateDirectory(dstSource2_2Dir);
+            string dst3DDir = Path.Combine(targetGroupFolder, "3D");
             Directory.CreateDirectory(dst3DDir);
 
             var groups = LoadCicdImageGroupsFromSelectedSource1Files(sourceRoot, Path.GetFileName(targetGroupFolder), selectedSource1Files);
             foreach (var group in groups)
             {
-                CopyFileToDir(group.Source1Path, dstSource1Dir);
-                CopyFileToDir(group.Source2_1Path, dstSource2_1Dir);
-                CopyFileToDir(group.Source2_2Path, dstSource2_2Dir);
+                for (int i = 0; i < sourceDirs.Count; i++)
+                {
+                    CopyFileToDir(group.GetPath(i), sourceDirs[i]);
+                }
+
                 CopyFileToDir(group.HeightImagePath, dst3DDir);
                 CopyFileToDir(group.GrayImagePath, dst3DDir);
             }
@@ -1573,10 +1592,7 @@ namespace WpfApp2.UI
                 while (!string.IsNullOrWhiteSpace(currentDir))
                 {
                     string folderName = Path.GetFileName(currentDir);
-                    if (string.Equals(folderName, "图像源1", StringComparison.OrdinalIgnoreCase)
-                        || string.Equals(folderName, "图像源2_1", StringComparison.OrdinalIgnoreCase)
-                        || string.Equals(folderName, "图像源2_2", StringComparison.OrdinalIgnoreCase)
-                        || string.Equals(folderName, "3D", StringComparison.OrdinalIgnoreCase))
+                    if (IsCicdSourceFolderName(folderName))
                     {
                         return Path.GetFileName(Path.GetDirectoryName(currentDir));
                     }

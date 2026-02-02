@@ -39,6 +39,7 @@ namespace WpfApp2.UI
             InitializeComponent();
             _windowMode = WindowMode.Collection;
             SetupCollectionMode();
+            ApplyImageSourceHints();
         }
 
         /// <summary>
@@ -52,6 +53,25 @@ namespace WpfApp2.UI
             _currentTemplateName = currentTemplateName;
 
             this.Loaded += (s, e) => SetupDetectionMode();
+            ApplyImageSourceHints();
+        }
+
+        private void ApplyImageSourceHints()
+        {
+            if (ImageSourceHintTextBlock == null)
+            {
+                return;
+            }
+
+            var displayNames = ImageSourceNaming.GetDisplayNames();
+            if (displayNames == null || displayNames.Count == 0)
+            {
+                ImageSourceHintTextBlock.Text = "2. 系统会递归搜索子文件夹中的图像源文件夹";
+                return;
+            }
+
+            var namesText = string.Join("、", displayNames.Select(name => $"'{name}'"));
+            ImageSourceHintTextBlock.Text = $"2. 系统会递归搜索子文件夹中的 {namesText} 文件夹";
         }
 
         /// <summary>
@@ -194,7 +214,7 @@ namespace WpfApp2.UI
                 {
                     // 检查第一个样本目录下的图像源文件夹中的图片数量
                     string firstSampleDir = sampleDirs[0];
-                    string source1Dir = Path.Combine(firstSampleDir, "图像源1");
+                    string source1Dir = Path.Combine(firstSampleDir, ImageSourceNaming.GetDisplayName(0));
                     if (Directory.Exists(source1Dir))
                     {
                         loopCycle = Directory.GetFiles(source1Dir, "*.bmp").Length;

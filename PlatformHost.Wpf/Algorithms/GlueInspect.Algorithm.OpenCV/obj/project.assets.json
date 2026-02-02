@@ -2,11 +2,12 @@
   "version": 3,
   "targets": {
     ".NETFramework,Version=v4.8": {
-      "OpenCvSharp4/4.11.0.20250507": {
+      "OpenCvSharp4/4.10.0.20240616": {
         "type": "package",
         "dependencies": {
-          "System.Memory": "4.6.3",
-          "System.ValueTuple": "4.6.1"
+          "System.Memory": "4.5.5",
+          "System.Runtime.CompilerServices.Unsafe": "6.0.0",
+          "System.ValueTuple": "4.5.0"
         },
         "frameworkAssemblies": [
           "System.Core",
@@ -24,7 +25,7 @@
           }
         }
       },
-      "OpenCvSharp4.runtime.win/4.11.0.20250507": {
+      "OpenCvSharp4.runtime.win/4.10.0.20240616": {
         "type": "package",
         "build": {
           "build/net48/OpenCvSharp4.runtime.win.props": {}
@@ -34,7 +35,7 @@
             "assetType": "native",
             "rid": "win-x64"
           },
-          "runtimes/win-x64/native/opencv_videoio_ffmpeg4110_64.dll": {
+          "runtimes/win-x64/native/opencv_videoio_ffmpeg4100_64.dll": {
             "assetType": "native",
             "rid": "win-x64"
           },
@@ -42,97 +43,95 @@
             "assetType": "native",
             "rid": "win-x86"
           },
-          "runtimes/win-x86/native/opencv_videoio_ffmpeg4110.dll": {
+          "runtimes/win-x86/native/opencv_videoio_ffmpeg4100.dll": {
             "assetType": "native",
             "rid": "win-x86"
           }
         }
       },
-      "System.Buffers/4.6.1": {
-        "type": "package",
-        "compile": {
-          "lib/net462/System.Buffers.dll": {
-            "related": ".xml"
-          }
-        },
-        "runtime": {
-          "lib/net462/System.Buffers.dll": {
-            "related": ".xml"
-          }
-        },
-        "build": {
-          "buildTransitive/net462/_._": {}
-        }
-      },
-      "System.Memory/4.6.3": {
-        "type": "package",
-        "dependencies": {
-          "System.Buffers": "4.6.1",
-          "System.Numerics.Vectors": "4.6.1",
-          "System.Runtime.CompilerServices.Unsafe": "6.1.2"
-        },
-        "compile": {
-          "lib/net462/System.Memory.dll": {
-            "related": ".xml"
-          }
-        },
-        "runtime": {
-          "lib/net462/System.Memory.dll": {
-            "related": ".xml"
-          }
-        },
-        "build": {
-          "buildTransitive/net462/_._": {}
-        }
-      },
-      "System.Numerics.Vectors/4.6.1": {
-        "type": "package",
-        "frameworkAssemblies": [
-          "System.Numerics"
-        ],
-        "compile": {
-          "lib/net462/System.Numerics.Vectors.dll": {
-            "related": ".xml"
-          }
-        },
-        "runtime": {
-          "lib/net462/System.Numerics.Vectors.dll": {
-            "related": ".xml"
-          }
-        },
-        "build": {
-          "buildTransitive/net462/_._": {}
-        }
-      },
-      "System.Runtime.CompilerServices.Unsafe/6.1.2": {
+      "System.Buffers/4.5.1": {
         "type": "package",
         "frameworkAssemblies": [
           "mscorlib"
         ],
         "compile": {
-          "lib/net462/System.Runtime.CompilerServices.Unsafe.dll": {
+          "ref/net45/System.Buffers.dll": {
             "related": ".xml"
           }
         },
         "runtime": {
-          "lib/net462/System.Runtime.CompilerServices.Unsafe.dll": {
+          "lib/net461/System.Buffers.dll": {
             "related": ".xml"
           }
-        },
-        "build": {
-          "buildTransitive/net462/_._": {}
         }
       },
-      "System.ValueTuple/4.6.1": {
+      "System.Memory/4.5.5": {
         "type": "package",
+        "dependencies": {
+          "System.Buffers": "4.5.1",
+          "System.Numerics.Vectors": "4.5.0",
+          "System.Runtime.CompilerServices.Unsafe": "4.5.3"
+        },
+        "frameworkAssemblies": [
+          "System",
+          "mscorlib"
+        ],
         "compile": {
-          "lib/net471/_._": {}
+          "lib/net461/System.Memory.dll": {
+            "related": ".xml"
+          }
         },
         "runtime": {
-          "lib/net471/_._": {}
+          "lib/net461/System.Memory.dll": {
+            "related": ".xml"
+          }
+        }
+      },
+      "System.Numerics.Vectors/4.5.0": {
+        "type": "package",
+        "frameworkAssemblies": [
+          "System.Numerics",
+          "mscorlib"
+        ],
+        "compile": {
+          "ref/net46/System.Numerics.Vectors.dll": {
+            "related": ".xml"
+          }
         },
-        "build": {
-          "buildTransitive/net471/System.ValueTuple.targets": {}
+        "runtime": {
+          "lib/net46/System.Numerics.Vectors.dll": {
+            "related": ".xml"
+          }
+        }
+      },
+      "System.Runtime.CompilerServices.Unsafe/6.0.0": {
+        "type": "package",
+        "frameworkAssemblies": [
+          "mscorlib"
+        ],
+        "compile": {
+          "lib/net461/System.Runtime.CompilerServices.Unsafe.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net461/System.Runtime.CompilerServices.Unsafe.dll": {
+            "related": ".xml"
+          }
+        }
+      },
+      "System.ValueTuple/4.5.0": {
+        "type": "package",
+        "frameworkAssemblies": [
+          "mscorlib"
+        ],
+        "compile": {
+          "ref/net47/System.ValueTuple.dll": {}
+        },
+        "runtime": {
+          "lib/net47/System.ValueTuple.dll": {
+            "related": ".xml"
+          }
         }
       },
       "GlueInspect.Algorithm.Contracts/1.0.0": {
@@ -146,11 +145,12 @@
       }
     },
     ".NETFramework,Version=v4.8/win": {
-      "OpenCvSharp4/4.11.0.20250507": {
+      "OpenCvSharp4/4.10.0.20240616": {
         "type": "package",
         "dependencies": {
-          "System.Memory": "4.6.3",
-          "System.ValueTuple": "4.6.1"
+          "System.Memory": "4.5.5",
+          "System.Runtime.CompilerServices.Unsafe": "6.0.0",
+          "System.ValueTuple": "4.5.0"
         },
         "frameworkAssemblies": [
           "System.Core",
@@ -168,483 +168,95 @@
           }
         }
       },
-      "OpenCvSharp4.runtime.win/4.11.0.20250507": {
+      "OpenCvSharp4.runtime.win/4.10.0.20240616": {
         "type": "package",
         "build": {
           "build/net48/OpenCvSharp4.runtime.win.props": {}
         }
       },
-      "System.Buffers/4.6.1": {
-        "type": "package",
-        "compile": {
-          "lib/net462/System.Buffers.dll": {
-            "related": ".xml"
-          }
-        },
-        "runtime": {
-          "lib/net462/System.Buffers.dll": {
-            "related": ".xml"
-          }
-        },
-        "build": {
-          "buildTransitive/net462/_._": {}
-        }
-      },
-      "System.Memory/4.6.3": {
-        "type": "package",
-        "dependencies": {
-          "System.Buffers": "4.6.1",
-          "System.Numerics.Vectors": "4.6.1",
-          "System.Runtime.CompilerServices.Unsafe": "6.1.2"
-        },
-        "compile": {
-          "lib/net462/System.Memory.dll": {
-            "related": ".xml"
-          }
-        },
-        "runtime": {
-          "lib/net462/System.Memory.dll": {
-            "related": ".xml"
-          }
-        },
-        "build": {
-          "buildTransitive/net462/_._": {}
-        }
-      },
-      "System.Numerics.Vectors/4.6.1": {
-        "type": "package",
-        "frameworkAssemblies": [
-          "System.Numerics"
-        ],
-        "compile": {
-          "lib/net462/System.Numerics.Vectors.dll": {
-            "related": ".xml"
-          }
-        },
-        "runtime": {
-          "lib/net462/System.Numerics.Vectors.dll": {
-            "related": ".xml"
-          }
-        },
-        "build": {
-          "buildTransitive/net462/_._": {}
-        }
-      },
-      "System.Runtime.CompilerServices.Unsafe/6.1.2": {
+      "System.Buffers/4.5.1": {
         "type": "package",
         "frameworkAssemblies": [
           "mscorlib"
         ],
         "compile": {
-          "lib/net462/System.Runtime.CompilerServices.Unsafe.dll": {
+          "ref/net45/System.Buffers.dll": {
             "related": ".xml"
           }
         },
         "runtime": {
-          "lib/net462/System.Runtime.CompilerServices.Unsafe.dll": {
+          "lib/net461/System.Buffers.dll": {
             "related": ".xml"
           }
-        },
-        "build": {
-          "buildTransitive/net462/_._": {}
         }
       },
-      "System.ValueTuple/4.6.1": {
-        "type": "package",
-        "compile": {
-          "lib/net471/_._": {}
-        },
-        "runtime": {
-          "lib/net471/_._": {}
-        },
-        "build": {
-          "buildTransitive/net471/System.ValueTuple.targets": {}
-        }
-      },
-      "GlueInspect.Algorithm.Contracts/1.0.0": {
-        "type": "project",
-        "compile": {
-          "bin/placeholder/GlueInspect.Algorithm.Contracts.dll": {}
-        },
-        "runtime": {
-          "bin/placeholder/GlueInspect.Algorithm.Contracts.dll": {}
-        }
-      }
-    },
-    ".NETFramework,Version=v4.8/win-arm64": {
-      "OpenCvSharp4/4.11.0.20250507": {
+      "System.Memory/4.5.5": {
         "type": "package",
         "dependencies": {
-          "System.Memory": "4.6.3",
-          "System.ValueTuple": "4.6.1"
+          "System.Buffers": "4.5.1",
+          "System.Numerics.Vectors": "4.5.0",
+          "System.Runtime.CompilerServices.Unsafe": "4.5.3"
         },
         "frameworkAssemblies": [
-          "System.Core",
-          "System.Security",
-          "System.Web"
+          "System",
+          "mscorlib"
         ],
         "compile": {
-          "lib/net48/OpenCvSharp.dll": {
+          "lib/net461/System.Memory.dll": {
             "related": ".xml"
           }
         },
         "runtime": {
-          "lib/net48/OpenCvSharp.dll": {
+          "lib/net461/System.Memory.dll": {
             "related": ".xml"
           }
         }
       },
-      "OpenCvSharp4.runtime.win/4.11.0.20250507": {
-        "type": "package",
-        "build": {
-          "build/net48/OpenCvSharp4.runtime.win.props": {}
-        }
-      },
-      "System.Buffers/4.6.1": {
-        "type": "package",
-        "compile": {
-          "lib/net462/System.Buffers.dll": {
-            "related": ".xml"
-          }
-        },
-        "runtime": {
-          "lib/net462/System.Buffers.dll": {
-            "related": ".xml"
-          }
-        },
-        "build": {
-          "buildTransitive/net462/_._": {}
-        }
-      },
-      "System.Memory/4.6.3": {
-        "type": "package",
-        "dependencies": {
-          "System.Buffers": "4.6.1",
-          "System.Numerics.Vectors": "4.6.1",
-          "System.Runtime.CompilerServices.Unsafe": "6.1.2"
-        },
-        "compile": {
-          "lib/net462/System.Memory.dll": {
-            "related": ".xml"
-          }
-        },
-        "runtime": {
-          "lib/net462/System.Memory.dll": {
-            "related": ".xml"
-          }
-        },
-        "build": {
-          "buildTransitive/net462/_._": {}
-        }
-      },
-      "System.Numerics.Vectors/4.6.1": {
+      "System.Numerics.Vectors/4.5.0": {
         "type": "package",
         "frameworkAssemblies": [
-          "System.Numerics"
+          "System.Numerics",
+          "mscorlib"
         ],
         "compile": {
-          "lib/net462/System.Numerics.Vectors.dll": {
+          "ref/net46/System.Numerics.Vectors.dll": {
             "related": ".xml"
           }
         },
         "runtime": {
-          "lib/net462/System.Numerics.Vectors.dll": {
+          "lib/net46/System.Numerics.Vectors.dll": {
             "related": ".xml"
           }
-        },
-        "build": {
-          "buildTransitive/net462/_._": {}
         }
       },
-      "System.Runtime.CompilerServices.Unsafe/6.1.2": {
+      "System.Runtime.CompilerServices.Unsafe/6.0.0": {
         "type": "package",
         "frameworkAssemblies": [
           "mscorlib"
         ],
         "compile": {
-          "lib/net462/System.Runtime.CompilerServices.Unsafe.dll": {
+          "lib/net461/System.Runtime.CompilerServices.Unsafe.dll": {
             "related": ".xml"
           }
         },
         "runtime": {
-          "lib/net462/System.Runtime.CompilerServices.Unsafe.dll": {
-            "related": ".xml"
-          }
-        },
-        "build": {
-          "buildTransitive/net462/_._": {}
-        }
-      },
-      "System.ValueTuple/4.6.1": {
-        "type": "package",
-        "compile": {
-          "lib/net471/_._": {}
-        },
-        "runtime": {
-          "lib/net471/_._": {}
-        },
-        "build": {
-          "buildTransitive/net471/System.ValueTuple.targets": {}
-        }
-      },
-      "GlueInspect.Algorithm.Contracts/1.0.0": {
-        "type": "project",
-        "compile": {
-          "bin/placeholder/GlueInspect.Algorithm.Contracts.dll": {}
-        },
-        "runtime": {
-          "bin/placeholder/GlueInspect.Algorithm.Contracts.dll": {}
-        }
-      }
-    },
-    ".NETFramework,Version=v4.8/win-x64": {
-      "OpenCvSharp4/4.11.0.20250507": {
-        "type": "package",
-        "dependencies": {
-          "System.Memory": "4.6.3",
-          "System.ValueTuple": "4.6.1"
-        },
-        "frameworkAssemblies": [
-          "System.Core",
-          "System.Security",
-          "System.Web"
-        ],
-        "compile": {
-          "lib/net48/OpenCvSharp.dll": {
-            "related": ".xml"
-          }
-        },
-        "runtime": {
-          "lib/net48/OpenCvSharp.dll": {
+          "lib/net461/System.Runtime.CompilerServices.Unsafe.dll": {
             "related": ".xml"
           }
         }
       },
-      "OpenCvSharp4.runtime.win/4.11.0.20250507": {
-        "type": "package",
-        "native": {
-          "runtimes/win-x64/native/OpenCvSharpExtern.dll": {},
-          "runtimes/win-x64/native/opencv_videoio_ffmpeg4110_64.dll": {}
-        },
-        "build": {
-          "build/net48/OpenCvSharp4.runtime.win.props": {}
-        }
-      },
-      "System.Buffers/4.6.1": {
-        "type": "package",
-        "compile": {
-          "lib/net462/System.Buffers.dll": {
-            "related": ".xml"
-          }
-        },
-        "runtime": {
-          "lib/net462/System.Buffers.dll": {
-            "related": ".xml"
-          }
-        },
-        "build": {
-          "buildTransitive/net462/_._": {}
-        }
-      },
-      "System.Memory/4.6.3": {
-        "type": "package",
-        "dependencies": {
-          "System.Buffers": "4.6.1",
-          "System.Numerics.Vectors": "4.6.1",
-          "System.Runtime.CompilerServices.Unsafe": "6.1.2"
-        },
-        "compile": {
-          "lib/net462/System.Memory.dll": {
-            "related": ".xml"
-          }
-        },
-        "runtime": {
-          "lib/net462/System.Memory.dll": {
-            "related": ".xml"
-          }
-        },
-        "build": {
-          "buildTransitive/net462/_._": {}
-        }
-      },
-      "System.Numerics.Vectors/4.6.1": {
-        "type": "package",
-        "frameworkAssemblies": [
-          "System.Numerics"
-        ],
-        "compile": {
-          "lib/net462/System.Numerics.Vectors.dll": {
-            "related": ".xml"
-          }
-        },
-        "runtime": {
-          "lib/net462/System.Numerics.Vectors.dll": {
-            "related": ".xml"
-          }
-        },
-        "build": {
-          "buildTransitive/net462/_._": {}
-        }
-      },
-      "System.Runtime.CompilerServices.Unsafe/6.1.2": {
+      "System.ValueTuple/4.5.0": {
         "type": "package",
         "frameworkAssemblies": [
           "mscorlib"
         ],
         "compile": {
-          "lib/net462/System.Runtime.CompilerServices.Unsafe.dll": {
-            "related": ".xml"
-          }
+          "ref/net47/System.ValueTuple.dll": {}
         },
         "runtime": {
-          "lib/net462/System.Runtime.CompilerServices.Unsafe.dll": {
+          "lib/net47/System.ValueTuple.dll": {
             "related": ".xml"
           }
-        },
-        "build": {
-          "buildTransitive/net462/_._": {}
-        }
-      },
-      "System.ValueTuple/4.6.1": {
-        "type": "package",
-        "compile": {
-          "lib/net471/_._": {}
-        },
-        "runtime": {
-          "lib/net471/_._": {}
-        },
-        "build": {
-          "buildTransitive/net471/System.ValueTuple.targets": {}
-        }
-      },
-      "GlueInspect.Algorithm.Contracts/1.0.0": {
-        "type": "project",
-        "compile": {
-          "bin/placeholder/GlueInspect.Algorithm.Contracts.dll": {}
-        },
-        "runtime": {
-          "bin/placeholder/GlueInspect.Algorithm.Contracts.dll": {}
-        }
-      }
-    },
-    ".NETFramework,Version=v4.8/win-x86": {
-      "OpenCvSharp4/4.11.0.20250507": {
-        "type": "package",
-        "dependencies": {
-          "System.Memory": "4.6.3",
-          "System.ValueTuple": "4.6.1"
-        },
-        "frameworkAssemblies": [
-          "System.Core",
-          "System.Security",
-          "System.Web"
-        ],
-        "compile": {
-          "lib/net48/OpenCvSharp.dll": {
-            "related": ".xml"
-          }
-        },
-        "runtime": {
-          "lib/net48/OpenCvSharp.dll": {
-            "related": ".xml"
-          }
-        }
-      },
-      "OpenCvSharp4.runtime.win/4.11.0.20250507": {
-        "type": "package",
-        "native": {
-          "runtimes/win-x86/native/OpenCvSharpExtern.dll": {},
-          "runtimes/win-x86/native/opencv_videoio_ffmpeg4110.dll": {}
-        },
-        "build": {
-          "build/net48/OpenCvSharp4.runtime.win.props": {}
-        }
-      },
-      "System.Buffers/4.6.1": {
-        "type": "package",
-        "compile": {
-          "lib/net462/System.Buffers.dll": {
-            "related": ".xml"
-          }
-        },
-        "runtime": {
-          "lib/net462/System.Buffers.dll": {
-            "related": ".xml"
-          }
-        },
-        "build": {
-          "buildTransitive/net462/_._": {}
-        }
-      },
-      "System.Memory/4.6.3": {
-        "type": "package",
-        "dependencies": {
-          "System.Buffers": "4.6.1",
-          "System.Numerics.Vectors": "4.6.1",
-          "System.Runtime.CompilerServices.Unsafe": "6.1.2"
-        },
-        "compile": {
-          "lib/net462/System.Memory.dll": {
-            "related": ".xml"
-          }
-        },
-        "runtime": {
-          "lib/net462/System.Memory.dll": {
-            "related": ".xml"
-          }
-        },
-        "build": {
-          "buildTransitive/net462/_._": {}
-        }
-      },
-      "System.Numerics.Vectors/4.6.1": {
-        "type": "package",
-        "frameworkAssemblies": [
-          "System.Numerics"
-        ],
-        "compile": {
-          "lib/net462/System.Numerics.Vectors.dll": {
-            "related": ".xml"
-          }
-        },
-        "runtime": {
-          "lib/net462/System.Numerics.Vectors.dll": {
-            "related": ".xml"
-          }
-        },
-        "build": {
-          "buildTransitive/net462/_._": {}
-        }
-      },
-      "System.Runtime.CompilerServices.Unsafe/6.1.2": {
-        "type": "package",
-        "frameworkAssemblies": [
-          "mscorlib"
-        ],
-        "compile": {
-          "lib/net462/System.Runtime.CompilerServices.Unsafe.dll": {
-            "related": ".xml"
-          }
-        },
-        "runtime": {
-          "lib/net462/System.Runtime.CompilerServices.Unsafe.dll": {
-            "related": ".xml"
-          }
-        },
-        "build": {
-          "buildTransitive/net462/_._": {}
-        }
-      },
-      "System.ValueTuple/4.6.1": {
-        "type": "package",
-        "compile": {
-          "lib/net471/_._": {}
-        },
-        "runtime": {
-          "lib/net471/_._": {}
-        },
-        "build": {
-          "buildTransitive/net471/System.ValueTuple.targets": {}
         }
       },
       "GlueInspect.Algorithm.Contracts/1.0.0": {
@@ -659,10 +271,10 @@
     }
   },
   "libraries": {
-    "OpenCvSharp4/4.11.0.20250507": {
-      "sha512": "j/R+G6xGC5IV2wGRU0/GF5qG/FrP+Uxp8dmNnXFlIdiw8Gfo4mtvKcBOBfS/bn4pP/7FNHLFX/xvMtgPJeDjAA==",
+    "OpenCvSharp4/4.10.0.20240616": {
+      "sha512": "+iaFSUq0Cp+B9s1sUqDwB3PvQ5HdWWvRE50WsAw1PL8smD3VZNbe0P786E4Yfu7LHM7jeqkulOwjk2CoihsZeg==",
       "type": "package",
-      "path": "opencvsharp4/4.11.0.20250507",
+      "path": "opencvsharp4/4.10.0.20240616",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
@@ -674,14 +286,14 @@
         "lib/netstandard2.0/OpenCvSharp.xml",
         "lib/netstandard2.1/OpenCvSharp.dll",
         "lib/netstandard2.1/OpenCvSharp.xml",
-        "opencvsharp4.4.11.0.20250507.nupkg.sha512",
+        "opencvsharp4.4.10.0.20240616.nupkg.sha512",
         "opencvsharp4.nuspec"
       ]
     },
-    "OpenCvSharp4.runtime.win/4.11.0.20250507": {
-      "sha512": "3PxMXyzR+pkL9UOx2PiBjZm+/iyCIu5D6OlA1sq9MH7oWrfvVnCXJlUYhIJv67F7SLUwUuGwXDIQBfdsL/54lg==",
+    "OpenCvSharp4.runtime.win/4.10.0.20240616": {
+      "sha512": "dpQNIR6PpeB/oZM0e0fZpt9lOS3Htjm6ZjtOgLyxN7QwjRekbNevrmO8VbgezUoetk68CRwxYZGaymCm2vt8Sg==",
       "type": "package",
-      "path": "opencvsharp4.runtime.win/4.11.0.20250507",
+      "path": "opencvsharp4.runtime.win/4.10.0.20240616",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
@@ -689,123 +301,182 @@
         "build/net5.0/OpenCvSharp4.runtime.win.props",
         "build/netcoreapp/OpenCvSharp4.runtime.win.props",
         "build/netstandard/OpenCvSharp4.runtime.win.props",
-        "opencvsharp4.runtime.win.4.11.0.20250507.nupkg.sha512",
+        "opencvsharp4.runtime.win.4.10.0.20240616.nupkg.sha512",
         "opencvsharp4.runtime.win.nuspec",
         "runtimes/win-x64/native/OpenCvSharpExtern.dll",
-        "runtimes/win-x64/native/opencv_videoio_ffmpeg4110_64.dll",
+        "runtimes/win-x64/native/opencv_videoio_ffmpeg4100_64.dll",
         "runtimes/win-x86/native/OpenCvSharpExtern.dll",
-        "runtimes/win-x86/native/opencv_videoio_ffmpeg4110.dll"
+        "runtimes/win-x86/native/opencv_videoio_ffmpeg4100.dll"
       ]
     },
-    "System.Buffers/4.6.1": {
-      "sha512": "N8GXpmiLMtljq7gwvyS+1QvKT/W2J8sNAvx+HVg4NGmsG/H+2k/y9QI23auLJRterrzCiDH+IWAw4V/GPwsMlw==",
+    "System.Buffers/4.5.1": {
+      "sha512": "Rw7ijyl1qqRS0YQD/WycNst8hUUMgrMH4FCn1nNm27M4VxchZ1js3fVjQaANHO5f3sN4isvP4a+Met9Y4YomAg==",
       "type": "package",
-      "path": "system.buffers/4.6.1",
+      "path": "system.buffers/4.5.1",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
-        "Icon.png",
-        "PACKAGE.md",
-        "buildTransitive/net461/System.Buffers.targets",
-        "buildTransitive/net462/_._",
-        "lib/net462/System.Buffers.dll",
-        "lib/net462/System.Buffers.xml",
+        "LICENSE.TXT",
+        "THIRD-PARTY-NOTICES.TXT",
+        "lib/net461/System.Buffers.dll",
+        "lib/net461/System.Buffers.xml",
         "lib/netcoreapp2.0/_._",
+        "lib/netstandard1.1/System.Buffers.dll",
+        "lib/netstandard1.1/System.Buffers.xml",
         "lib/netstandard2.0/System.Buffers.dll",
         "lib/netstandard2.0/System.Buffers.xml",
-        "lib/netstandard2.1/_._",
-        "system.buffers.4.6.1.nupkg.sha512",
-        "system.buffers.nuspec"
+        "lib/uap10.0.16299/_._",
+        "ref/net45/System.Buffers.dll",
+        "ref/net45/System.Buffers.xml",
+        "ref/netcoreapp2.0/_._",
+        "ref/netstandard1.1/System.Buffers.dll",
+        "ref/netstandard1.1/System.Buffers.xml",
+        "ref/netstandard2.0/System.Buffers.dll",
+        "ref/netstandard2.0/System.Buffers.xml",
+        "ref/uap10.0.16299/_._",
+        "system.buffers.4.5.1.nupkg.sha512",
+        "system.buffers.nuspec",
+        "useSharedDesignerContext.txt",
+        "version.txt"
       ]
     },
-    "System.Memory/4.6.3": {
-      "sha512": "qdcDOgnFZY40+Q9876JUHnlHu7bosOHX8XISRoH94fwk6hgaeQGSgfZd8srWRZNt5bV9ZW2TljcegDNxsf+96A==",
+    "System.Memory/4.5.5": {
+      "sha512": "XIWiDvKPXaTveaB7HVganDlOCRoj03l+jrwNvcge/t8vhGYKvqV+dMv6G4SAX2NoNmN0wZfVPTAlFwZcZvVOUw==",
       "type": "package",
-      "path": "system.memory/4.6.3",
+      "path": "system.memory/4.5.5",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
-        "Icon.png",
-        "PACKAGE.md",
-        "buildTransitive/net461/System.Memory.targets",
-        "buildTransitive/net462/_._",
-        "lib/net462/System.Memory.dll",
-        "lib/net462/System.Memory.xml",
+        "LICENSE.TXT",
+        "THIRD-PARTY-NOTICES.TXT",
+        "lib/net461/System.Memory.dll",
+        "lib/net461/System.Memory.xml",
         "lib/netcoreapp2.1/_._",
+        "lib/netstandard1.1/System.Memory.dll",
+        "lib/netstandard1.1/System.Memory.xml",
         "lib/netstandard2.0/System.Memory.dll",
         "lib/netstandard2.0/System.Memory.xml",
-        "lib/netstandard2.1/_._",
-        "system.memory.4.6.3.nupkg.sha512",
-        "system.memory.nuspec"
+        "ref/netcoreapp2.1/_._",
+        "system.memory.4.5.5.nupkg.sha512",
+        "system.memory.nuspec",
+        "useSharedDesignerContext.txt",
+        "version.txt"
       ]
     },
-    "System.Numerics.Vectors/4.6.1": {
-      "sha512": "sQxefTnhagrhoq2ReR0D/6K0zJcr9Hrd6kikeXsA1I8kOCboTavcUC4r7TSfpKFeE163uMuxZcyfO1mGO3EN8Q==",
+    "System.Numerics.Vectors/4.5.0": {
+      "sha512": "QQTlPTl06J/iiDbJCiepZ4H//BVraReU4O4EoRw1U02H5TLUIT7xn3GnDp9AXPSlJUDyFs4uWjWafNX6WrAojQ==",
       "type": "package",
-      "path": "system.numerics.vectors/4.6.1",
+      "path": "system.numerics.vectors/4.5.0",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
-        "Icon.png",
-        "PACKAGE.md",
-        "buildTransitive/net461/System.Numerics.Vectors.targets",
-        "buildTransitive/net462/_._",
-        "lib/net462/System.Numerics.Vectors.dll",
-        "lib/net462/System.Numerics.Vectors.xml",
+        "LICENSE.TXT",
+        "THIRD-PARTY-NOTICES.TXT",
+        "lib/MonoAndroid10/_._",
+        "lib/MonoTouch10/_._",
+        "lib/net46/System.Numerics.Vectors.dll",
+        "lib/net46/System.Numerics.Vectors.xml",
         "lib/netcoreapp2.0/_._",
+        "lib/netstandard1.0/System.Numerics.Vectors.dll",
+        "lib/netstandard1.0/System.Numerics.Vectors.xml",
         "lib/netstandard2.0/System.Numerics.Vectors.dll",
         "lib/netstandard2.0/System.Numerics.Vectors.xml",
-        "lib/netstandard2.1/_._",
-        "system.numerics.vectors.4.6.1.nupkg.sha512",
-        "system.numerics.vectors.nuspec"
+        "lib/portable-net45+win8+wp8+wpa81/System.Numerics.Vectors.dll",
+        "lib/portable-net45+win8+wp8+wpa81/System.Numerics.Vectors.xml",
+        "lib/uap10.0.16299/_._",
+        "lib/xamarinios10/_._",
+        "lib/xamarinmac20/_._",
+        "lib/xamarintvos10/_._",
+        "lib/xamarinwatchos10/_._",
+        "ref/MonoAndroid10/_._",
+        "ref/MonoTouch10/_._",
+        "ref/net45/System.Numerics.Vectors.dll",
+        "ref/net45/System.Numerics.Vectors.xml",
+        "ref/net46/System.Numerics.Vectors.dll",
+        "ref/net46/System.Numerics.Vectors.xml",
+        "ref/netcoreapp2.0/_._",
+        "ref/netstandard1.0/System.Numerics.Vectors.dll",
+        "ref/netstandard1.0/System.Numerics.Vectors.xml",
+        "ref/netstandard2.0/System.Numerics.Vectors.dll",
+        "ref/netstandard2.0/System.Numerics.Vectors.xml",
+        "ref/uap10.0.16299/_._",
+        "ref/xamarinios10/_._",
+        "ref/xamarinmac20/_._",
+        "ref/xamarintvos10/_._",
+        "ref/xamarinwatchos10/_._",
+        "system.numerics.vectors.4.5.0.nupkg.sha512",
+        "system.numerics.vectors.nuspec",
+        "useSharedDesignerContext.txt",
+        "version.txt"
       ]
     },
-    "System.Runtime.CompilerServices.Unsafe/6.1.2": {
-      "sha512": "2hBr6zdbIBTDE3EhK7NSVNdX58uTK6iHW/P/Axmm9sl1xoGSLqDvMtpecn226TNwHByFokYwJmt/aQQNlO5CRw==",
+    "System.Runtime.CompilerServices.Unsafe/6.0.0": {
+      "sha512": "/iUeP3tq1S0XdNNoMz5C9twLSrM/TH+qElHkXWaPvuNOt+99G75NrV0OS2EqHx5wMN7popYjpc8oTjC1y16DLg==",
       "type": "package",
-      "path": "system.runtime.compilerservices.unsafe/6.1.2",
+      "path": "system.runtime.compilerservices.unsafe/6.0.0",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
         "Icon.png",
-        "PACKAGE.md",
-        "buildTransitive/net461/System.Runtime.CompilerServices.Unsafe.targets",
-        "buildTransitive/net462/_._",
-        "buildTransitive/net6.0/_._",
+        "LICENSE.TXT",
+        "THIRD-PARTY-NOTICES.TXT",
         "buildTransitive/netcoreapp2.0/System.Runtime.CompilerServices.Unsafe.targets",
-        "lib/net462/System.Runtime.CompilerServices.Unsafe.dll",
-        "lib/net462/System.Runtime.CompilerServices.Unsafe.xml",
+        "buildTransitive/netcoreapp3.1/_._",
+        "lib/net461/System.Runtime.CompilerServices.Unsafe.dll",
+        "lib/net461/System.Runtime.CompilerServices.Unsafe.xml",
         "lib/net6.0/System.Runtime.CompilerServices.Unsafe.dll",
         "lib/net6.0/System.Runtime.CompilerServices.Unsafe.xml",
-        "lib/net7.0/_._",
+        "lib/netcoreapp3.1/System.Runtime.CompilerServices.Unsafe.dll",
+        "lib/netcoreapp3.1/System.Runtime.CompilerServices.Unsafe.xml",
         "lib/netstandard2.0/System.Runtime.CompilerServices.Unsafe.dll",
         "lib/netstandard2.0/System.Runtime.CompilerServices.Unsafe.xml",
-        "system.runtime.compilerservices.unsafe.6.1.2.nupkg.sha512",
-        "system.runtime.compilerservices.unsafe.nuspec"
+        "system.runtime.compilerservices.unsafe.6.0.0.nupkg.sha512",
+        "system.runtime.compilerservices.unsafe.nuspec",
+        "useSharedDesignerContext.txt"
       ]
     },
-    "System.ValueTuple/4.6.1": {
-      "sha512": "+RJT4qaekpZ7DDLhf+LTjq+E48jieKiY9ulJ+BoxKmZblIJfIJT8Ufcaa/clQqnYvWs8jugfGSMu8ylS0caG0w==",
+    "System.ValueTuple/4.5.0": {
+      "sha512": "okurQJO6NRE/apDIP23ajJ0hpiNmJ+f0BwOlB/cSqTLQlw5upkf+5+96+iG2Jw40G1fCVCyPz/FhIABUjMR+RQ==",
       "type": "package",
-      "path": "system.valuetuple/4.6.1",
+      "path": "system.valuetuple/4.5.0",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
-        "Icon.png",
-        "PACKAGE.md",
-        "build/net471/System.ValueTuple.targets",
-        "buildTransitive/net461/System.ValueTuple.targets",
-        "buildTransitive/net462/_._",
-        "buildTransitive/net471/System.ValueTuple.targets",
-        "lib/net462/System.ValueTuple.dll",
-        "lib/net462/System.ValueTuple.xml",
+        "LICENSE.TXT",
+        "THIRD-PARTY-NOTICES.TXT",
+        "lib/MonoAndroid10/_._",
+        "lib/MonoTouch10/_._",
+        "lib/net461/System.ValueTuple.dll",
+        "lib/net461/System.ValueTuple.xml",
         "lib/net47/System.ValueTuple.dll",
         "lib/net47/System.ValueTuple.xml",
-        "lib/net471/_._",
         "lib/netcoreapp2.0/_._",
+        "lib/netstandard1.0/System.ValueTuple.dll",
+        "lib/netstandard1.0/System.ValueTuple.xml",
         "lib/netstandard2.0/_._",
-        "system.valuetuple.4.6.1.nupkg.sha512",
-        "system.valuetuple.nuspec"
+        "lib/portable-net40+sl4+win8+wp8/System.ValueTuple.dll",
+        "lib/portable-net40+sl4+win8+wp8/System.ValueTuple.xml",
+        "lib/uap10.0.16299/_._",
+        "lib/xamarinios10/_._",
+        "lib/xamarinmac20/_._",
+        "lib/xamarintvos10/_._",
+        "lib/xamarinwatchos10/_._",
+        "ref/MonoAndroid10/_._",
+        "ref/MonoTouch10/_._",
+        "ref/net461/System.ValueTuple.dll",
+        "ref/net47/System.ValueTuple.dll",
+        "ref/netcoreapp2.0/_._",
+        "ref/netstandard2.0/_._",
+        "ref/portable-net40+sl4+win8+wp8/System.ValueTuple.dll",
+        "ref/uap10.0.16299/_._",
+        "ref/xamarinios10/_._",
+        "ref/xamarinmac20/_._",
+        "ref/xamarintvos10/_._",
+        "ref/xamarinwatchos10/_._",
+        "system.valuetuple.4.5.0.nupkg.sha512",
+        "system.valuetuple.nuspec",
+        "useSharedDesignerContext.txt",
+        "version.txt"
       ]
     },
     "GlueInspect.Algorithm.Contracts/1.0.0": {
@@ -817,8 +488,8 @@
   "projectFileDependencyGroups": {
     ".NETFramework,Version=v4.8": [
       "GlueInspect.Algorithm.Contracts >= 1.0.0",
-      "OpenCvSharp4 >= 4.11.0.20250507",
-      "OpenCvSharp4.runtime.win >= 4.11.0.20250507"
+      "OpenCvSharp4 >= 4.10.0.20240616",
+      "OpenCvSharp4.runtime.win >= 4.10.0.20240616"
     ]
   },
   "packageFolders": {
@@ -828,11 +499,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "E:\\posen_project\\点胶检测\\上位机程序\\WpfApp2\\Algorithms\\GlueInspect.Algorithm.OpenCV\\GlueInspect.Algorithm.OpenCV.csproj",
+      "projectUniqueName": "E:\\posen_project\\点胶检测\\上位机程序\\WpfApp2\\Platform\\PlatformHost.Wpf\\Algorithms\\GlueInspect.Algorithm.OpenCV\\GlueInspect.Algorithm.OpenCV.csproj",
       "projectName": "GlueInspect.Algorithm.OpenCV",
-      "projectPath": "E:\\posen_project\\点胶检测\\上位机程序\\WpfApp2\\Algorithms\\GlueInspect.Algorithm.OpenCV\\GlueInspect.Algorithm.OpenCV.csproj",
+      "projectPath": "E:\\posen_project\\点胶检测\\上位机程序\\WpfApp2\\Platform\\PlatformHost.Wpf\\Algorithms\\GlueInspect.Algorithm.OpenCV\\GlueInspect.Algorithm.OpenCV.csproj",
       "packagesPath": "C:\\Users\\liangyuhang\\.nuget\\packages\\",
-      "outputPath": "E:\\posen_project\\点胶检测\\上位机程序\\WpfApp2\\Algorithms\\GlueInspect.Algorithm.OpenCV\\obj\\",
+      "outputPath": "E:\\posen_project\\点胶检测\\上位机程序\\WpfApp2\\Platform\\PlatformHost.Wpf\\Algorithms\\GlueInspect.Algorithm.OpenCV\\obj\\",
       "projectStyle": "PackageReference",
       "skipContentFileWrite": true,
       "UsingMicrosoftNETSdk": false,
@@ -854,8 +525,8 @@
       "frameworks": {
         "net48": {
           "projectReferences": {
-            "E:\\posen_project\\点胶检测\\上位机程序\\WpfApp2\\Algorithms\\GlueInspect.Algorithm.Contracts\\GlueInspect.Algorithm.Contracts.csproj": {
-              "projectPath": "E:\\posen_project\\点胶检测\\上位机程序\\WpfApp2\\Algorithms\\GlueInspect.Algorithm.Contracts\\GlueInspect.Algorithm.Contracts.csproj"
+            "E:\\posen_project\\点胶检测\\上位机程序\\WpfApp2\\Platform\\PlatformHost.Wpf\\Algorithms\\GlueInspect.Algorithm.Contracts\\GlueInspect.Algorithm.Contracts.csproj": {
+              "projectPath": "E:\\posen_project\\点胶检测\\上位机程序\\WpfApp2\\Platform\\PlatformHost.Wpf\\Algorithms\\GlueInspect.Algorithm.Contracts\\GlueInspect.Algorithm.Contracts.csproj"
             }
           }
         }
@@ -871,26 +542,17 @@
         "dependencies": {
           "OpenCvSharp4": {
             "target": "Package",
-            "version": "[4.11.0.20250507, )"
+            "version": "[4.10.0.20240616, )"
           },
           "OpenCvSharp4.runtime.win": {
             "target": "Package",
-            "version": "[4.11.0.20250507, )"
+            "version": "[4.10.0.20240616, )"
           }
         }
       }
     },
     "runtimes": {
       "win": {
-        "#import": []
-      },
-      "win-arm64": {
-        "#import": []
-      },
-      "win-x64": {
-        "#import": []
-      },
-      "win-x86": {
         "#import": []
       }
     }

@@ -1,7 +1,6 @@
 E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\PlatformHost.Wpf\bin\Release\dll\x86\OpenCvSharpExtern.dll
-E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\PlatformHost.Wpf\bin\Release\dll\x86\opencv_videoio_ffmpeg4110.dll
 E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\PlatformHost.Wpf\bin\Release\dll\x64\OpenCvSharpExtern.dll
-E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\PlatformHost.Wpf\bin\Release\dll\x64\opencv_videoio_ffmpeg4110_64.dll
+E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\PlatformHost.Wpf\bin\Release\SampleImages\demo.png
 E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\PlatformHost.Wpf\bin\Release\libHarfBuzzSharp.dylib
 E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\PlatformHost.Wpf\bin\Release\x86\libHarfBuzzSharp.dll
 E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\PlatformHost.Wpf\bin\Release\x64\libHarfBuzzSharp.dll
@@ -26,7 +25,6 @@ E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\PlatformHost.Wpf\
 E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\PlatformHost.Wpf\bin\Release\posen.ico
 E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\PlatformHost.Wpf\bin\Release\GlueInspect.exe.config
 E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\PlatformHost.Wpf\bin\Release\GlueInspect.exe
-E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\PlatformHost.Wpf\bin\Release\GlueInspect.pdb
 E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\PlatformHost.Wpf\bin\Release\EPPlus.dll
 E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\PlatformHost.Wpf\bin\Release\GlueInspect.Algorithm.Contracts.dll
 E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\PlatformHost.Wpf\bin\Release\GlueInspect.Algorithm.ONNX.dll
@@ -54,10 +52,7 @@ E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\PlatformHost.Wpf\
 E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\PlatformHost.Wpf\bin\Release\System.Text.Json.dll
 E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\PlatformHost.Wpf\bin\Release\System.Threading.Tasks.Extensions.dll
 E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\PlatformHost.Wpf\bin\Release\System.ValueTuple.dll
-E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\PlatformHost.Wpf\bin\Release\GlueInspect.Algorithm.Contracts.pdb
-E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\PlatformHost.Wpf\bin\Release\GlueInspect.Algorithm.OpenCV.pdb
-E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\PlatformHost.Wpf\bin\Release\GlueInspect.Algorithm.ONNX.pdb
-E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\PlatformHost.Wpf\bin\Release\GlueInspect.ThreeD.Contracts.pdb
+E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\PlatformHost.Wpf\bin\Release\OpenCvSharp.dll
 E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\PlatformHost.Wpf\bin\Release\OfficeOpenXml.Core.ExcelPackage.pdb
 E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\PlatformHost.Wpf\bin\Release\System.IO.Pipelines.xml
 E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\PlatformHost.Wpf\bin\Release\System.Runtime.CompilerServices.Unsafe.xml
@@ -191,4 +186,8 @@ E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\PlatformHost.Wpf\
 E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\PlatformHost.Wpf\obj\Release\PlatformHost.Wpf.csproj.CoreCompileInputs.cache
 E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\PlatformHost.Wpf\obj\Release\Platform.E052C7BE.Up2Date
 E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\PlatformHost.Wpf\obj\Release\GlueInspect.exe
+E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\PlatformHost.Wpf\bin\Release\OpenCvSharp.xml
+E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\PlatformHost.Wpf\bin\Release\dll\x86\opencv_videoio_ffmpeg4110.dll
+E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\PlatformHost.Wpf\bin\Release\dll\x64\opencv_videoio_ffmpeg4110_64.dll
+E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\PlatformHost.Wpf\bin\Release\GlueInspect.pdb
 E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\PlatformHost.Wpf\obj\Release\GlueInspect.pdb

@@ -75,7 +75,8 @@
                    Foreground="#FF2E3440"/>
 
         <TextBlock Grid.Row="1"
-                   Text="添加多个图片文件作为样本（建议从“图像源1”中选择），会自动按文件名后缀（如“_1”）匹配同组内的 图像源2_1/图像源2_2/3D 图片。可跨不同分类挑选并组合样本，避免样品数目不均衡；测试完成后再命名并生成基准 cicd_refer.csv。"
+                   x:Name="HintTextBlock"
+                   Text="添加多个图片文件作为样本，会自动按文件名后缀匹配同组内的其它图像。可跨不同分类挑选并组合样本，避免样品数目不均衡；测试完成后再命名并生成基准 cicd_refer.csv。"
                    FontSize="12"
                    Foreground="#FF666666"
                    TextWrapping="Wrap"

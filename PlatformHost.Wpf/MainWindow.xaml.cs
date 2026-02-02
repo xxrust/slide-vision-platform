@@ -12,11 +12,8 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using VM.Core;
-using VM.PlatformSDKCS;
 using System.IO;
 using static WpfApp2.UI.Page1;
-using IMVSHPFeatureMatchModuCs;
 using WpfApp2.UI;
 using WpfApp2.Models;
 using WpfApp2.UI.Models;
@@ -32,7 +29,6 @@ namespace WpfApp2
     /// </summary>
     public partial class MainWindow : Window
     {
-        private VmProcedure procedure;
         private bool _closeConfirmationAccepted;
 
         //新建两个frame，使Page1.xaml和Page2.xaml可以在同一个窗口中切换
@@ -253,19 +249,7 @@ namespace WpfApp2
                 LogManager.Error($"释放PLC串口资源时出错: {ex.Message}");
             }
 
-            // 调用 CloseSolution 方法（已去除自动保存，改为手动保存）
-            try
-            {
-                // ✅ 已移除自动保存：VmSolution.Save();
-                VmSolution.Instance.Dispose();
-                //不需要再调用 VmSolution.Instance.CloseSolution()，因为 Dispose 方法会自动处理关闭逻辑
-                //VmSolution.Instance.CloseSolution();
-
-            }
-            catch (VmException ex)
-            {
-                MessageBox.Show(ex.Message.ToString());
-            }
+            // 算法引擎已解耦：无需释放外部引擎资源
         }
 
         // 最后，在应用程序启动时自动加载最后使用的模板

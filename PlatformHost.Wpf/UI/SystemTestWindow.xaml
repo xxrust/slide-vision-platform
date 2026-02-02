@@ -1,7 +1,7 @@
-<Window x:Class="WpfApp2.UI.SystemTestWindow"
+﻿<Window x:Class="WpfApp2.UI.SystemTestWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="系统测试" Height="500" Width="600"
+        Title="绯荤粺娴嬭瘯" Height="500" Width="600"
         WindowStartupLocation="CenterScreen"
         ResizeMode="NoResize"
         Background="#FF2C3E50">
@@ -13,15 +13,15 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <!-- 标题区域 -->
+        <!-- 鏍囬鍖哄煙 -->
         <Border Grid.Row="0" Background="#FF34495E" CornerRadius="8" Padding="15" Margin="0,0,0,15">
             <StackPanel>
-                <TextBlock Text="🔬 系统测试" FontSize="20" FontWeight="Bold" Foreground="#FF3498DB" HorizontalAlignment="Center" Margin="0,0,0,5"/>
-                <TextBlock Text="在线仿真测试 - 性能监控" FontSize="12" Foreground="#FFBDC3C7" HorizontalAlignment="Center"/>
+                <TextBlock Text="馃敩 绯荤粺娴嬭瘯" FontSize="20" FontWeight="Bold" Foreground="#FF3498DB" HorizontalAlignment="Center" Margin="0,0,0,5"/>
+                <TextBlock Text="鍦ㄧ嚎浠跨湡娴嬭瘯 - 鎬ц兘鐩戞帶" FontSize="12" Foreground="#FFBDC3C7" HorizontalAlignment="Center"/>
             </StackPanel>
         </Border>
 
-        <!-- 主内容区域 -->
+        <!-- 涓诲唴瀹瑰尯鍩?-->
         <Grid Grid.Row="1">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
@@ -29,97 +29,97 @@
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
 
-            <!-- 左侧：控制区域 -->
+            <!-- 宸︿晶锛氭帶鍒跺尯鍩?-->
             <Border Grid.Column="0" Background="#FF34495E" CornerRadius="8" Padding="15">
                 <StackPanel>
-                    <TextBlock Text="⚡ 测试控制" FontSize="16" FontWeight="Bold" Foreground="#FF3498DB" Margin="0,0,0,15"/>
+                    <TextBlock Text="鈿?娴嬭瘯鎺у埗" FontSize="16" FontWeight="Bold" Foreground="#FF3498DB" Margin="0,0,0,15"/>
                     
-                    <!-- 触发按钮 -->
-                    <Button x:Name="TriggerButton" Content="🚀 触发测试" Height="50" FontSize="16" FontWeight="Bold"
+                    <!-- 瑙﹀彂鎸夐挳 -->
+                    <Button x:Name="TriggerButton" Content="馃殌 瑙﹀彂娴嬭瘯" Height="50" FontSize="16" FontWeight="Bold"
                             Background="#FF27AE60" Foreground="White" Margin="0,0,0,15" Click="TriggerButton_Click"/>
                     
-                    <!-- PLC连接状态 -->
+                    <!-- PLC杩炴帴鐘舵€?-->
                     <Border Background="#FF2C3E50" CornerRadius="6" Padding="10" Margin="0,0,0,15">
                         <StackPanel>
-                            <TextBlock Text="🔗 PLC连接状态" FontSize="12" FontWeight="Bold" Foreground="#FF3498DB" Margin="0,0,0,8"/>
+                            <TextBlock Text="馃敆 PLC杩炴帴鐘舵€?" FontSize="12" FontWeight="Bold" Foreground="#FF3498DB" Margin="0,0,0,8"/>
                             <StackPanel Orientation="Horizontal">
                                 <Ellipse x:Name="PLCStatusIndicator" Width="12" Height="12" Fill="Gray" Margin="0,0,5,0"/>
-                                <TextBlock x:Name="PLCStatusText" Text="未连接" FontSize="11" Foreground="White"/>
+                                <TextBlock x:Name="PLCStatusText" Text="鏈繛鎺?" FontSize="11" Foreground="White"/>
                             </StackPanel>
                         </StackPanel>
                     </Border>
 
-                    <!-- 测试状态 -->
+                    <!-- 娴嬭瘯鐘舵€?-->
                     <Border Background="#FF2C3E50" CornerRadius="6" Padding="10">
                         <StackPanel>
-                            <TextBlock Text="📊 测试状态" FontSize="12" FontWeight="Bold" Foreground="#FF3498DB" Margin="0,0,0,8"/>
-                            <TextBlock x:Name="TestStatusText" Text="准备就绪" FontSize="11" Foreground="White"/>
+                            <TextBlock Text="馃搳 娴嬭瘯鐘舵€?" FontSize="12" FontWeight="Bold" Foreground="#FF3498DB" Margin="0,0,0,8"/>
+                            <TextBlock x:Name="TestStatusText" Text="鍑嗗灏辩华" FontSize="11" Foreground="White"/>
                         </StackPanel>
                     </Border>
                 </StackPanel>
             </Border>
 
-            <!-- 右侧：时间监控区域 -->
+            <!-- 鍙充晶锛氭椂闂寸洃鎺у尯鍩?-->
             <Border Grid.Column="2" Background="#FF34495E" CornerRadius="8" Padding="15">
                 <StackPanel>
-                    <TextBlock Text="⏱️ 性能监控" FontSize="16" FontWeight="Bold" Foreground="#FF3498DB" Margin="0,0,0,15"/>
+                    <TextBlock Text="鈴憋笍 鎬ц兘鐩戞帶" FontSize="16" FontWeight="Bold" Foreground="#FF3498DB" Margin="0,0,0,15"/>
                     
-                    <!-- VM回调完成时间 -->
+                    <!-- 2D回调完成时间 -->
                     <Border Background="#FF2C3E50" CornerRadius="6" Padding="10" Margin="0,0,0,8">
                         <Grid>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*"/>
                                 <ColumnDefinition Width="Auto"/>
                             </Grid.ColumnDefinitions>
-                            <TextBlock Grid.Column="0" Text="VM回调完成" FontSize="12" FontWeight="Bold" Foreground="#FF52C41A" VerticalAlignment="Center"/>
-                            <TextBlock Grid.Column="1" x:Name="VMCallbackTimeText" Text="-- ms" FontSize="12" FontWeight="Bold" Foreground="White" VerticalAlignment="Center"/>
+                            <TextBlock Grid.Column="0" Text="2D回调完成" FontSize="12" FontWeight="Bold" Foreground="#FF52C41A" VerticalAlignment="Center"/>
+                            <TextBlock Grid.Column="1" x:Name="Callback2DTimeText" Text="-- ms" FontSize="12" FontWeight="Bold" Foreground="White" VerticalAlignment="Center"/>
                         </Grid>
                     </Border>
 
-                    <!-- 3D相机回调完成时间 -->
+                    <!-- 3D鐩告満鍥炶皟瀹屾垚鏃堕棿 -->
                     <Border Background="#FF2C3E50" CornerRadius="6" Padding="10" Margin="0,0,0,8">
                         <Grid>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*"/>
                                 <ColumnDefinition Width="Auto"/>
                             </Grid.ColumnDefinitions>
-                            <TextBlock Grid.Column="0" Text="3D相机回调完成" FontSize="12" FontWeight="Bold" Foreground="#FF1890FF" VerticalAlignment="Center"/>
+                            <TextBlock Grid.Column="0" Text="3D鐩告満鍥炶皟瀹屾垚" FontSize="12" FontWeight="Bold" Foreground="#FF1890FF" VerticalAlignment="Center"/>
                             <TextBlock Grid.Column="1" x:Name="LJDCallbackTimeText" Text="-- ms" FontSize="12" FontWeight="Bold" Foreground="White" VerticalAlignment="Center"/>
                         </Grid>
                     </Border>
 
-                    <!-- IO输出完成时间 -->
+                    <!-- IO杈撳嚭瀹屾垚鏃堕棿 -->
                     <Border Background="#FF2C3E50" CornerRadius="6" Padding="10" Margin="0,0,0,8">
                         <Grid>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*"/>
                                 <ColumnDefinition Width="Auto"/>
                             </Grid.ColumnDefinitions>
-                            <TextBlock Grid.Column="0" Text="IO输出完成" FontSize="12" FontWeight="Bold" Foreground="#FFFA8C16" VerticalAlignment="Center"/>
+                            <TextBlock Grid.Column="0" Text="IO杈撳嚭瀹屾垚" FontSize="12" FontWeight="Bold" Foreground="#FFFA8C16" VerticalAlignment="Center"/>
                             <TextBlock Grid.Column="1" x:Name="IOOutputTimeText" Text="-- ms" FontSize="12" FontWeight="Bold" Foreground="White" VerticalAlignment="Center"/>
                         </Grid>
                     </Border>
 
-                    <!-- 界面渲染完成时间 -->
+                    <!-- 鐣岄潰娓叉煋瀹屾垚鏃堕棿 -->
                     <Border Background="#FF2C3E50" CornerRadius="6" Padding="10" Margin="0,0,0,8">
                         <Grid>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*"/>
                                 <ColumnDefinition Width="Auto"/>
                             </Grid.ColumnDefinitions>
-                            <TextBlock Grid.Column="0" Text="界面渲染完成" FontSize="12" FontWeight="Bold" Foreground="#FFF04864" VerticalAlignment="Center"/>
+                            <TextBlock Grid.Column="0" Text="鐣岄潰娓叉煋瀹屾垚" FontSize="12" FontWeight="Bold" Foreground="#FFF04864" VerticalAlignment="Center"/>
                             <TextBlock Grid.Column="1" x:Name="UIRenderTimeText" Text="-- ms" FontSize="12" FontWeight="Bold" Foreground="White" VerticalAlignment="Center"/>
                         </Grid>
                     </Border>
 
-                    <!-- 总耗时 -->
+                    <!-- 鎬昏€楁椂 -->
                     <Border Background="#FF2C3E50" CornerRadius="6" Padding="10" Margin="0,15,0,0">
                         <Grid>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*"/>
                                 <ColumnDefinition Width="Auto"/>
                             </Grid.ColumnDefinitions>
-                            <TextBlock Grid.Column="0" Text="总耗时" FontSize="14" FontWeight="Bold" Foreground="#FFD4AF37" VerticalAlignment="Center"/>
+                            <TextBlock Grid.Column="0" Text="鎬昏€楁椂" FontSize="14" FontWeight="Bold" Foreground="#FFD4AF37" VerticalAlignment="Center"/>
                             <TextBlock Grid.Column="1" x:Name="TotalTimeText" Text="-- ms" FontSize="14" FontWeight="Bold" Foreground="#FFD4AF37" VerticalAlignment="Center"/>
                         </Grid>
                     </Border>
@@ -127,14 +127,16 @@
             </Border>
         </Grid>
 
-        <!-- 底部按钮区域 -->
+        <!-- 搴曢儴鎸夐挳鍖哄煙 -->
         <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,15,0,0">
-            <Button x:Name="MotorSettingsButton" Content="⚙️ 电机参数设置" Width="120" Height="30" Margin="0,0,10,0"
+            <Button x:Name="MotorSettingsButton" Content="鈿欙笍 鐢垫満鍙傛暟璁剧疆" Width="120" Height="30" Margin="0,0,10,0"
                     Background="#FF3498DB" Foreground="White" FontSize="11" FontWeight="Bold" Click="MotorSettingsButton_Click"/>
-            <Button x:Name="ClearButton" Content="🗑️ 清除记录" Width="100" Height="30" Margin="0,0,10,0"
+            <Button x:Name="ClearButton" Content="馃棏锔?娓呴櫎璁板綍" Width="100" Height="30" Margin="0,0,10,0"
                     Background="#FFE74C3C" Foreground="White" FontSize="11" FontWeight="Bold" Click="ClearButton_Click"/>
-            <Button x:Name="CloseButton" Content="❌ 关闭" Width="80" Height="30"
+            <Button x:Name="CloseButton" Content="鉂?鍏抽棴" Width="80" Height="30"
                     Background="#FF95A5A6" Foreground="White" FontSize="11" FontWeight="Bold" Click="CloseButton_Click"/>
         </StackPanel>
     </Grid>
 </Window> 
+
+

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Diagnostics;
 using System.Threading.Tasks;
 using System.Windows;
@@ -341,7 +341,7 @@ namespace WpfApp2.UI
                 _vmCallbackTime = _testStopwatch.ElapsedMilliseconds;
                 Dispatcher.Invoke(() =>
                 {
-                    VMCallbackTimeText.Text = $"{_vmCallbackTime:F1} ms";
+                    Callback2DTimeText.Text = $"{_vmCallbackTime:F1} ms";
                 });
                 LogMessage($"VM回调完成: {_vmCallbackTime:F1} ms");
             }
@@ -506,7 +506,7 @@ namespace WpfApp2.UI
             _ioOutputTime = -1;
             _uiRenderTime = -1;
             
-            VMCallbackTimeText.Text = "-- ms";
+            Callback2DTimeText.Text = "-- ms";
             LJDCallbackTimeText.Text = "-- ms";
             IOOutputTimeText.Text = "-- ms";
             UIRenderTimeText.Text = "-- ms";

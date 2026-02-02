@@ -1,12 +1,9 @@
 E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\PlatformHost.Wpf\Algorithms\GlueInspect.Algorithm.ONNX\bin\Debug\GlueInspect.Algorithm.ONNX.dll
-E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\PlatformHost.Wpf\Algorithms\GlueInspect.Algorithm.ONNX\bin\Debug\GlueInspect.Algorithm.ONNX.pdb
 E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\PlatformHost.Wpf\Algorithms\GlueInspect.Algorithm.ONNX\bin\Debug\GlueInspect.Algorithm.Contracts.dll
-E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\PlatformHost.Wpf\Algorithms\GlueInspect.Algorithm.ONNX\bin\Debug\GlueInspect.Algorithm.Contracts.pdb
 E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\PlatformHost.Wpf\Algorithms\GlueInspect.Algorithm.ONNX\obj\Debug\GlueInspect.Algorithm.ONNX.csproj.AssemblyReference.cache
 E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\PlatformHost.Wpf\Algorithms\GlueInspect.Algorithm.ONNX\obj\Debug\GlueInspect.Algorithm.ONNX.csproj.CoreCompileInputs.cache
 E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\PlatformHost.Wpf\Algorithms\GlueInspect.Algorithm.ONNX\obj\Debug\GlueInsp.BDD18081.Up2Date
 E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\PlatformHost.Wpf\Algorithms\GlueInspect.Algorithm.ONNX\obj\Debug\GlueInspect.Algorithm.ONNX.dll
-E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\PlatformHost.Wpf\Algorithms\GlueInspect.Algorithm.ONNX\obj\Debug\GlueInspect.Algorithm.ONNX.pdb
 E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\PlatformHost.Wpf\Algorithms\GlueInspect.Algorithm.ONNX\bin\Debug\Microsoft.ML.OnnxRuntime.dll
 E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\PlatformHost.Wpf\Algorithms\GlueInspect.Algorithm.ONNX\bin\Debug\Microsoft.ML.OnnxRuntime.pdb
 E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\PlatformHost.Wpf\Algorithms\GlueInspect.Algorithm.ONNX\bin\Debug\System.Buffers.dll

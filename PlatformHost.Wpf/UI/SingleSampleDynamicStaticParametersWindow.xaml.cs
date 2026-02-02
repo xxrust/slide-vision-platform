@@ -104,10 +104,11 @@ namespace WpfApp2.UI
                 int loopCycle = 0;
                 string errorMessage = null;
 
-                string source1Dir = Path.Combine(folderPath, "图号1", "图像源1");
+                string source1Name = ImageSourceNaming.GetDisplayName(0);
+                string source1Dir = Path.Combine(folderPath, "图号1", source1Name);
                 if (!Directory.Exists(source1Dir))
                 {
-                    errorMessage = "缺少 图号1/图像源1";
+                    errorMessage = $"缺少 图号1/{source1Name}";
                 }
                 else
                 {
@@ -119,7 +120,7 @@ namespace WpfApp2.UI
 
                     if (loopCycle <= 0)
                     {
-                        errorMessage = "图像源1内无图片";
+                        errorMessage = $"{source1Name}内无图片";
                     }
                 }
 

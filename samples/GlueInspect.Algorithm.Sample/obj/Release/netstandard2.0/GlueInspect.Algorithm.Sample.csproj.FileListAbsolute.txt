@@ -1,8 +1,6 @@
 E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\samples\GlueInspect.Algorithm.Sample\bin\Release\netstandard2.0\GlueInspect.Algorithm.Sample.deps.json
 E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\samples\GlueInspect.Algorithm.Sample\bin\Release\netstandard2.0\GlueInspect.Algorithm.Sample.dll
-E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\samples\GlueInspect.Algorithm.Sample\bin\Release\netstandard2.0\GlueInspect.Algorithm.Sample.pdb
 E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\samples\GlueInspect.Algorithm.Sample\bin\Release\netstandard2.0\GlueInspect.Platform.Abstractions.dll
-E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\samples\GlueInspect.Algorithm.Sample\bin\Release\netstandard2.0\GlueInspect.Platform.Abstractions.pdb
 E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\samples\GlueInspect.Algorithm.Sample\obj\Release\netstandard2.0\GlueInspect.Algorithm.Sample.csproj.AssemblyReference.cache
 E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\samples\GlueInspect.Algorithm.Sample\obj\Release\netstandard2.0\GlueInspect.Algorithm.Sample.GeneratedMSBuildEditorConfig.editorconfig
 E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\samples\GlueInspect.Algorithm.Sample\obj\Release\netstandard2.0\GlueInspect.Algorithm.Sample.AssemblyInfoInputs.cache
@@ -10,4 +8,3 @@ E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\samples\GlueInspe
 E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\samples\GlueInspect.Algorithm.Sample\obj\Release\netstandard2.0\GlueInspect.Algorithm.Sample.csproj.CoreCompileInputs.cache
 E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\samples\GlueInspect.Algorithm.Sample\obj\Release\netstandard2.0\GlueInsp.5495EFDE.Up2Date
 E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\samples\GlueInspect.Algorithm.Sample\obj\Release\netstandard2.0\GlueInspect.Algorithm.Sample.dll
-E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\samples\GlueInspect.Algorithm.Sample\obj\Release\netstandard2.0\GlueInspect.Algorithm.Sample.pdb

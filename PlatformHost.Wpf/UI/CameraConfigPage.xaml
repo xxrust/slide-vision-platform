@@ -4,7 +4,7 @@
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
       xmlns:local="clr-namespace:WpfApp2.UI"
-      xmlns:vm="clr-namespace:VMControls.WPF.Release"
+      xmlns:controls="clr-namespace:WpfApp2.UI.Controls"
       mc:Ignorable="d" 
       d:DesignHeight="1024" d:DesignWidth="1920"
       Title="相机配置页面"
@@ -104,7 +104,7 @@
                             BorderBrush="#FF555555" 
                             BorderThickness="2" 
                             CornerRadius="5">
-                        <vm:VmRenderControl x:Name="FlyingCameraRender" Background="Black"/>
+                        <controls:ImageInspectionViewer x:Name="FlyingCameraRender"/>
                     </Border>
 
                     <!-- 飞拍相机参数配置区域 -->
@@ -293,7 +293,7 @@
                             BorderBrush="#FF555555" 
                             BorderThickness="2" 
                             CornerRadius="5">
-                        <vm:VmRenderControl x:Name="FixedCamera1Render" Background="Black"/>
+                        <controls:ImageInspectionViewer x:Name="FixedCamera1Render"/>
                     </Border>
 
                     <!-- 定拍相机1参数配置区域 -->
@@ -436,7 +436,7 @@
                             BorderBrush="#FF555555" 
                             BorderThickness="2" 
                             CornerRadius="5">
-                        <vm:VmRenderControl x:Name="FixedCamera2Render" Background="Black"/>
+                        <controls:ImageInspectionViewer x:Name="FixedCamera2Render"/>
                     </Border>
 
                     <!-- 定拍相机2参数配置区域 -->

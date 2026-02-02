@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace WpfApp2.UI.Models
 {
@@ -20,7 +20,7 @@ namespace WpfApp2.UI.Models
         public double PkgCenterY { get; set; }
         public double ChipCenterX { get; set; }
         public double ChipCenterY { get; set; }
-        // 来自检测结果的长度/宽度，单位微米（VM输出），便于前端展示和计算
+        // 来自检测结果的长度/宽度，单位微米，便于前端展示和计算
         public double ChipLengthUm { get; set; }
         public double ChipWidthUm { get; set; }
         public double ChipAngleDeg { get; set; }
@@ -57,3 +57,4 @@ namespace WpfApp2.UI.Models
         public bool HasGrayImage => !string.IsNullOrEmpty(GrayImagePath);
     }
 }
+

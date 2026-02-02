@@ -47,7 +47,8 @@ namespace WpfApp2.UI
                     int loopCycle = searchResult.LoopCycle;
                     if (imageGroups == null || imageGroups.Count == 0 || loopCycle <= 0)
                     {
-                        errorMessage = "未找到任何可用图片，请检查文件夹结构是否包含“图像源1”等子文件夹";
+                        var sourceHint = ImageSourceNaming.BuildDisplayNameList();
+                        errorMessage = $"未找到任何可用图片，请检查文件夹结构是否包含{sourceHint}等子文件夹";
                         errorTitle = "未找到图片";
                         return;
                     }
@@ -103,19 +104,20 @@ namespace WpfApp2.UI
                     return;
                 }
 
-                string source1Dir = Path.Combine(folderPath, "图号1", "图像源1");
+                string source1Name = ImageSourceNaming.GetDisplayName(0);
+                string source1Dir = Path.Combine(folderPath, "图号1", source1Name);
                 if (!Directory.Exists(source1Dir))
                 {
-                    LogUpdate("单片动态/静态测试失败：未找到图号1/图像源1目录");
-                    MessageBox.Show("未找到图号1/图像源1目录，请确认该文件夹为单片动态/静态图片集", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+                    LogUpdate($"单片动态/静态测试失败：未找到图号1/{source1Name}目录");
+                    MessageBox.Show($"未找到图号1/{source1Name}目录，请确认该文件夹为单片动态/静态图片集", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
                     return;
                 }
 
                 int loopCycle = Directory.GetFiles(source1Dir, "*.bmp").Length;
                 if (loopCycle <= 0)
                 {
-                    LogUpdate("单片动态/静态测试失败：图像源1内无bmp图片");
-                    MessageBox.Show("图像源1内未找到bmp图片", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+                    LogUpdate($"单片动态/静态测试失败：{source1Name}内无bmp图片");
+                    MessageBox.Show($"{source1Name}内未找到bmp图片", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
                     return;
                 }
 

@@ -1,173 +1,64 @@
-﻿# Skill 草案（请勿启用）
+﻿
+本项目图像输入数量的修改方式（默认 1 张，支持通过配置动态改为 2 张或更多）
 
-名称: GlueInspect 平台工业项目集成（草案）
-状态: draft
-文件: skill_开发中.md
-范围: PlatformHost.Wpf + Platform 插件框架集成
+目标
+- 默认只输入 1 张图像。
+- 通过配置 JSON 改动即可切换为 2 张或更多，系统 UI/流程自动适配。
 
-## 目的
-提供一套可复用流程，把 GlueInspect Platform 框架落地到工业项目：定义所需输入、映射参数、集成算法引擎/插件，并完成 IO/PLC 输出联动。
+改动入口（首选）
+1) 配置文件：`PlatformHost.Wpf/Config/TemplateHierarchy.json`
+   - 每个 Profile 的 `ImageSources` 列表决定输入图数量与名称。
+   - 示例（1 张）：
+     - ImageSources: [{ Id: "Image1", DisplayName: "图像1" }]
+   - 示例（2 张）：
+     - ImageSources:
+       - { Id: "Image1", DisplayName: "图像1" }
+       - { Id: "Image2", DisplayName: "图像2" }
+   - 示例（3 张）：
+     - ImageSources:
+       - { Id: "Image1", DisplayName: "图像1" }
+       - { Id: "Image2", DisplayName: "图像2" }
+       - { Id: "Image3", DisplayName: "图像3" }
 
-## 触发条件（仅手动）
-仅在用户明确要求“基于该框架进行工业项目集成”并要求“生成/更新 skill”时使用。
+2) 默认回退配置（无 JSON 或 JSON 缺失时生效）
+   - `PlatformHost.Wpf/UI/Models/TemplateHierarchyConfig.cs`
+   - `CreateDefaultImageSources()` 返回默认图像源列表。
+   - 需要保持与 JSON 一致（目前默认 1 张）。
 
-## 必要输入
-- 项目元信息：模板档案分级（profiles）、步骤清单、缺陷分类
-- 算法路线：插件模式（Platform/）或 WPF 引擎（PlatformHost.Wpf/Algorithms）
-- 参数规格：参数名、单位、范围、默认值、换算规则
-- 输出规格：指标名、上下限、OK/NG 判定逻辑、缺陷命名
-- 硬件信息：IO/PLC 型号、映射、时序、部署要求
-- 验收条件：性能约束、验证标准
+核心适配逻辑（了解即可）
+- `PlatformHost.Wpf/UI/ImageSourceNaming.cs`
+  - `GetActiveSourceCount()` 读取当前 Profile 的图像数量（最少 1）。
+  - `GetFolderCandidates(index)` 会同时兼容历史目录名：
+    - index=1 → "图像源2_1"
+    - index=2 → "图像源2_2"
+  - 也会加入 `图像源{n}`、`Image{n}` 的兜底名称。
 
-## 预期输出
-- 引擎/插件映射更新
-- 步骤/参数注册与模板更新
-- IO/PLC 映射与运行时处理更新
-- 验证步骤与必需资源说明
+- 动态适配入口（已改为按配置数量运行）：
+  - `PlatformHost.Wpf/UI/Page1.xaml.cs`
+    - 选图/匹配/存图/验机/导出流程都以 `GetRequired2DSourceCount()` 为准。
+  - `PlatformHost.Wpf/UI/TemplateConfigPage.xaml.cs`
+    - 自动匹配、提示文案、模板拷贝结构都按配置数量生成。
+  - `ImageGroupSet.Has2DImages / IsValid` 已按“配置数量”判断。
 
-## 关键路径（项目相关）
-- 基座项目: `E:\posen_project\点胶检测\上位机程序\WpfApp2`
-- 平台根目录: `E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform`
-- Abstractions: `src/GlueInspect.Platform.Abstractions/`
-- Runtime Loader: `src/GlueInspect.Platform.Runtime/`
-- WPF 宿主: `PlatformHost.Wpf/`
-- 算法引擎（WPF）: `PlatformHost.Wpf/Algorithms/`
-- 通用相机接口: `PlatformHost.Wpf/Hardware/`（GenericCameraManager/Models）
-- 通用相机配置文件: `PlatformHost.Wpf/Config/GenericCameraProfiles.json`
-- 图像渲染器: `PlatformHost.Wpf/Rendering/`（项目级选择，Renderer.json）
-- 图像查看器: `PlatformHost.Wpf/UI/Controls/ImageInspectionViewer.*`（缩放/平移/坐标RGB/像素级显示）
-- 示例档案: `PlatformHost.Wpf/Config/TemplateHierarchy.json`（profile-basic 用于框架验证）
-- UI 流程: `PlatformHost.Wpf/UI/`
-- 模板目录: `PlatformHost.Wpf/Templates/`（运行时生成）
-- 配置目录: `PlatformHost.Wpf/Config/`
-- 参数图片: `PlatformHost.Wpf/Resources/ParameterImages/`
-- IO/PLC: `PlatformHost.Wpf/SMTGPIO/`
+目录约定与兼容
+- 推荐目录名：与 `DisplayName` 保持一致。
+- 旧目录名仍可识别：`图像源2_1`、`图像源2_2`。
+- 3D 目录固定为 `3D`。
 
-## 核心数据流
-1) UI/模板 -> AlgorithmInput（Page1.BuildAlgorithmInput + PopulateAlgorithmInputParameters）
-2) 引擎/插件执行 -> AlgorithmResult
-3) 结果归一化 + 回填 UI/统计
-4) 可选 IO/PLC 输出
+常见操作步骤（改为 2 张 / 3 张）
+1) 修改 `PlatformHost.Wpf/Config/TemplateHierarchy.json` 的 `ImageSources` 列表数量。
+2) 保持 `TemplateHierarchyConfig.CreateDefaultImageSources()` 同步（如需默认改动）。
+3) 确保模板/样本目录存在对应数量的图像源子目录（名称与 DisplayName 或旧兼容名一致）。
+4) 重新编译验证。
 
-## 必改触点（函数/文件）
+编译命令（Release）
+- 常规：
+  - `D:\CodingSys\Microsoft Visual Studio\2022\Community\MSBuild\Current\Bin\MSBuild.exe .\GlueInspect.Platform.sln /p:Configuration=Release /m`
+- 若遇到 `GlueInspect.pdb` 被占用（锁定写入）：
+  - 关闭占用进程或删除 `PlatformHost.Wpf/obj/Release/GlueInspect.pdb` 后重编。
+  - 或用无 PDB 输出（可过 CI/本地验证）：
+    - `...\MSBuild.exe .\GlueInspect.Platform.sln /p:Configuration=Release /p:DebugType=None /p:DebugSymbols=false /m`
 
-### 引擎选择与注册
-- `PlatformHost.Wpf/Algorithms/AlgorithmEngineRegistry.cs`
-  - Initialize() 注册引擎
-  - GetDefaultDescription() 定义 UI 提示
-- `PlatformHost.Wpf/Algorithms/OpenCvOnnxAlgorithmEngine.cs`
-  - OpenCV + ONNX 组合引擎（经典算法 + 深度学习）
-
-### 渲染器选择（项目级）
-- `PlatformHost.Wpf/Rendering/RendererSettingsManager.cs`
-- `PlatformHost.Wpf/Rendering/ImageRendererManager.cs`
-- `PlatformHost.Wpf/Rendering/VmImageRenderer.cs`
-- `PlatformHost.Wpf/Rendering/FileImageRenderer.cs`
-- `PlatformHost.Wpf/UI/Controls/ImageInspectionViewer.xaml(.cs)`
-- `PlatformHost.Wpf/UI/Models/AlgorithmEngineSettings.cs`
-  - PreferredEngineId + AlgorithmEngine.json
-
-### 算法输入映射
-- `PlatformHost.Wpf/UI/Page1.xaml.cs`
-  - BuildAlgorithmInput(...)
-  - PopulateAlgorithmInputParameters(...)
-
-### 算法结果映射
-- `PlatformHost.Wpf/UI/Page1.xaml.cs`
-  - ExecuteAlgorithmEngineDetectionAsync(...)
-  - NormalizeAlgorithmResult(...)
-  - ApplyAlgorithmResultTo2DCache(...)
-  - BuildAlgorithmResult(...)
-
-### 步骤/参数注册
-- `PlatformHost.Wpf/UI/Models/ModuleRegistry.cs`
-  - RegisterAllDefaultModules() 定义步骤与参数
-- `PlatformHost.Wpf/UI/Models/ModuleDefinition.cs`
-  - 参数换算与映射
-- `PlatformHost.Wpf/UI/Models/Class1.cs`
-  - StepType（项目步骤）/ SampleType / CoatingType（legacy）/ TemplateParameters
-
-### IO/PLC
-- `PlatformHost.Wpf/SMTGPIO/IOManager.cs`
-  - Initialize(), SetDetectionResult(...)
-- `PlatformHost.Wpf/SMTGPIO/PLCSerialController.cs`
-  - PLC 通讯细节
-- `PlatformHost.Wpf/App.xaml.cs`
-  - 启动/退出初始化与释放
-
-### 插件路线（可选）
-- `src/GlueInspect.Platform.Abstractions/IAlgorithmPlugin.cs`
-- `src/GlueInspect.Platform.Abstractions/IAlgorithmSession.cs`
-- `src/GlueInspect.Platform.Runtime/PluginLoader.cs`
-- `src/GlueInspect.Platform.Runtime/AlgorithmRegistry.cs`
-
-## 交付物清单
-- [ ] 新/改 TemplateHierarchy.json（profiles）+ StepType
-- [ ] ModuleRegistry 步骤映射（输入/输出/动作）
-- [ ] 模板 JSON（每个产线模板）
-- [ ] 算法引擎或插件实现 + 注册
-- [ ] 输出指标与 UI/统计对齐
-- [ ] IO/PLC 映射更新并实机验证
-- [ ] Release 构建 + 手动回归
-
-## 需要向用户确认的问题
-1) 选择路线：WPF 引擎还是 Platform 插件（或两者）？
-2) 完整步骤清单与参数定义？
-3) 输出指标与 OK/NG 规则？
-4) 硬件型号与 IO/PLC 映射？
-5) 性能与验收约束？
-6) 模板 JSON 由谁维护？
-
-## 模板分级（全局定义）
-- 文件：`PlatformHost.Wpf/Config/TemplateHierarchy.json`
-- 目的：把“模板分级/档案”集中在一个文件内维护，模板只记录 ProfileId。
-- 约定：项目特异步骤直接使用业务名，平台通用步骤保持通用命名。
-- profile 字段要点：
-  - Id: 全局唯一档案ID（字符串）
-  - DisplayName/Description: UI显示
-  - Steps: StepType 名称列表（字符串）
-  - GlobalVariables: 写入算法全局变量（键值对）
-  - DefaultTemplateName: 新模板默认名
-  - MeasurementOutputCount: 输出通道数量（影响 out1 读取）
-- LegacyMappings: 默认不在文件中出现，仅在需要兼容旧模板时临时加入。
-- 旧模板兼容：旧步骤名会在加载时自动映射为当前步骤名。
-
-示例（节选）：
-```json
-{
-  "DefaultProfileId": "profile-standard",
-  "Profiles": [
-    {
-      "Id": "profile-basic",
-      "DisplayName": "Basic Template",
-      "Steps": ["ImageSelection", "DemoSetup", "DemoSummary", "TemplateName"],
-      "GlobalVariables": { "PROFILE": "basic" }
-    }
-  ]
-}
-```
-
-## 示例业务（本次自定义）
-- Profile A: profile-basic（最小步骤验证流程）
-- Profile B: profile-standard（增加计算步骤）
-- Profile C: profile-3d（增加 3D 配置步骤）
-- UI 仅展示前 3 个 profile；更多档案请扩展 UI 或复用列表模式。
-
-## 非目标
-- 不改 UI 结构
-- 不新增业务页面
-- 不更改无关 VM 逻辑（除非必须）
-
-## 验证步骤（手动）
-- Release 构建并运行 GlueInspect.exe
-- 验证 TemplateConfigPage + Page1 全流程
-- 确认 AlgorithmEngine.json 生效
-- 参数说明与图片映射正确
-- 图片选择 -> 下一项 -> 返回，图像仍显示
-- 图像窗口可缩放/拖拽，鼠标位置显示坐标与 RGB
-- IO/PLC 实机信号正确
-
-## 备注
-- 保留原有中文注释，不随意删除。
-- 大体量资源放 contents/ 或 ImageTemp/。
-- 避免改动无关文件或 UI 流程。
+注意事项
+- 修改图像源数量后，建议同时检查模板配置页与图片测试模式是否能正确显示/匹配。
+- 只需要改 JSON 即可快速切换；代码已适配动态数量，不再需要硬编码 3 张。

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.IO;
 using System.Windows.Media;
 using WpfApp2.Models;
 
@@ -93,6 +94,12 @@ namespace WpfApp2.UI.Models
 
         #endregion
 
+        private static string GetDefaultSampleImagePath()
+        {
+            var baseDir = AppDomain.CurrentDomain.BaseDirectory;
+            return Path.Combine(baseDir, "SampleImages", "demo.png");
+        }
+
         #region 静态构造函数 - 注册所有默认模块
 
         static ModuleRegistry()
@@ -110,12 +117,13 @@ namespace WpfApp2.UI.Models
             {
                 StepType = StepType.ImageSelection,
                 DisplayName = "图片选择",
-                VmModuleName = "图片选择",
-                VmModulePath = "",
-                VmModuleType = VmModuleType.None,
+                ModuleName = "图片选择",
+                ModulePath = "",
+                ModuleType = ModuleType.None,
                 InputParameters = new List<ModuleParameter>
                 {
-                    new ModuleParameter { Name = "图片路径", DefaultValue = "", Type = ParamType.FilePath }
+                    new ModuleParameter { Name = "图片路径", DefaultValue = GetDefaultSampleImagePath(), Type = ParamType.FilePath },
+                    new ModuleParameter { Name = "自动匹配多图", DefaultValue = "true", Type = ParamType.Boolean }
                 },
                 Actions = new List<ModuleAction>
                 {
@@ -123,7 +131,80 @@ namespace WpfApp2.UI.Models
                 },
                 Labels = new List<string>
                 {
-                    "请选择任意一张图片，系统将自动匹配并加载其他相关图片"
+                    "请选择任意一张图片，系统将自动匹配其余图像。"
+                }
+            });
+
+            // ========== 预处理（示例） ==========
+            RegisterModule(new ModuleDefinition
+            {
+                StepType = StepType.DemoSetup,
+                DisplayName = "预处理",
+                ModuleName = "",
+                ModulePath = "",
+                ModuleType = ModuleType.None,
+                InputParameters = new List<ModuleParameter>
+                {
+                    new ModuleParameter { Name = "灰度模式", DefaultValue = "true", Type = ParamType.Boolean, Group = "预处理" },
+                    new ModuleParameter { Name = "高斯核尺寸", DefaultValue = "5", Type = ParamType.Number, Group = "预处理" },
+                    new ModuleParameter { Name = "高斯σ", DefaultValue = "1.2", Type = ParamType.Number, Group = "预处理" }
+                },
+                Labels = new List<string>
+                {
+                    "设置预处理参数，用于后续边缘与测量步骤"
+                }
+            });
+
+            // ========== 边缘提取（示例） ==========
+            RegisterModule(new ModuleDefinition
+            {
+                StepType = StepType.DemoCalculation,
+                DisplayName = "边缘提取",
+                ModuleName = "",
+                ModulePath = "",
+                ModuleType = ModuleType.None,
+                InputParameters = new List<ModuleParameter>
+                {
+                    new ModuleParameter { Name = "Canny低阈值", DefaultValue = "60", Type = ParamType.Number, Group = "边缘" },
+                    new ModuleParameter { Name = "Canny高阈值", DefaultValue = "120", Type = ParamType.Number, Group = "边缘" },
+                    new ModuleParameter { Name = "膨胀次数", DefaultValue = "1", Type = ParamType.Number, Group = "边缘" }
+                },
+                OutputParameters = new List<ModuleParameter>
+                {
+                    new ModuleParameter { Name = "边缘像素数", DefaultValue = "", Type = ParamType.Number, IsReadOnly = true }
+                },
+                Labels = new List<string>
+                {
+                    "设置边缘提取参数，执行后输出边缘像素数"
+                }
+            });
+
+            // ========== 测量与判定（示例） ==========
+            RegisterModule(new ModuleDefinition
+            {
+                StepType = StepType.DemoSummary,
+                DisplayName = "测量与判定",
+                ModuleName = "",
+                ModulePath = "",
+                ModuleType = ModuleType.None,
+                InputParameters = new List<ModuleParameter>
+                {
+                    new ModuleParameter { Name = "灰度均值下限", DefaultValue = "60", Type = ParamType.Number, Group = "判定阈值" },
+                    new ModuleParameter { Name = "灰度均值上限", DefaultValue = "200", Type = ParamType.Number, Group = "判定阈值" },
+                    new ModuleParameter { Name = "边缘像素数下限", DefaultValue = "500", Type = ParamType.Number, Group = "判定阈值" },
+                    new ModuleParameter { Name = "边缘像素数上限", DefaultValue = "20000", Type = ParamType.Number, Group = "判定阈值" }
+                },
+                OutputParameters = new List<ModuleParameter>
+                {
+                    new ModuleParameter { Name = "灰度均值", DefaultValue = "", Type = ParamType.Number, IsReadOnly = true },
+                    new ModuleParameter { Name = "灰度标准差", DefaultValue = "", Type = ParamType.Number, IsReadOnly = true },
+                    new ModuleParameter { Name = "边缘像素数", DefaultValue = "", Type = ParamType.Number, IsReadOnly = true },
+                    new ModuleParameter { Name = "宽度", DefaultValue = "", Type = ParamType.Number, IsReadOnly = true },
+                    new ModuleParameter { Name = "高度", DefaultValue = "", Type = ParamType.Number, IsReadOnly = true }
+                },
+                Labels = new List<string>
+                {
+                    "根据阈值判断OK/NG，并输出结构化指标"
                 }
             });
 
@@ -132,9 +213,9 @@ namespace WpfApp2.UI.Models
             {
                 StepType = StepType.PkgEnhance,
                 DisplayName = "PKG增亮",
-                VmModuleName = "PKG增亮",
-                VmModulePath = "校准.PKG增亮",
-                VmModuleType = VmModuleType.ImageEnhance,
+                ModuleName = "PKG增亮",
+                ModulePath = "校准.PKG增亮",
+                ModuleType = ModuleType.ImageEnhance,
                 InputParameters = new List<ModuleParameter>
                 {
                     new ModuleParameter
@@ -153,9 +234,9 @@ namespace WpfApp2.UI.Models
             {
                 StepType = StepType.PkgMatching,
                 DisplayName = "PKG位置匹配",
-                VmModuleName = "PKG位置匹配",
-                VmModulePath = "校准.PKG匹配",
-                VmModuleType = VmModuleType.FeatureMatch,
+                ModuleName = "PKG位置匹配",
+                ModulePath = "校准.PKG匹配",
+                ModuleType = ModuleType.FeatureMatch,
                 InputParameters = new List<ModuleParameter>
                 {
                     new ModuleParameter
@@ -182,9 +263,9 @@ namespace WpfApp2.UI.Models
             {
                 StepType = StepType.PkgAngleMeasure,
                 DisplayName = "PKG测角",
-                VmModuleName = "PKG测角",
-                VmModulePath = "校准.PKG测角",
-                VmModuleType = VmModuleType.LineFind,
+                ModuleName = "PKG测角",
+                ModulePath = "校准.PKG测角",
+                ModuleType = ModuleType.LineFind,
                 InputParameters = new List<ModuleParameter>
                 {
                     new ModuleParameter
@@ -207,9 +288,9 @@ namespace WpfApp2.UI.Models
             {
                 StepType = StepType.PKGSeparation,
                 DisplayName = "PKG分离",
-                VmModuleName = "PKG分离",
-                VmModulePath = "校准.PKG二值分离",
-                VmModuleType = VmModuleType.SaveImage,
+                ModuleName = "PKG分离",
+                ModulePath = "校准.PKG二值分离",
+                ModuleType = ModuleType.SaveImage,
                 InputParameters = new List<ModuleParameter>
                 {
                     new ModuleParameter
@@ -240,9 +321,9 @@ namespace WpfApp2.UI.Models
             {
                 StepType = StepType.PKGPointDetection,
                 DisplayName = "PKG拉胶",
-                VmModuleName = "PKG拉胶检测",
-                VmModulePath = "校准.输出拉胶",
-                VmModuleType = VmModuleType.SaveImage,
+                ModuleName = "PKG拉胶检测",
+                ModulePath = "校准.输出拉胶",
+                ModuleType = ModuleType.SaveImage,
                 InputParameters = new List<ModuleParameter>
                 {
                     new ModuleParameter
@@ -277,9 +358,9 @@ namespace WpfApp2.UI.Models
             {
                 StepType = StepType.PkgEdgeSize,
                 DisplayName = "PKG边缘尺寸",
-                VmModuleName = "PKG边缘尺寸",
-                VmModulePath = "校准.PKG内边渲染",
-                VmModuleType = VmModuleType.SaveImage,
+                ModuleName = "PKG边缘尺寸",
+                ModulePath = "校准.PKG内边渲染",
+                ModuleType = ModuleType.SaveImage,
                 InputParameters = new List<ModuleParameter>
                 {
                     // C值基准设定相关参数
@@ -384,9 +465,9 @@ namespace WpfApp2.UI.Models
             {
                 StepType = StepType.ChipPositionSize,
                 DisplayName = "晶片位置与尺寸",
-                VmModuleName = "晶片位置与尺寸",
-                VmModulePath = "校准.BLK渲染",
-                VmModuleType = VmModuleType.SaveImage,
+                ModuleName = "晶片位置与尺寸",
+                ModulePath = "校准.BLK渲染",
+                ModuleType = ModuleType.SaveImage,
                 InputParameters = new List<ModuleParameter>
                 {
                     new ModuleParameter
@@ -570,9 +651,9 @@ namespace WpfApp2.UI.Models
             {
                 StepType = StepType.CoatingPkgEnhance,
                 DisplayName = "镀膜PKG增亮",
-                VmModuleName = "镀膜PKG增亮",
-                VmModulePath = "校准.镀膜PKG增亮",
-                VmModuleType = VmModuleType.ImageEnhance,
+                ModuleName = "镀膜PKG增亮",
+                ModulePath = "校准.镀膜PKG增亮",
+                ModuleType = ModuleType.ImageEnhance,
                 InputParameters = new List<ModuleParameter>
                 {
                     new ModuleParameter
@@ -591,9 +672,9 @@ namespace WpfApp2.UI.Models
             {
                 StepType = StepType.CoatingPkgMatching,
                 DisplayName = "镀膜PKG位置匹配",
-                VmModuleName = "异图PKG匹配",
-                VmModulePath = "校准.异图PKG匹配",
-                VmModuleType = VmModuleType.FeatureMatch,
+                ModuleName = "异图PKG匹配",
+                ModulePath = "校准.异图PKG匹配",
+                ModuleType = ModuleType.FeatureMatch,
                 InputParameters = new List<ModuleParameter>
                 {
                     new ModuleParameter { Name = "镀膜PKG模板路径", DefaultValue = "", Type = ParamType.FilePath }
@@ -614,9 +695,9 @@ namespace WpfApp2.UI.Models
             {
                 StepType = StepType.CoatingPkgAngleMeasure,
                 DisplayName = "镀膜PKG测角",
-                VmModuleName = "镀膜PKG边界查找",
-                VmModulePath = "校准.镀膜PKG边界查找",
-                VmModuleType = VmModuleType.LineFind,
+                ModuleName = "镀膜PKG边界查找",
+                ModulePath = "校准.镀膜PKG边界查找",
+                ModuleType = ModuleType.LineFind,
                 InputParameters = new List<ModuleParameter>
                 {
                     new ModuleParameter
@@ -635,9 +716,9 @@ namespace WpfApp2.UI.Models
             {
                 StepType = StepType.ChipEnhance,
                 DisplayName = "晶片增亮",
-                VmModuleName = "晶片增亮",
-                VmModulePath = "校准.晶片增亮",
-                VmModuleType = VmModuleType.ImageEnhance,
+                ModuleName = "晶片增亮",
+                ModulePath = "校准.晶片增亮",
+                ModuleType = ModuleType.ImageEnhance,
                 InputParameters = new List<ModuleParameter>
                 {
                     new ModuleParameter
@@ -656,9 +737,9 @@ namespace WpfApp2.UI.Models
             {
                 StepType = StepType.BlkMatching,
                 DisplayName = "BLK位置匹配",
-                VmModuleName = "BLK位置匹配",
-                VmModulePath = "校准.BLK匹配",
-                VmModuleType = VmModuleType.FeatureMatch,
+                ModuleName = "BLK位置匹配",
+                ModulePath = "校准.BLK匹配",
+                ModuleType = ModuleType.FeatureMatch,
                 InputParameters = new List<ModuleParameter>
                 {
                     new ModuleParameter { Name = "BLK匹配模板路径", DefaultValue = "", Type = ParamType.FilePath }
@@ -674,9 +755,9 @@ namespace WpfApp2.UI.Models
             {
                 StepType = StepType.CoatingMatching,
                 DisplayName = "镀膜匹配",
-                VmModuleName = "镀膜匹配",
-                VmModulePath = "校准.纯镀膜匹配",
-                VmModuleType = VmModuleType.FeatureMatch,
+                ModuleName = "镀膜匹配",
+                ModulePath = "校准.纯镀膜匹配",
+                ModuleType = ModuleType.FeatureMatch,
                 InputParameters = new List<ModuleParameter>
                 {
                     new ModuleParameter { Name = "镀膜匹配模板路径", DefaultValue = "", Type = ParamType.FilePath }
@@ -692,9 +773,9 @@ namespace WpfApp2.UI.Models
             {
                 StepType = StepType.CoatingChipEnhance,
                 DisplayName = "银面图晶片定位",
-                VmModuleName = "镀膜晶片增益",
-                VmModulePath = "校准.镀膜BLK渲染",
-                VmModuleType = VmModuleType.SaveImage,
+                ModuleName = "镀膜晶片增益",
+                ModulePath = "校准.镀膜BLK渲染",
+                ModuleType = ModuleType.SaveImage,
                 InputParameters = new List<ModuleParameter>
                 {
                     new ModuleParameter
@@ -729,9 +810,9 @@ namespace WpfApp2.UI.Models
             {
                 StepType = StepType.CoatingGeometrySize,
                 DisplayName = "银面几何尺寸",
-                VmModuleName = "镀膜几何尺寸",
-                VmModulePath = "校准.镀膜基准匹配",
-                VmModuleType = VmModuleType.SaveImage,
+                ModuleName = "镀膜几何尺寸",
+                ModulePath = "校准.镀膜基准匹配",
+                ModuleType = ModuleType.SaveImage,
                 InputParameters = new List<ModuleParameter>
                 {
                     new ModuleParameter
@@ -849,9 +930,9 @@ namespace WpfApp2.UI.Models
             {
                 StepType = StepType.MainDefect,
                 DisplayName = "主振瑕疵",
-                VmModuleName = "主振瑕疵",
-                VmModulePath = "校准.主振瑕疵",
-                VmModuleType = VmModuleType.BlobFind,
+                ModuleName = "主振瑕疵",
+                ModulePath = "校准.主振瑕疵",
+                ModuleType = ModuleType.BlobFind,
                 InputParameters = new List<ModuleParameter>
                 {
                     new ModuleParameter
@@ -873,9 +954,9 @@ namespace WpfApp2.UI.Models
             {
                 StepType = StepType.UpperPinDefect,
                 DisplayName = "上引脚瑕疵",
-                VmModuleName = "上引脚瑕疵",
-                VmModulePath = "校准.上引脚瑕疵",
-                VmModuleType = VmModuleType.BlobFind,
+                ModuleName = "上引脚瑕疵",
+                ModulePath = "校准.上引脚瑕疵",
+                ModuleType = ModuleType.BlobFind,
                 InputParameters = new List<ModuleParameter>
                 {
                     new ModuleParameter
@@ -897,9 +978,9 @@ namespace WpfApp2.UI.Models
             {
                 StepType = StepType.LowerPinDefect,
                 DisplayName = "下引脚瑕疵",
-                VmModuleName = "下引脚瑕疵",
-                VmModulePath = "校准.下引脚瑕疵",
-                VmModuleType = VmModuleType.BlobFind,
+                ModuleName = "下引脚瑕疵",
+                ModulePath = "校准.下引脚瑕疵",
+                ModuleType = ModuleType.BlobFind,
                 InputParameters = new List<ModuleParameter>(),
                 Labels = new List<string>
                 {
@@ -912,9 +993,9 @@ namespace WpfApp2.UI.Models
             {
                 StepType = StepType.UpperGluePointDetection,
                 DisplayName = "胶点尺寸检测",
-                VmModuleName = "双胶点轮廓",
-                VmModulePath = "校准.双胶点轮廓",
-                VmModuleType = VmModuleType.SaveImage,
+                ModuleName = "双胶点轮廓",
+                ModulePath = "校准.双胶点轮廓",
+                ModuleType = ModuleType.SaveImage,
                 InputParameters = new List<ModuleParameter>
                 {
                     // 基准值设定
@@ -1069,9 +1150,9 @@ namespace WpfApp2.UI.Models
             {
                 StepType = StepType.LowerGluePointDetection,
                 DisplayName = "胶点位置检测",
-                VmModuleName = "下胶点检测",
-                VmModulePath = "校准.双胶点图",
-                VmModuleType = VmModuleType.SaveImage,
+                ModuleName = "下胶点检测",
+                ModulePath = "校准.双胶点图",
+                ModuleType = ModuleType.SaveImage,
                 InputParameters = new List<ModuleParameter>
                 {
                     new ModuleParameter
@@ -1114,9 +1195,9 @@ namespace WpfApp2.UI.Models
             {
                 StepType = StepType.BlkDamageDetection,
                 DisplayName = "BLK破损检测",
-                VmModuleName = "BLK破损检测",
-                VmModulePath = "校准.破损blob",
-                VmModuleType = VmModuleType.BlobFind,
+                ModuleName = "BLK破损检测",
+                ModulePath = "校准.破损blob",
+                ModuleType = ModuleType.BlobFind,
                 InputParameters = new List<ModuleParameter>
                 {
                     new ModuleParameter
@@ -1151,9 +1232,9 @@ namespace WpfApp2.UI.Models
             {
                 StepType = StepType.ScratchDetection,
                 DisplayName = "划痕检测",
-                VmModuleName = "划痕检测",
-                VmModulePath = "校准.划痕检测图",
-                VmModuleType = VmModuleType.SaveImage,
+                ModuleName = "划痕检测",
+                ModulePath = "校准.划痕检测图",
+                ModuleType = ModuleType.SaveImage,
                 InputParameters = new List<ModuleParameter>
                 {
                     new ModuleParameter
@@ -1196,9 +1277,9 @@ namespace WpfApp2.UI.Models
             {
                 StepType = StepType.DeepDamageDetection,
                 DisplayName = "深度破损检测",
-                VmModuleName = "深度破损检测",
-                VmModulePath = "校准.晶片图分割",
-                VmModuleType = VmModuleType.FlawModuleC,
+                ModuleName = "深度破损检测",
+                ModulePath = "校准.晶片图分割",
+                ModuleType = ModuleType.FlawModuleC,
                 InputParameters = new List<ModuleParameter>
                 {
                     new ModuleParameter
@@ -1226,9 +1307,9 @@ namespace WpfApp2.UI.Models
             {
                 StepType = StepType.ShortCircuitDetection,
                 DisplayName = "短路检测",
-                VmModuleName = "短路检测",
-                VmModulePath = "校准.短路输出",
-                VmModuleType = VmModuleType.SaveImage,
+                ModuleName = "短路检测",
+                ModulePath = "校准.短路输出",
+                ModuleType = ModuleType.SaveImage,
                 InputParameters = new List<ModuleParameter>()
             });
 
@@ -1237,9 +1318,9 @@ namespace WpfApp2.UI.Models
             {
                 StepType = StepType.ThreeDConfiguration,
                 DisplayName = "3D配置",
-                VmModuleName = "",
-                VmModulePath = "",
-                VmModuleType = VmModuleType.None,
+                ModuleName = "",
+                ModulePath = "",
+                ModuleType = ModuleType.None,
                 IsSpecialStep = true,
                 InputParameters = new List<ModuleParameter>
                 {
@@ -1315,9 +1396,9 @@ namespace WpfApp2.UI.Models
             {
                 StepType = StepType.TemplateName,
                 DisplayName = "模板命名",
-                VmModuleName = "",
-                VmModulePath = "",
-                VmModuleType = VmModuleType.None,
+                ModuleName = "",
+                ModulePath = "",
+                ModuleType = ModuleType.None,
                 IsSpecialStep = true,
                 InputParameters = new List<ModuleParameter>
                 {
@@ -1524,16 +1605,16 @@ namespace WpfApp2.UI.Models
         }
 
         /// <summary>
-        /// 获取VM模块映射字典（VmModuleName -> VmModulePath, VmModuleType）
+        /// 获取模块映射字典（ModuleName -> ModulePath, ModuleType）
         /// </summary>
-        public static Dictionary<string, (string Path, VmModuleType Type)> GetVmModuleMap()
+        public static Dictionary<string, (string Path, ModuleType Type)> GetModuleMap()
         {
-            var map = new Dictionary<string, (string Path, VmModuleType Type)>();
+            var map = new Dictionary<string, (string Path, ModuleType Type)>();
             foreach (var module in _allModules)
             {
-                if (!string.IsNullOrEmpty(module.VmModuleName) && !string.IsNullOrEmpty(module.VmModulePath))
+                if (!string.IsNullOrEmpty(module.ModuleName) && !string.IsNullOrEmpty(module.ModulePath))
                 {
-                    map[module.VmModuleName] = (module.VmModulePath, module.VmModuleType);
+                    map[module.ModuleName] = (module.ModulePath, module.ModuleType);
                 }
             }
             return map;
@@ -1680,3 +1761,4 @@ namespace WpfApp2.UI.Models
         #endregion
     }
 }
+

@@ -1,7 +1,7 @@
 ﻿<Window x:Class="WpfApp2.UI.RenderViewerWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:Release="clr-namespace:VMControls.WPF.Release"
+        xmlns:controls="clr-namespace:WpfApp2.UI.Controls"
         Title="渲染图查看器" Height="854" Width="854"
         WindowStartupLocation="CenterScreen"
         Background="#FF2C3E50">
@@ -32,7 +32,7 @@
 
                     <!-- 2D渲染控件 -->
                     <Border Grid.Row="1" Background="Black" Margin="10">
-                                                 <Release:VmRenderControl x:Name="VmRender2D"/>
+                                                 <controls:ImageInspectionViewer x:Name="Render2DViewer"/>
 
                     </Border>
                 </Grid>

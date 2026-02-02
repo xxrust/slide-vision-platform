@@ -7,7 +7,6 @@ namespace GlueInspect.Algorithm.Contracts
 {
     public static class AlgorithmEngineIds
     {
-        public const string Vm = "VM";
         public const string OpenCv = "OpenCV";
         public const string Onnx = "ONNX";
         public const string OpenCvOnnx = "OpenCV+ONNX";

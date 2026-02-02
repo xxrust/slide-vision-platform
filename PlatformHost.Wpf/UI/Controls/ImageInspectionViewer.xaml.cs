@@ -78,6 +78,52 @@ namespace WpfApp2.UI.Controls
             InfoTextBlock.Text = "--";
         }
 
+        public void SaveOriginalImage(string outputPath)
+        {
+            if (_bitmap == null || string.IsNullOrWhiteSpace(outputPath))
+            {
+                return;
+            }
+
+            try
+            {
+                var directory = Path.GetDirectoryName(outputPath);
+                if (!string.IsNullOrWhiteSpace(directory) && !Directory.Exists(directory))
+                {
+                    Directory.CreateDirectory(directory);
+                }
+
+                BitmapEncoder encoder;
+                switch (Path.GetExtension(outputPath)?.ToLowerInvariant())
+                {
+                    case ".bmp":
+                        encoder = new BmpBitmapEncoder();
+                        break;
+                    case ".jpg":
+                    case ".jpeg":
+                        encoder = new JpegBitmapEncoder();
+                        break;
+                    case ".tif":
+                    case ".tiff":
+                        encoder = new TiffBitmapEncoder();
+                        break;
+                    default:
+                        encoder = new PngBitmapEncoder();
+                        break;
+                }
+
+                encoder.Frames.Add(BitmapFrame.Create(_bitmap));
+                using (var stream = new FileStream(outputPath, FileMode.Create, FileAccess.Write, FileShare.None))
+                {
+                    encoder.Save(stream);
+                }
+            }
+            catch
+            {
+                // Ignore save failures to avoid breaking UI flow
+            }
+        }
+
         private void ResetTransform()
         {
             _scaleTransform.ScaleX = 1.0;

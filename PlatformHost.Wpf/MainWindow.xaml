@@ -5,7 +5,6 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:local="clr-namespace:WpfApp2"
     xmlns:ScottPlot="clr-namespace:ScottPlot.WPF;assembly=ScottPlot.WPF"
-    xmlns:Release="clr-namespace:VMControls.WPF.Release"
     x:Class="WpfApp2.MainWindow"
     mc:Ignorable="d"
     Title="点胶检测系统" 

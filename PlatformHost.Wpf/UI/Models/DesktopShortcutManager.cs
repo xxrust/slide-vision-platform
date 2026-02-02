@@ -1,8 +1,7 @@
-using System;
+﻿using System;
 using System.IO;
 using System.Reflection;
 using System.Windows;
-using IWshRuntimeLibrary;
 
 namespace WpfApp2.UI.Models
 {
@@ -73,9 +72,16 @@ namespace WpfApp2.UI.Models
                 string currentExePath = Assembly.GetExecutingAssembly().Location;
                 string workingDirectory = Path.GetDirectoryName(currentExePath);
 
-                // 创建WScript.Shell对象
-                WshShell shell = new WshShell();
-                IWshShortcut shortcut = (IWshShortcut)shell.CreateShortcut(shortcutPath);
+                // 创建WScript.Shell对象（避免显式COM引用）
+                var shellType = Type.GetTypeFromProgID("WScript.Shell");
+                if (shellType == null)
+                {
+                    LogManager.Error("无法创建WScript.Shell对象，系统可能缺少相关组件", "DesktopShortcut");
+                    return false;
+                }
+
+                dynamic shell = Activator.CreateInstance(shellType);
+                dynamic shortcut = shell.CreateShortcut(shortcutPath);
 
                 // 设置快捷方式属性
                 shortcut.TargetPath = currentExePath;

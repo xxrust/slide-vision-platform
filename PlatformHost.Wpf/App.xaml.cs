@@ -302,8 +302,7 @@ namespace WpfApp2
                     StartupDiagnostic.LogError("释放单实例互斥体时出现异常", mutexEx);
                 }
                 
-                // 清理事件处理器
-                UI.TemplateConfigPage.CleanupEventHandlers();
+                // 算法引擎已解耦：无需清理外部引擎事件处理器
                 
                 // 释放IO控制器资源
                 try

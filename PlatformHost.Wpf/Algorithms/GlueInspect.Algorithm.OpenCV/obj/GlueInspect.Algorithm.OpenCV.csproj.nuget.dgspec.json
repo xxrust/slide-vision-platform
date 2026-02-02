@@ -1,14 +1,14 @@
 {
   "format": 1,
   "restore": {
-    "E:\\posen_project\\点胶检测\\上位机程序\\WpfApp2\\Algorithms\\GlueInspect.Algorithm.OpenCV\\GlueInspect.Algorithm.OpenCV.csproj": {}
+    "E:\\posen_project\\点胶检测\\上位机程序\\WpfApp2\\Platform\\PlatformHost.Wpf\\Algorithms\\GlueInspect.Algorithm.OpenCV\\GlueInspect.Algorithm.OpenCV.csproj": {}
   },
   "projects": {
-    "E:\\posen_project\\点胶检测\\上位机程序\\WpfApp2\\Algorithms\\GlueInspect.Algorithm.Contracts\\GlueInspect.Algorithm.Contracts.csproj": {
+    "E:\\posen_project\\点胶检测\\上位机程序\\WpfApp2\\Platform\\PlatformHost.Wpf\\Algorithms\\GlueInspect.Algorithm.Contracts\\GlueInspect.Algorithm.Contracts.csproj": {
       "restore": {
-        "projectUniqueName": "E:\\posen_project\\点胶检测\\上位机程序\\WpfApp2\\Algorithms\\GlueInspect.Algorithm.Contracts\\GlueInspect.Algorithm.Contracts.csproj",
+        "projectUniqueName": "E:\\posen_project\\点胶检测\\上位机程序\\WpfApp2\\Platform\\PlatformHost.Wpf\\Algorithms\\GlueInspect.Algorithm.Contracts\\GlueInspect.Algorithm.Contracts.csproj",
         "projectName": "GlueInspect.Algorithm.Contracts",
-        "projectPath": "E:\\posen_project\\点胶检测\\上位机程序\\WpfApp2\\Algorithms\\GlueInspect.Algorithm.Contracts\\GlueInspect.Algorithm.Contracts.csproj",
+        "projectPath": "E:\\posen_project\\点胶检测\\上位机程序\\WpfApp2\\Platform\\PlatformHost.Wpf\\Algorithms\\GlueInspect.Algorithm.Contracts\\GlueInspect.Algorithm.Contracts.csproj",
         "UsingMicrosoftNETSdk": false,
         "frameworks": {
           "net48": {
@@ -20,14 +20,14 @@
         "net48": {}
       }
     },
-    "E:\\posen_project\\点胶检测\\上位机程序\\WpfApp2\\Algorithms\\GlueInspect.Algorithm.OpenCV\\GlueInspect.Algorithm.OpenCV.csproj": {
+    "E:\\posen_project\\点胶检测\\上位机程序\\WpfApp2\\Platform\\PlatformHost.Wpf\\Algorithms\\GlueInspect.Algorithm.OpenCV\\GlueInspect.Algorithm.OpenCV.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "E:\\posen_project\\点胶检测\\上位机程序\\WpfApp2\\Algorithms\\GlueInspect.Algorithm.OpenCV\\GlueInspect.Algorithm.OpenCV.csproj",
+        "projectUniqueName": "E:\\posen_project\\点胶检测\\上位机程序\\WpfApp2\\Platform\\PlatformHost.Wpf\\Algorithms\\GlueInspect.Algorithm.OpenCV\\GlueInspect.Algorithm.OpenCV.csproj",
         "projectName": "GlueInspect.Algorithm.OpenCV",
-        "projectPath": "E:\\posen_project\\点胶检测\\上位机程序\\WpfApp2\\Algorithms\\GlueInspect.Algorithm.OpenCV\\GlueInspect.Algorithm.OpenCV.csproj",
+        "projectPath": "E:\\posen_project\\点胶检测\\上位机程序\\WpfApp2\\Platform\\PlatformHost.Wpf\\Algorithms\\GlueInspect.Algorithm.OpenCV\\GlueInspect.Algorithm.OpenCV.csproj",
         "packagesPath": "C:\\Users\\liangyuhang\\.nuget\\packages\\",
-        "outputPath": "E:\\posen_project\\点胶检测\\上位机程序\\WpfApp2\\Algorithms\\GlueInspect.Algorithm.OpenCV\\obj\\",
+        "outputPath": "E:\\posen_project\\点胶检测\\上位机程序\\WpfApp2\\Platform\\PlatformHost.Wpf\\Algorithms\\GlueInspect.Algorithm.OpenCV\\obj\\",
         "projectStyle": "PackageReference",
         "skipContentFileWrite": true,
         "UsingMicrosoftNETSdk": false,
@@ -49,8 +49,8 @@
         "frameworks": {
           "net48": {
             "projectReferences": {
-              "E:\\posen_project\\点胶检测\\上位机程序\\WpfApp2\\Algorithms\\GlueInspect.Algorithm.Contracts\\GlueInspect.Algorithm.Contracts.csproj": {
-                "projectPath": "E:\\posen_project\\点胶检测\\上位机程序\\WpfApp2\\Algorithms\\GlueInspect.Algorithm.Contracts\\GlueInspect.Algorithm.Contracts.csproj"
+              "E:\\posen_project\\点胶检测\\上位机程序\\WpfApp2\\Platform\\PlatformHost.Wpf\\Algorithms\\GlueInspect.Algorithm.Contracts\\GlueInspect.Algorithm.Contracts.csproj": {
+                "projectPath": "E:\\posen_project\\点胶检测\\上位机程序\\WpfApp2\\Platform\\PlatformHost.Wpf\\Algorithms\\GlueInspect.Algorithm.Contracts\\GlueInspect.Algorithm.Contracts.csproj"
               }
             }
           }
@@ -66,26 +66,17 @@
           "dependencies": {
             "OpenCvSharp4": {
               "target": "Package",
-              "version": "[4.11.0.20250507, )"
+              "version": "[4.10.0.20240616, )"
             },
             "OpenCvSharp4.runtime.win": {
               "target": "Package",
-              "version": "[4.11.0.20250507, )"
+              "version": "[4.10.0.20240616, )"
             }
           }
         }
       },
       "runtimes": {
         "win": {
-          "#import": []
-        },
-        "win-arm64": {
-          "#import": []
-        },
-        "win-x64": {
-          "#import": []
-        },
-        "win-x86": {
           "#import": []
         }
       }

@@ -308,7 +308,7 @@ namespace WpfApp2.Models
         // 模板名称
         public string TemplateName { get; set; }
 
-        // 算法引擎标识（VM/OpenCV/ONNX）
+        // 算法引擎标识（OpenCV/ONNX/其他）
         public string AlgorithmEngineId { get; set; } = AlgorithmEngineIds.OpenCvOnnx;
 
         // 备注信息

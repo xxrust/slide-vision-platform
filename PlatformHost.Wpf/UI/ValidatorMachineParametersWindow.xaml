@@ -184,7 +184,8 @@
                            FontSize="11"
                            Foreground="#FF666666"
                            Margin="0,0,0,5"><Run Text="1. 选择"/><Run Language="zh-cn" Text="一个LOT号文件夹，不要选择某种具体的NG类型"/></TextBlock>
-                <TextBlock Text="2. 系统会递归搜索子文件夹中的 '图像源1'、'图像源2_1'、'图像源2_2' 文件夹"
+                <TextBlock x:Name="ImageSourceHintTextBlock"
+                           Text="2. 系统会递归搜索子文件夹中的图像源文件夹"
                            FontSize="11"
                            Foreground="#FF666666"
                            Margin="0,0,0,5"/>

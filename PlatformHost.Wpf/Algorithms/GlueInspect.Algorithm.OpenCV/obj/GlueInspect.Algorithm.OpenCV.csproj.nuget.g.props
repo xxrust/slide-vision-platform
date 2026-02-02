@@ -14,6 +14,6 @@
     <SourceRoot Include="D:\CodingSys\Microsoft Visual Studio\Shared\NuGetPackages\" />
   </ItemGroup>
   <ImportGroup Condition=" '$(ExcludeRestorePackageImports)' != 'true' ">
-    <Import Project="$(NuGetPackageRoot)opencvsharp4.runtime.win\4.11.0.20250507\build\net48\OpenCvSharp4.runtime.win.props" Condition="Exists('$(NuGetPackageRoot)opencvsharp4.runtime.win\4.11.0.20250507\build\net48\OpenCvSharp4.runtime.win.props')" />
+    <Import Project="$(NuGetPackageRoot)opencvsharp4.runtime.win\4.10.0.20240616\build\net48\OpenCvSharp4.runtime.win.props" Condition="Exists('$(NuGetPackageRoot)opencvsharp4.runtime.win\4.10.0.20240616\build\net48\OpenCvSharp4.runtime.win.props')" />
   </ImportGroup>
 </Project>

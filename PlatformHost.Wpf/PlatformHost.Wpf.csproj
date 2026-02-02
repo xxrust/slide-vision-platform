@@ -198,6 +198,11 @@
   <ItemGroup>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="SampleImages\demo.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
     <ApplicationDefinition Include="App.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -236,7 +241,6 @@
     <Compile Include="Rendering\ImageRendererContracts.cs" />
     <Compile Include="Rendering\ImageRendererManager.cs" />
     <Compile Include="Rendering\RendererSettingsManager.cs" />
-    <Compile Include="Rendering\VmImageRenderer.cs" />
     <Compile Include="Rendering\FileImageRenderer.cs" />
     <Compile Include="Hardware\GenericCameraModels.cs" />
     <Compile Include="Hardware\GenericCameraManager.cs" />
@@ -301,6 +305,7 @@
     <Compile Include="UI\FileSelectionWindow.xaml.cs">
       <DependentUpon>FileSelectionWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="UI\ImageSourceNaming.cs" />
     <Compile Include="UI\ImageTestModeSelectionWindow.xaml.cs">
       <DependentUpon>ImageTestModeSelectionWindow.xaml</DependentUpon>
     </Compile>
@@ -581,7 +586,6 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Compile Include="VMStubs\VmStubs.cs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs">

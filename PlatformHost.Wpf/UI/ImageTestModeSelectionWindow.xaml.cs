@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -7,6 +7,7 @@ using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Controls;
 using WpfApp2.UI.Models;
+using WpfApp2.Models;
 using System.Threading.Tasks;
 using System.Windows.Threading;
 
@@ -19,20 +20,20 @@ namespace WpfApp2.UI
     {
         public enum TestMode
         {
-            CategoryMode,           // 按类别查找（原有功能）
-            NGNumberMode,           // 按NG编号查找
-            SevereNGDetection,      // 严重NG检测
-            ChallengeDetection,     // 挑战件检测
-            GoodDetection,          // 良品检测
-            ValidatorMachineDetection, // 验机图片检测
+            CategoryMode,                      // 按类别查找（原有功能）
+            NGNumberMode,                      // 按NG编号查找
+            SevereNGDetection,                 // 严重NG检测
+            ChallengeDetection,                // 挑战件检测
+            GoodDetection,                     // 良品检测
+            ValidatorMachineDetection,         // 验机图片检测
             SingleSampleDynamicStaticDetection, // 单片动态/静态测试
-            CicdImageSetTest,       // CICD图片集测试
-            SevereNGCollection,     // 严重NG图集制作
-            ChallengeCollection,    // 挑战件图集制作
-            GoodCollection,         // 良品图集制作
-            ValidatorMachineCollection, // 验机图片集制作
+            CicdImageSetTest,                  // CICD图片集测试
+            SevereNGCollection,                // 严重NG图集制作
+            ChallengeCollection,               // 挑战件图集制作
+            GoodCollection,                    // 良品图集制作
+            ValidatorMachineCollection,        // 验机图片集制作
             SingleSampleDynamicStaticCollection, // 单片动态/静态测试集制作
-            CicdImageSetCollection  // CICD图片集制作
+            CicdImageSetCollection             // CICD图片集制作
         }
 
         public TestMode SelectedMode { get; private set; } = TestMode.CategoryMode;
@@ -60,9 +61,8 @@ namespace WpfApp2.UI
             _currentLotValue = lotValue;
             _currentNGCountFromUI = currentNGCountFromUI;
             
-            LogManager.Info($"ImageTestModeSelectionWindow构造函数 - LOT: {_currentLotValue}, NG数量: {_currentNGCountFromUI}");
-            
-            // 在窗口完全加载后设置值
+            LogManager.Info($"ImageTestModeSelectionWindow init - LOT: {_currentLotValue}, NG count: {_currentNGCountFromUI}");
+
             this.Loaded += Window_Loaded;
         }
 
@@ -70,14 +70,11 @@ namespace WpfApp2.UI
         {
             try
             {
-                // 设置NG数量文本框
-                LogManager.Info($"Window_Loaded: 设置NGCountTextBox为 {_currentNGCountFromUI}");
-                
-                // 确保文本框可用且可编辑
+                LogManager.Info($"Window_Loaded: NGCountTextBox = {_currentNGCountFromUI}");
+
                 NGCountTextBox.IsEnabled = true;
                 NGCountTextBox.IsReadOnly = false;
                 
-                // 多种方式设置文本值
                 NGCountTextBox.Text = _currentNGCountFromUI.ToString();
                 NGCountTextBox.SetValue(TextBox.TextProperty, _currentNGCountFromUI.ToString());
                 
@@ -93,7 +90,6 @@ namespace WpfApp2.UI
                 // 初始化NG图片数量信息
                 InitializeNGCountInfo();
                 
-                // 尝试聚焦到文本框验证是否可编辑
                 NGCountTextBox.Focus();
             }
             catch (Exception ex)
@@ -170,7 +166,7 @@ namespace WpfApp2.UI
                     try
                     {
                         // 显示加载对话框
-                        loadingDialog = new LoadingDialog($"正在查找前 {NGCount} 个NG图片，请稍候...");
+                        loadingDialog = new LoadingDialog($"正在查找 {NGCount} 个NG图片，请稍候...");
                         loadingDialog.Owner = this;
                         loadingDialog.Show();
                         
@@ -368,7 +364,7 @@ namespace WpfApp2.UI
                 else if (SingleSampleDynamicStaticCollectionRadio.IsChecked == true)
                 {
                     SelectedMode = TestMode.SingleSampleDynamicStaticCollection;
-                    LogManager.Info("用户选择单片动态/静态测试集制作模式");
+                    LogManager.Info("用户选择单片动�?静态测试集制作模式");
 
                     using (var folderDialog = new System.Windows.Forms.FolderBrowserDialog())
                     {
@@ -442,17 +438,15 @@ namespace WpfApp2.UI
             {
                 LogManager.Info("手动刷新NGCountTextBox");
                 
-                // 清空后重新设置
-                NGCountTextBox.Clear();
+                // ???????
                 NGCountTextBox.Text = "";
                 NGCountTextBox.UpdateLayout();
                 
-                // 重新设置值
+                // ????
                 string newValue = _currentNGCountFromUI.ToString();
-                NGCountTextBox.Text = newValue;
                 NGCountTextBox.SetValue(TextBox.TextProperty, newValue);
                 
-                LogManager.Info($"刷新后 NGCountTextBox.Text = '{NGCountTextBox.Text}'");
+                LogManager.Info($"??? NGCountTextBox.Text = '{NGCountTextBox.Text}'");
                 
                 // 强制聚焦和选中
                 NGCountTextBox.Focus();
@@ -532,55 +526,57 @@ namespace WpfApp2.UI
         private List<NGImageInfo> FindNGImagesInCurrentLot()
         {
             var ngImages = new List<NGImageInfo>();
-            
             try
             {
                 // 获取当前LOT的存图根目录
                 string baseDir = AppDomain.CurrentDomain.BaseDirectory;
                 string lotRootDir = Path.Combine(baseDir, "原图存储", _currentLotValue);
-                
+
                 LogManager.Info($"查找NG图片，LOT根目录: {lotRootDir}");
-                
+
                 if (!Directory.Exists(lotRootDir))
                 {
                     LogManager.Warning($"LOT根目录不存在: {lotRootDir}");
                     return ngImages;
                 }
-                
-                // 直接查找所有NG类型文件夹（不是固定的"NG"文件夹，而是各种缺陷类型文件夹）
+
+                var sourceNames = ImageSourceNaming.GetDisplayNames();
+                string ngSourceName = sourceNames.Count > 1 ? sourceNames[1] : (sourceNames.Count > 0 ? sourceNames[0] : "图像1");
+
+                // 直接查找所有NG类型文件夹（不是固定“NG”文件夹，而是各种缺陷类型文件夹）
                 var ngTypeFolders = Directory.GetDirectories(lotRootDir)
-                    .Where(dir => 
+                    .Where(dir =>
                     {
                         string folderName = Path.GetFileName(dir);
                         // 排除良品文件夹，只查找NG类型文件夹
-                        return !folderName.Equals("良品", StringComparison.OrdinalIgnoreCase) &&
-                               !folderName.Equals("OK", StringComparison.OrdinalIgnoreCase);
+                        return !folderName.Equals("良品", StringComparison.OrdinalIgnoreCase)
+                               && !folderName.Equals("OK", StringComparison.OrdinalIgnoreCase);
                     });
-                
+
                 LogManager.Info($"在LOT根目录中找到NG类型文件夹: {string.Join(", ", ngTypeFolders.Select(Path.GetFileName))}");
-                
+
                 foreach (var ngTypeFolder in ngTypeFolders)
                 {
                     string ngTypeName = Path.GetFileName(ngTypeFolder);
                     LogManager.Info($"检查NG类型文件夹: {ngTypeName}");
-                    
-                    // 查找图像源2_1文件夹中的NG图片
-                    string source2_1Folder = Path.Combine(ngTypeFolder, "图像源2_1");
-                    LogManager.Info($"检查图像源2_1文件夹: {source2_1Folder}");
-                    
-                    if (!Directory.Exists(source2_1Folder))
+
+                    // 查找配置的图像源文件夹中的NG图片
+                    string sourceFolder = Path.Combine(ngTypeFolder, ngSourceName);
+                    LogManager.Info($"检查图像源文件夹: {sourceFolder}");
+
+                    if (!Directory.Exists(sourceFolder))
                     {
-                        LogManager.Info($"图像源2_1文件夹不存在: {source2_1Folder}");
+                        LogManager.Info($"图像源文件夹不存在: {sourceFolder}");
                         continue;
                     }
-                    
+
                     // 查找所有NG图片文件
-                    var ngFiles = Directory.GetFiles(source2_1Folder, "*.bmp")
-                        .Concat(Directory.GetFiles(source2_1Folder, "*.png"))
+                    var ngFiles = Directory.GetFiles(sourceFolder, "*.bmp")
+                        .Concat(Directory.GetFiles(sourceFolder, "*.png"))
                         .ToList();
-                    
-                    LogManager.Info($"在 {source2_1Folder} 中找到图片文件: {ngFiles.Count} 个");
-                    
+
+                    LogManager.Info($"{sourceFolder} 中找到图片文件: {ngFiles.Count} 张");
+
                     foreach (var ngFile in ngFiles)
                     {
                         var imageNumber = ExtractImageNumberFromFilename(Path.GetFileName(ngFile));
@@ -591,10 +587,10 @@ namespace WpfApp2.UI
                                 ImageNumber = imageNumber.Value,
                                 DateFolder = string.Empty, // 不再使用日期文件夹
                                 NgTypeName = ngTypeName,
-                                Source2_1Path = ngFile,
+                                Source2Path = ngFile,
                                 NGFolderPath = ngTypeFolder
                             });
-                            
+
                             LogManager.Info($"添加NG图片: 编号={imageNumber.Value}, 类型={ngTypeName}, 路径={ngFile}");
                         }
                         else
@@ -603,21 +599,20 @@ namespace WpfApp2.UI
                         }
                     }
                 }
-                
+
                 LogManager.Info($"在LOT {_currentLotValue} 中总共找到 {ngImages.Count} 张NG图片");
             }
             catch (Exception ex)
             {
                 LogManager.Error($"查找LOT NG图片失败: {ex.Message}");
             }
-            
+
             return ngImages;
         }
 
         /// <summary>
         /// 从NG图片信息创建ImageGroupSet
-        /// 复用现有的成功模式：使用Directory.GetFiles通配符搜索
-        /// </summary>
+        /// 复用现有的成功模式：使用Directory.GetFiles通配符搜�?        /// </summary>
         private ImageGroupSet CreateImageGroupFromNGImage(NGImageInfo ngImageInfo)
         {
             try
@@ -625,65 +620,40 @@ namespace WpfApp2.UI
                 string ngTypeFolderPath = ngImageInfo.NGFolderPath; 
                 string imageNumberStr = ngImageInfo.ImageNumber.ToString();
 
-                // 关键修复：按NG编号查找时，应使用“图片名后缀”匹配，而不是强制PadLeft(4)。
-                // 例如 a_11 / b_0443，这里的后缀应分别为 _11 / _0443。
-                var suffixCandidates = BuildNgSuffixCandidates(imageNumberStr, ngImageInfo.Source2_1Path);
+                // 关键修复：按NG编号查找时，应使用“图片名后缀”匹配，而不是强制PadLeft(4)
+                // 例如 a_11 / b_0443，这里的后缀应分别为 _11 / _0443
+                var suffixCandidates = BuildNgSuffixCandidates(imageNumberStr, ngImageInfo.Source2Path);
                 string displaySuffix = suffixCandidates.FirstOrDefault() ?? ("_" + imageNumberStr);
-                
+
                 LogManager.Info($"创建ImageGroup - 编号: {imageNumberStr}, NG类型: {ngImageInfo.NgTypeName}, 文件夹: {ngTypeFolderPath}, 后缀候选: {string.Join(", ", suffixCandidates)}");
-                
-                // 使用现有的成功模式：在三个图像源目录中分别查找指定后缀的图片文件（支持bmp/png）
-                var source1Dir = Path.Combine(ngTypeFolderPath, "图像源1");
-                var source2_1Dir = Path.Combine(ngTypeFolderPath, "图像源2_1");
-                var source2_2Dir = Path.Combine(ngTypeFolderPath, "图像源2_2");
 
-                string source1Path = null;
-                string source2_1Path = null;
-                string source2_2Path = null;
-
-                // 查找图像源1文件
-                if (Directory.Exists(source1Dir))
-                {
-                    source1Path = FindFirstImageBySuffixCandidates(source1Dir, suffixCandidates);
-                    if (!string.IsNullOrEmpty(source1Path))
-                    {
-                        LogManager.Info($"找到图像源1文件: {Path.GetFileName(source1Path)}");
-                    }
-                }
-
-                // 查找图像源2_1文件
-                if (Directory.Exists(source2_1Dir))
-                {
-                    source2_1Path = FindFirstImageBySuffixCandidates(source2_1Dir, suffixCandidates);
-                    if (!string.IsNullOrEmpty(source2_1Path))
-                    {
-                        LogManager.Info($"找到图像源2_1文件: {Path.GetFileName(source2_1Path)}");
-                    }
-                }
-
-                // 查找图像源2_2文件
-                if (Directory.Exists(source2_2Dir))
-                {
-                    source2_2Path = FindFirstImageBySuffixCandidates(source2_2Dir, suffixCandidates);
-                    if (!string.IsNullOrEmpty(source2_2Path))
-                    {
-                        LogManager.Info($"找到图像源2_2文件: {Path.GetFileName(source2_2Path)}");
-                    }
-                }
-
+                var sourceNames = ImageSourceNaming.GetDisplayNames();
                 var imageGroup = new ImageGroupSet
                 {
-                    Source1Path = source1Path,
-                    Source2_1Path = source2_1Path,
-                    Source2_2Path = source2_2Path,
                     BaseName = $"NG_{ngImageInfo.NgTypeName}_{ngImageInfo.DateFolder}_{imageNumberStr}"
                 };
 
-                // 查找对应的3D图片（如果3D使能）- 🔧 修复：使用统一的3D图片查找方法
+                for (int i = 0; i < sourceNames.Count; i++)
+                {
+                    string sourceName = sourceNames[i];
+                    string sourceDir = Path.Combine(ngTypeFolderPath, sourceName);
+                    if (!Directory.Exists(sourceDir))
+                    {
+                        continue;
+                    }
+
+                    string path = FindFirstImageBySuffixCandidates(sourceDir, suffixCandidates);
+                    if (!string.IsNullOrEmpty(path))
+                    {
+                        imageGroup.SetSource(i, path, displayName: sourceName);
+                        LogManager.Info($"找到{sourceName}文件: {Path.GetFileName(path)}");
+                    }
+                }
+
+                // 查找对应3D图片（如3D使能）- 使用统一3D图片查找方法
                 bool is3DEnabled = Page1.PageManager.Page1Instance?.Is3DDetectionEnabled() == true;
                 if (is3DEnabled)
                 {
-                    // 🔧 修复：使用统一的查找逻辑，避免文件夹结构假设不一致
                     foreach (var candidateSuffix in suffixCandidates)
                     {
                         if (imageGroup.Has3DImages)
@@ -705,66 +675,65 @@ namespace WpfApp2.UI
                 {
                     LogManager.Info($"3D未使能，跳过3D图片查找");
                 }
-                
+
                 // 检查并记录缺失的文件
                 var missingFiles = GetMissingFiles(imageGroup, is3DEnabled, displaySuffix);
                 if (missingFiles.Count > 0)
                 {
                     LogManager.Warning($"图片组 {imageGroup.BaseName} 缺失文件: {string.Join(", ", missingFiles)}");
                 }
-                
+
                 LogManager.Info($"创建的ImageGroup BaseName: {imageGroup.BaseName}, IsValid: {imageGroup.IsValid}");
-                
+
                 return imageGroup;
             }
             catch (Exception ex)
             {
-                LogManager.Error($"创建NG图片组失败 (编号: {ngImageInfo.ImageNumber}, 类型: {ngImageInfo.NgTypeName}): {ex.Message}");
+                LogManager.Error($"创建NG图片组失败(编号: {ngImageInfo.ImageNumber}, 类型: {ngImageInfo.NgTypeName}): {ex.Message}");
                 return null;
             }
         }
         
         /// <summary>
-        /// 获取缺失的文件列表
-        /// </summary>
+        /// 获取缺失的文件列�?        /// </summary>
         private List<string> GetMissingFiles(ImageGroupSet imageGroup, bool is3DEnabled, string suffixForDisplay)
         {
             var missingFiles = new List<string>();
-            
-            if (string.IsNullOrEmpty(imageGroup.Source1Path))
-                missingFiles.Add($"图像源1/*{suffixForDisplay}");
-            
-            if (string.IsNullOrEmpty(imageGroup.Source2_1Path))
-                missingFiles.Add($"图像源2_1/*{suffixForDisplay}");
-            
-            if (string.IsNullOrEmpty(imageGroup.Source2_2Path))
-                missingFiles.Add($"图像源2_2/*{suffixForDisplay}");
-            
+            var sourceNames = ImageSourceNaming.GetDisplayNames();
+
+            for (int i = 0; i < sourceNames.Count; i++)
+            {
+                if (string.IsNullOrEmpty(imageGroup.GetPath(i)))
+                {
+                    missingFiles.Add($"{sourceNames[i]}/*{suffixForDisplay}");
+                }
+            }
+
             if (is3DEnabled)
             {
                 if (string.IsNullOrEmpty(imageGroup.HeightImagePath))
                     missingFiles.Add($"3D/height*{suffixForDisplay}");
-                
+
                 if (string.IsNullOrEmpty(imageGroup.GrayImagePath))
                     missingFiles.Add($"3D/gray*{suffixForDisplay}");
             }
-            
+
             return missingFiles;
         }
 
         private string GetNgDisplaySuffix(NGImageInfo ngImageInfo)
         {
-            var suffixCandidates = BuildNgSuffixCandidates(ngImageInfo.ImageNumber.ToString(), ngImageInfo.Source2_1Path);
+            var suffixCandidates = BuildNgSuffixCandidates(ngImageInfo.ImageNumber.ToString(), ngImageInfo.Source2Path);
             return suffixCandidates.FirstOrDefault() ?? ("_" + ngImageInfo.ImageNumber);
         }
 
-        private List<string> BuildNgSuffixCandidates(string imageNumberStr, string source2_1Path)
+        private List<string> BuildNgSuffixCandidates(string imageNumberStr, string Source2Path)
         {
             var candidates = new List<string>();
 
-            if (!string.IsNullOrEmpty(source2_1Path))
+            if (!string.IsNullOrEmpty(Source2Path))
             {
-                var extracted = ExtractSuffixFromFilename(Path.GetFileNameWithoutExtension(source2_1Path));
+                var extracted = ExtractSuffixFromFilename(Path.GetFileNameWithoutExtension(Source2Path));
                 if (!string.IsNullOrEmpty(extracted))
                 {
                     candidates.Add(extracted);
@@ -827,16 +796,20 @@ namespace WpfApp2.UI
             var message = new StringBuilder();
             message.AppendLine($"检测到 {invalidGroups.Count} 组NG图片文件不完整，将不纳入检测范围：");
             message.AppendLine();
-            
-            string requiredFiles = is3DEnabled ? "5张图片（图像源1、图像源2_1、图像源2_2、3D高度图、3D灰度图）" : "3张图片（图像源1、图像源2_1、图像源2_2）";
+
+            var sourceNames = ImageSourceNaming.GetDisplayNames();
+            string sourceList = sourceNames.Count > 0 ? string.Join("、", sourceNames) : "图像";
+            string requiredFiles = is3DEnabled
+                ? $"{sourceNames.Count}张图片（{sourceList}、3D高度图、3D灰度图）"
+                : $"{sourceNames.Count}张图片（{sourceList}）";
             message.AppendLine($"当前模式需要每组有 {requiredFiles}");
             message.AppendLine();
-            
+
             int displayCount = Math.Min(invalidGroups.Count, 10); // 最多显示10组
             for (int i = 0; i < displayCount; i++)
             {
                 var (groupName, missingFiles) = invalidGroups[i];
-                message.AppendLine($"• {groupName}");
+                message.AppendLine($"组名：{groupName}");
                 message.AppendLine($"  缺失: {string.Join(", ", missingFiles)}");
                 message.AppendLine();
             }
@@ -851,7 +824,7 @@ namespace WpfApp2.UI
             message.AppendLine("2. 确认图片文件是否正确保存");
             if (is3DEnabled)
             {
-                message.AppendLine("3. 如不需要3D检测，可在配置中关闭3D功能");
+                message.AppendLine("3. 如不需3D检测，可在配置中关闭3D功能");
             }
             
             MessageBox.Show(message.ToString(), "文件缺失警告", MessageBoxButton.OK, MessageBoxImage.Warning);
@@ -864,11 +837,10 @@ namespace WpfApp2.UI
         {
             try
             {
-                // 提取文件名中的数字部分（不包含扩展名）
                 string nameWithoutExt = Path.GetFileNameWithoutExtension(filename);
-                
-                // 尝试直接解析为数字
-                if (int.TryParse(nameWithoutExt, out int number))
+
+                int number;
+                if (int.TryParse(nameWithoutExt, out number))
                 {
                     return number;
                 }
@@ -922,13 +894,13 @@ namespace WpfApp2.UI
                     MessageBox.Show($"模板目录不存在:\n{templateDir}", "目录不存在", MessageBoxButton.OK, MessageBoxImage.Information);
                     return new List<ImageGroupSet>();
                 }
-                
+
                 // 在后台线程异步查找图片
                 var imageGroups = await Task.Run(() => FindImagesInTemplateDirectory(templateDir));
                 
                 if (imageGroups.Count == 0)
                 {
-                    MessageBox.Show($"在模板目录中未找到有效的图片组:\n{templateDir}", 
+                    MessageBox.Show($"在模板目录中未找到有效的图片:\n{templateDir}", 
                                   "未找到图片", MessageBoxButton.OK, MessageBoxImage.Information);
                     return new List<ImageGroupSet>();
                 }
@@ -962,27 +934,25 @@ namespace WpfApp2.UI
             
             try
             {
-                // 检查必需的2D目录结构
-                var source1Dir = Path.Combine(templateDir, "图像源1");
-                var source2_1Dir = Path.Combine(templateDir, "图像源2_1");
-                var source2_2Dir = Path.Combine(templateDir, "图像源2_2");
-                var threeDDir = Path.Combine(templateDir, "3D");
+                var sourceNames = ImageSourceNaming.GetDisplayNames();
+                var sourceDirs = sourceNames.Select(name => Path.Combine(templateDir, name)).ToList();
 
                 // 如果关键目录不存在，尝试扁平化查找（兼容旧格式）
-                if (!Directory.Exists(source1Dir) && !Directory.Exists(source2_1Dir) && !Directory.Exists(source2_2Dir))
+                if (!sourceDirs.Any(Directory.Exists))
                 {
-                    LogManager.Warning($"未找到标准目录结构，尝试扁平化查找: {templateDir}");
+                    LogManager.Warning($"未找到标准目录结构，尝试扁平化查�? {templateDir}");
                     return FindImagesInTemplateDirectoryFlat(templateDir);
                 }
 
                 // 收集所有图片文件的后缀
                 var allSuffixes = new HashSet<string>();
                 
-                // 从图像源2_1目录收集后缀（通常最全）
-                if (Directory.Exists(source2_1Dir))
+                // 从已存在的图像源目录收集后缀
+                foreach (var dir in sourceDirs.Where(Directory.Exists))
                 {
-                    var source2_1Files = Directory.GetFiles(source2_1Dir, "*.bmp");
-                    foreach (var file in source2_1Files)
+                    var files = Directory.GetFiles(dir, "*.bmp")
+                        .Concat(Directory.GetFiles(dir, "*.png"));
+                    foreach (var file in files)
                     {
                         string suffix = ExtractSuffixFromFilename(Path.GetFileNameWithoutExtension(file));
                         if (!string.IsNullOrEmpty(suffix))
@@ -994,18 +964,18 @@ namespace WpfApp2.UI
 
                 LogManager.Info($"在模板目录中找到 {allSuffixes.Count} 个不同的图片后缀");
 
-                // 为每个后缀创建图片组
+                // Create image groups for each suffix.
                 foreach (string suffix in allSuffixes)
                 {
                     var imageGroup = CreateImageGroupFromTemplateDirectories(templateDir, suffix);
                     if (imageGroup != null && imageGroup.IsValid)
                     {
                         imageGroups.Add(imageGroup);
-                        LogManager.Info($"创建模板图片组: {imageGroup.BaseName} (2D: {imageGroup.Has2DImages}, 3D: {imageGroup.Has3DImages})");
+                        LogManager.Info($"创建模板图片�? {imageGroup.BaseName} (2D: {imageGroup.Has2DImages}, 3D: {imageGroup.Has3DImages})");
                     }
                 }
 
-                LogManager.Info($"在模板目录中共找到 {imageGroups.Count} 个有效图片组");
+                LogManager.Info($"在模板目录中共找�?{imageGroups.Count} 个有效图片组");
             }
             catch (Exception ex)
             {
@@ -1027,35 +997,20 @@ namespace WpfApp2.UI
                     BaseName = suffix
                 };
 
-                // 查找2D图片
-                var source1Dir = Path.Combine(templateDir, "图像源1");
-                var source2_1Dir = Path.Combine(templateDir, "图像源2_1");
-                var source2_2Dir = Path.Combine(templateDir, "图像源2_2");
-
-                if (Directory.Exists(source1Dir))
+                var sourceNames = ImageSourceNaming.GetDisplayNames();
+                for (int i = 0; i < sourceNames.Count; i++)
                 {
-                    var source1Files = Directory.GetFiles(source1Dir, $"*{suffix}.bmp");
-                    if (source1Files.Length > 0)
+                    string sourceDir = Path.Combine(templateDir, sourceNames[i]);
+                    if (!Directory.Exists(sourceDir))
                     {
-                        imageGroup.Source1Path = source1Files[0];
+                        continue;
                     }
-                }
 
-                if (Directory.Exists(source2_1Dir))
-                {
-                    var source2_1Files = Directory.GetFiles(source2_1Dir, $"*{suffix}.bmp");
-                    if (source2_1Files.Length > 0)
+                    string path = FindFirstImageBySuffix(sourceDir, suffix, "bmp")
+                                  ?? FindFirstImageBySuffix(sourceDir, suffix, "png");
+                    if (!string.IsNullOrEmpty(path))
                     {
-                        imageGroup.Source2_1Path = source2_1Files[0];
-                    }
-                }
-
-                if (Directory.Exists(source2_2Dir))
-                {
-                    var source2_2Files = Directory.GetFiles(source2_2Dir, $"*{suffix}.bmp");
-                    if (source2_2Files.Length > 0)
-                    {
-                        imageGroup.Source2_2Path = source2_2Files[0];
+                        imageGroup.SetSource(i, path, displayName: sourceNames[i]);
                     }
                 }
 
@@ -1115,6 +1070,8 @@ namespace WpfApp2.UI
                     .GroupBy(x => x.Suffix)
                     .ToList();
 
+                var sourceNames = ImageSourceNaming.GetDisplayNames();
+
                 foreach (var group in suffixGroups)
                 {
                     var imageGroup = new ImageGroupSet
@@ -1126,24 +1083,31 @@ namespace WpfApp2.UI
                     foreach (var file in group)
                     {
                         string fileName = Path.GetFileName(file.File);
-                        
-                        if (fileName.Contains("source1") || fileName.Contains("图像源1"))
+
+                        bool matchedSource = false;
+                        for (int i = 0; i < sourceNames.Count; i++)
                         {
-                            imageGroup.Source1Path = file.File;
+                            if (!string.IsNullOrWhiteSpace(sourceNames[i]) &&
+                                fileName.IndexOf(sourceNames[i], StringComparison.OrdinalIgnoreCase) >= 0)
+                            {
+                                imageGroup.SetSource(i, file.File, displayName: sourceNames[i]);
+                                matchedSource = true;
+                                break;
+                            }
                         }
-                        else if (fileName.Contains("source2_1") || fileName.Contains("图像源2_1"))
+
+                        if (matchedSource)
                         {
-                            imageGroup.Source2_1Path = file.File;
+                            continue;
                         }
-                        else if (fileName.Contains("source2_2") || fileName.Contains("图像源2_2"))
-                        {
-                            imageGroup.Source2_2Path = file.File;
-                        }
-                        else if (fileName.Contains("height") || fileName.Contains("高度"))
+
+                        if (fileName.IndexOf("height", StringComparison.OrdinalIgnoreCase) >= 0
+                            || fileName.IndexOf("高度", StringComparison.OrdinalIgnoreCase) >= 0)
                         {
                             imageGroup.HeightImagePath = file.File;
                         }
-                        else if (fileName.Contains("gray") || fileName.Contains("灰度"))
+                        else if (fileName.IndexOf("gray", StringComparison.OrdinalIgnoreCase) >= 0
+                                 || fileName.IndexOf("灰度", StringComparison.OrdinalIgnoreCase) >= 0)
                         {
                             imageGroup.GrayImagePath = file.File;
                         }
@@ -1245,28 +1209,32 @@ namespace WpfApp2.UI
                     return page1Instance.CurrentTemplateName;
                 }
 
-                // 如果无法获取，返回默认模板名称
-                LogManager.Warning("无法获取当前模板名称，使用默认值");
-                return "MESA-25"; // 默认模板名称
+                // 如果无法获取，返回默认模板名
+                LogManager.Warning("无法获取当前模板名称，使用默认模板名");
+                return TemplateHierarchyConfig.Instance.ResolveProfile(TemplateHierarchyConfig.Instance.DefaultProfileId)?.DefaultTemplateName
+                       ?? "Template-Default";
             }
             catch (Exception ex)
             {
                 LogManager.Error($"获取当前模板名称失败: {ex.Message}");
-                return "MESA-25"; // 默认模板名称
+                return TemplateHierarchyConfig.Instance.ResolveProfile(TemplateHierarchyConfig.Instance.DefaultProfileId)?.DefaultTemplateName
+                       ?? "Template-Default";
             }
         }
 
         /// <summary>
-        /// NG图片信息类
+        /// NG图片信息
         /// </summary>
         private class NGImageInfo
         {
             public int ImageNumber { get; set; }        // 图片编号
             public string DateFolder { get; set; }      // 日期文件夹名
             public string NgTypeName { get; set; }      // NG类型名称
-            public string Source2_1Path { get; set; }   // 图像源2_1路径
+            public string Source2Path { get; set; }     // 参与查找后缀的源图像路径
             public string NGFolderPath { get; set; }    // NG类型文件夹路径
         }
 
     }
 } 
+
+

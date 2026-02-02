@@ -1,10 +1,7 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
-using IMVSHPFeatureMatchModuCs;
 using static WpfApp2.UI.Page1;
 using static WpfApp2.UI.Page2;
-using VM.Core;
-using VM.PlatformSDKCS;
 using System.Windows.Media;
 using WpfApp2.Models;
 using System.Collections.Generic;
@@ -17,14 +14,11 @@ using System.Threading.Tasks;
 using System.Windows.Shapes;
 using System.Windows.Input;
 using System.Windows.Data;
-using VMControls.WPF.Release;
-using GlobalCameraModuleCs;
 using System.Windows.Threading;
 using Path = System.IO.Path;
 using WpfApp2.UI;
 using WpfApp2.UI.Models;
 using WpfApp2.UI.Controls;
-using VmModuleType = WpfApp2.UI.Models.VmModuleType;
 using WpfApp2.SMTGPIO;
 using WpfApp2.ThreeD;
 using System;
@@ -134,7 +128,7 @@ namespace WpfApp2.UI
     {
         public StepType StepType { get; set; }
         public string DisplayName { get; set; }
-        public string VmModuleName { get; set; }
+        public string ModuleName { get; set; }
         public List<ParameterConfig> InputParameters { get; set; } = new List<ParameterConfig>();
         public List<ParameterConfig> OutputParameters { get; set; } = new List<ParameterConfig>();
         public List<ActionConfig> Actions { get; set; } = new List<ActionConfig>();
@@ -146,25 +140,9 @@ namespace WpfApp2.UI
     public partial class TemplateConfigPage : Page
     {
         /// <summary>
-        /// 静态标志位，确保事件处理器只绑定一次
+        /// 静态标志位，标记算法引擎准备状态
         /// </summary>
-        private static bool _isEventHandlerBound = false;
-
-        /// <summary>
-        /// 防止10009流程告警弹窗重复弹出（同一时刻只允许一个）
-        /// </summary>
-        private static bool _isProcess10009WarningDialogShowing = false;
-
-        /// <summary>
-        /// 静态锁对象，确保线程安全
-        /// </summary>
-        private static readonly object _eventBindingLock = new object();
-
-        /// <summary>
-        /// 静态标志位，防止重复加载VM解决方案
-        /// 确保VM解决方案在整个应用程序生命周期中只加载一次
-        /// </summary>
-        private static bool _isVmSolutionLoaded = false;
+        private static bool _isAlgorithmReady = false;
 
         /// <summary>
         /// 静态实例引用，用于其他页面访问
@@ -394,7 +372,7 @@ namespace WpfApp2.UI
         }
 
         /// <summary>
-        /// 参数映射表，将UI参数名称映射到VM平台的全局变量名
+        /// 参数映射表，将UI参数名称映射到算法平台的全局变量名
         /// 【已迁移到ModuleRegistry】- 现在从ModuleRegistry.GetAllParameterMappings()获取
         /// </summary>
         private Dictionary<string, string> parameterToGlobalVariableMap => ModuleRegistry.GetAllParameterMappings();
@@ -608,7 +586,7 @@ namespace WpfApp2.UI
         }
 
         /// <summary>
-        /// 将模板中所有已保存的参数应用到VM全局变量（改进版 - 只处理有效步骤）
+        /// 将模板中所有已保存的参数应用到算法全局变量（改进版 - 只处理有效步骤）
         /// </summary>
         public void ApplyParametersToGlobalVariables()
         {
@@ -922,8 +900,6 @@ namespace WpfApp2.UI
                 currentTemplate.TemplateName = currentProfileDefinition.DefaultTemplateName;
             }
 
-            // 只在第一次时加载VM解决方案，避免重复加载
-            TryAutoLoadVmSolution();
             
             // 设置模板档案全局变量
             SetProfileGlobalVariables();
@@ -945,9 +921,9 @@ namespace WpfApp2.UI
         {
             try
             {
-                if (!_isVmSolutionLoaded)
+                if (!_isAlgorithmReady)
                 {
-                    LogManager.Info("VM未加载，改为写入算法全局变量（OpenCV/ONNX）", "初始化");
+                    LogManager.Info("算法引擎未就绪，先写入算法全局变量", "初始化");
                 }
 
                 var globals = currentProfileDefinition?.GlobalVariables ?? new Dictionary<string, string>();
@@ -970,12 +946,9 @@ namespace WpfApp2.UI
             {
                 _imageRendererContext = new ImageRendererContext
                 {
-                    VmRender1 = VmRender1,
-                    VmRender2_1 = VmRender2_1,
-                    VmRender2_2 = VmRender2_2,
                     PreviewViewer1 = PreviewViewer1,
-                    PreviewViewer2_1 = PreviewViewer2_1,
-                    PreviewViewer2_2 = PreviewViewer2_2
+                    PreviewViewer2 = PreviewViewer2,
+                    PreviewViewer3 = PreviewViewer3
                 };
 
                 _imageRenderer = ImageRendererManager.ResolveRenderer(_imageRendererContext);
@@ -1411,20 +1384,7 @@ namespace WpfApp2.UI
 
         private void UpdateImageSdk()
         {
-            try
-            {
-                // 校准界面：始终使用图片选择步骤中设置的固定图片路径
-                LogMessage("更新图像SDK：开始设置图片路径到VM模块", LogLevel.Info);
-                
-                // 直接调用SetImagePathsToVM，它会处理所有的图片路径逻辑
-                SetImagePathsToVM();
-                
-                LogMessage("更新图像SDK：图片路径设置完成", LogLevel.Info);
-            }
-            catch (Exception ex)
-            {
-                LogMessage($"更新图像SDK失败: {ex.Message}", LogLevel.Error);
-            }
+            // 平台不直接操作算法 SDK，保持空实现
         }
 
         private void Execute_Click(object sender, RoutedEventArgs e)
@@ -1544,24 +1504,10 @@ namespace WpfApp2.UI
                     PageManager.Page1Instance.DetectionManager.SetSystemState(SystemDetectionState.TemplateConfiguring);
                 }
 
-                bool useVmEngine = ShouldAutoLoadVmSolution();
-
-                // 1. 更新图像SDK（仅VM流程需要）
-                if (useVmEngine)
-                {
-                    UpdateImageSdk();
-                }
-
-                // 2. 将参数应用到全局变量
+                // 1. 将参数应用到全局变量
                 ApplyParametersToGlobalVariables();
 
-                // 3. VM流程：执行"获取路径图像"；算法流程：直接使用当前路径
-                if (useVmEngine)
-                {
-                    ExecuteImageSelectionStep();
-                }
-
-                // 4. 生成当前图像组（与VM解耦）
+                // 2. 生成当前图像组
                 try
                 {
                     var (source1, source2_1, source2_2) = GetCurrentImagePaths();
@@ -1579,18 +1525,10 @@ namespace WpfApp2.UI
                     return;
                 }
 
-                // 5. 算法引擎流程（OpenCV + ONNX）
+                // 3. 算法引擎流程
                 _imageRenderer?.DisplayImageGroup(_currentImageGroup);
-
-                if (!useVmEngine)
-                {
-                    _ = PageManager.Page1Instance?.ExecuteAlgorithmPipelineForImageGroup(_currentImageGroup, isTemplateConfig: true);
-                    LogMessage($"已为步骤 {stepName} 执行算法引擎流程", LogLevel.Info);
-                    return;
-                }
-
-                // 3D执行/渲染已迁移到独立进程（Host/Tool），模板配置阶段主进程不执行3D。
-                LogMessage($"已为步骤 {stepName} 执行完整的获取路径图像流程", LogLevel.Info);
+                _ = PageManager.Page1Instance?.ExecuteAlgorithmPipelineForImageGroup(_currentImageGroup, isTemplateConfig: true);
+                LogMessage($"已为步骤 {stepName} 执行算法引擎流程", LogLevel.Info);
             }
             catch (Exception ex)
             {
@@ -1638,52 +1576,7 @@ namespace WpfApp2.UI
             return imageGroup;
         }
 
-        /// <summary>
-        /// 执行图片选择步骤的特定逻辑
-        /// </summary>
-        private void ExecuteImageSelectionStep()
-        {
-            try
-            {
-                LogMessage("开始执行图像选择步骤", LogLevel.Info);
-
-                // 🔧 修复：在新检测开始前清空3D缓存，确保不显示上次数据
-                Page1.Clear3DDataCache();
-                LogMessage("已清空3D数据缓存", LogLevel.Info);
-
-                // 重置VM回调标志，开始新的检测周期
-                Page1.ResetVmCallbackFlag();
-                LogMessage("已重置VM回调标志", LogLevel.Info);
-
-                // 检查VmSolution实例是否可用
-                if (VmSolution.Instance == null)
-                {
-                    LogMessage("VmSolution.Instance为null，无法获取图像流程", LogLevel.Error);
-                    throw new InvalidOperationException("VmSolution实例未初始化");
-                }
-
-                // 获取"获取路径图像"流程并执行
-                var imagePathProcedure = VmSolution.Instance["获取路径图像"] as VmProcedure;
-                if (imagePathProcedure != null)
-                {
-                    LogMessage("找到'获取路径图像'流程，开始执行", LogLevel.Info);
-                    imagePathProcedure.Run();
-                    LogManager.Info("图像获取流程执行完成", "图像处理");
-                    LogMessage("图像获取流程执行成功", LogLevel.Info);
-                }
-                else
-                {
-                    LogMessage("未找到'获取路径图像'流程", LogLevel.Warning);
-                }
-            }
-            catch (Exception ex)
-            {
-                LogMessage($"执行图像选择步骤失败: {ex.Message}", LogLevel.Error);
-                LogManager.Error($"执行图像选择步骤失败: {ex.Message}\r\n堆栈跟踪: {ex.StackTrace}");
-                throw;
-            }
-        }
-
+        // 图片选择步骤已改为直接使用当前路径构建图像组
 
         private void UpdateUI(int stepIndex)
         {
@@ -1720,9 +1613,7 @@ namespace WpfApp2.UI
             BuildParametersUI(config);
             BuildActionsUI(config);
             BuildLabelsUI(config);
-
-            // 切换VM模块
-            ChangeVM(config.VmModuleName);
+            UpdatePreviewLayoutForStep(config);
 
             // 3D配置步骤特殊处理：切换到3D渲染界面
             if (config.StepType == StepType.ThreeDConfiguration)
@@ -1731,7 +1622,6 @@ namespace WpfApp2.UI
             }
             else
             {
-                SwitchToVMView();
             }
 
             // 处理特殊步骤
@@ -1762,34 +1652,7 @@ namespace WpfApp2.UI
             }
         }
 
-        private bool ShouldAutoLoadVmSolution()
-        {
-            return string.Equals(AlgorithmEngineSettingsManager.PreferredEngineId, AlgorithmEngineIds.Vm, StringComparison.OrdinalIgnoreCase);
-        }
-
-        private void TryAutoLoadVmSolution()
-        {
-            if (!ShouldAutoLoadVmSolution())
-            {
-                LogMessage("当前算法引擎非VM，跳过VM解决方案加载", LogLevel.Info);
-                return;
-            }
-
-            lock (_eventBindingLock)
-            {
-                if (!_isVmSolutionLoaded)
-                {
-                    // 同步加载VM解决方案
-                    load_vm_solution_async();
-                    _isVmSolutionLoaded = true;
-                    LogMessage("VM解决方案首次加载启动", LogLevel.Info);
-                }
-                else
-                {
-                    LogMessage("VM解决方案已存在，跳过重复加载", LogLevel.Info);
-                }
-            }
-        }
+        // 算法引擎加载由中间层负责，模板配置页不直接触发
 
         private void InsertAlgorithmEngineSelector(StepConfiguration config)
         {
@@ -1880,7 +1743,7 @@ namespace WpfApp2.UI
             else
             {
                 _algorithmEngineHintText.Foreground = Brushes.Goldenrod;
-                _algorithmEngineHintText.Text = $"模板设置：{descriptor.Description}（未启用，运行时自动回退VM）";
+                _algorithmEngineHintText.Text = $"模板设置：{descriptor.Description}（未启用，运行时自动回退默认引擎）";
             }
         }
 
@@ -3023,27 +2886,8 @@ namespace WpfApp2.UI
                 SaveLastUsedTemplate(filePath);
                 // 标记为已保存状态
                 MarkAsSaved();
-                
-                // 🔧 新增：同时保存VM解决方案，避免软件重启时参数需要重新注入
-                try
-                {
-                    if (VmSolution.Instance != null)
-                    {
-                        VmSolution.Save();
-                        LogManager.Info($"已同时保存VM解决方案到磁盘", "模板保存");
-                    }
-                    else
-                    {
-                        LogManager.Warning("VM解决方案未初始化，跳过VM保存", "模板保存");
-                    }
-                }
-                catch (Exception vmEx)
-                {
-                    LogManager.Warning($"保存VM解决方案失败: {vmEx.Message}", "模板保存");
-                    // VM保存失败不影响模板保存的成功状态
-                }
-                
-                MessageBox.Show($"模板 \"{currentTemplate.TemplateName}\" 已成功保存\n\n✅ 已同时保存VM解决方案到磁盘", "保存成功", MessageBoxButton.OK, MessageBoxImage.Information);
+
+                MessageBox.Show($"模板 \"{currentTemplate.TemplateName}\" 已成功保存", "保存成功", MessageBoxButton.OK, MessageBoxImage.Information);
             }
             catch (Exception ex)
             {
@@ -3461,178 +3305,29 @@ namespace WpfApp2.UI
             }
         }
 
-        private void ChangeVM(string name)
+        private void UpdatePreviewLayoutForStep(StepConfiguration config)
         {
-            // 首先检查是否是图片选择步骤，如果是则显示多图像区域
-            if (name == "图片选择")
+            if (config == null)
             {
-                // 切换到多图像显示模式
+                return;
+            }
+
+            if (config.StepType == StepType.ImageSelection)
+            {
                 SingleImageContainer.Visibility = Visibility.Collapsed;
                 MultiImageContainer.Visibility = Visibility.Visible;
-
+                ThreeDContainer.Visibility = Visibility.Collapsed;
                 EnsureCurrentImageGroupFromStep(currentStep);
                 _imageRenderer?.DisplayImageGroup(_currentImageGroup);
-
-                PageManager.Page1Instance?.LogUpdate("已切换到多图像显示模式");
-                return;
-            }
-            else
-            {
-                // 切换到单一VM控件显示模式
-                SingleImageContainer.Visibility = Visibility.Visible;
-                MultiImageContainer.Visibility = Visibility.Collapsed;
-            }
-
-            if (!ShouldAutoLoadVmSolution())
-            {
-                PageManager.Page1Instance?.LogUpdate("非VM引擎，跳过VM模块切换");
                 return;
             }
 
-            // 如果名称为空或不需要VM模块，直接返回
-            if (string.IsNullOrEmpty(name))
-            {
-                return;
-            }
-
-            // 使用 ModuleRegistry 中的映射表（VmModuleName -> VmModulePath, VmModuleType）
-            var vmModuleMap = ModuleRegistry.GetVmModuleMap();
-            if (!vmModuleMap.TryGetValue(name, out var config))
-            {
-                return;
-            }
-
-            Action setupAction = GetVmModuleSetupAction(name, config.Path);
-
-            try
-            {
-                object moduleInstance = VmSolution.Instance[config.Path];
-
-                if (moduleInstance == null)
-                {
-                    PageManager.Page1Instance?.LogUpdate($"未找到VM模块: {config.Path}");
-                    return;
-                }
-
-                // 根据模块类型设置VmParamsConfigWithRenderControl.ModuleSource
-                switch (config.Type)
-                {
-                    case VmModuleType.ImageSource:
-                        var imageSourceTool = moduleInstance as ImageSourceModuleCs.ImageSourceModuleTool;
-                        if (imageSourceTool != null)
-                            VmParamsConfigWithRenderControl.ModuleSource = imageSourceTool;
-                        break;
-
-                    case VmModuleType.ImageEnhance:
-                        var enhanceTool = moduleInstance as IMVSImageEnhanceModuCs.IMVSImageEnhanceModuTool;
-                        if (enhanceTool != null)
-                            VmParamsConfigWithRenderControl.ModuleSource = enhanceTool;
-                        break;
-
-                    case VmModuleType.FeatureMatch:
-                        var matchTool = moduleInstance as IMVSHPFeatureMatchModuCs.IMVSHPFeatureMatchModuTool;
-                        if (matchTool != null)
-                            VmParamsConfigWithRenderControl.ModuleSource = matchTool;
-                        break;
-
-                    case VmModuleType.SaveImage:
-                        var saveImageTool = moduleInstance as SaveImageCs.SaveImageTool;
-                        if (saveImageTool != null)
-                            VmParamsConfigWithRenderControl.ModuleSource = saveImageTool;
-                        break;
-
-                    case VmModuleType.BlobFind:
-                        var blobFindTool = moduleInstance as IMVSBlobFindModuCs.IMVSBlobFindModuTool;
-                        if (blobFindTool != null)
-                            VmParamsConfigWithRenderControl.ModuleSource = blobFindTool;
-                        break;
-
-                    case VmModuleType.LineFind:
-                        var lineFindTool = moduleInstance as IMVSLineFindModuCs.IMVSLineFindModuTool;
-                        if (lineFindTool != null)
-                            VmParamsConfigWithRenderControl.ModuleSource = lineFindTool;
-                        break;
-
-                    case VmModuleType.CircleFind:
-                        var circleFindTool = moduleInstance as IMVSCircleFindModuCs.IMVSCircleFindModuTool;
-                        if (circleFindTool != null)
-                            VmParamsConfigWithRenderControl.ModuleSource = circleFindTool;
-                        break;
-
-                    case VmModuleType.FlawModuleC:
-                        // 对于自定义类型，尝试转换为IVmModule接口
-                        var vmModule = moduleInstance as IMVSCnnFlawModuCCs.IMVSCnnFlawModuCTool;
-                        if (vmModule != null)
-                            VmParamsConfigWithRenderControl.ModuleSource = vmModule;
-                        break;
-                }
-
-                // 执行额外的设置操作
-                setupAction?.Invoke();
-
-                PageManager.Page1Instance?.LogUpdate($"已切换到VM模块: {config.Path}");
-            }
-            catch (Exception ex)
-            {
-                PageManager.Page1Instance?.LogUpdate($"切换VM模块失败: {ex.Message}");
-                MessageBox.Show($"切换到 {name} 模块时出错: {ex.Message}");
-            }
+            SingleImageContainer.Visibility = Visibility.Visible;
+            MultiImageContainer.Visibility = Visibility.Collapsed;
+            ThreeDContainer.Visibility = Visibility.Collapsed;
         }
 
-        // VmModuleType 枚举已迁移到 WpfApp2.UI.Models.VmModuleType
-        // 使用 using alias: VmModuleType = WpfApp2.UI.Models.VmModuleType;
-
-        /// <summary>
-        /// 获取VM模块切换时的额外设置逻辑（例如加载匹配模板）
-        /// </summary>
-        private Action GetVmModuleSetupAction(string vmModuleName, string vmModulePath)
-        {
-            switch (vmModuleName)
-            {
-                case "PKG位置匹配":
-                    return () => ApplyFeatureMatchTemplate(vmModulePath, GetMatchTemplatePathFromConfig(), "匹配模板");
-                case "异图PKG匹配":
-                    return () => ApplyFeatureMatchTemplate(vmModulePath, GetCoatingPkgMatchTemplatePathFromConfig(), "镀膜PKG模板");
-                case "BLK位置匹配":
-                    return () => ApplyFeatureMatchTemplate(vmModulePath, GetBlkMatchTemplatePathFromConfig(), "BLK匹配模板");
-                case "镀膜匹配":
-                    return () => ApplyFeatureMatchTemplate(vmModulePath, GetCoatingMatchTemplatePathFromConfig(), "镀膜匹配模板");
-                default:
-                    return null;
-            }
-        }
-
-        private void ApplyFeatureMatchTemplate(string vmModulePath, string templatePath, string templateLabel)
-        {
-            try
-            {
-                if (string.IsNullOrWhiteSpace(vmModulePath))
-                {
-                    return;
-                }
-
-                var matchTool = VmSolution.Instance[vmModulePath] as IMVSHPFeatureMatchModuCs.IMVSHPFeatureMatchModuTool;
-                if (matchTool == null)
-                {
-                    return;
-                }
-
-                if (!string.IsNullOrWhiteSpace(templatePath) && File.Exists(templatePath))
-                {
-                    matchTool.ImportModelData(new string[] { templatePath });
-                    PageManager.Page1Instance?.LogUpdate($"已从配置加载{templateLabel}: {templatePath}");
-                }
-                else if (!string.IsNullOrWhiteSpace(templatePath))
-                {
-                    PageManager.Page1Instance?.LogUpdate($"{templateLabel}文件不存在: {templatePath}");
-                }
-            }
-            catch (Exception ex)
-            {
-                PageManager.Page1Instance?.LogUpdate($"加载{templateLabel}失败: {ex.Message}");
-            }
-        }
-
+        // 模块切换相关的模板加载逻辑已移除（由算法中间层处理）
         /// <summary>
         /// 🔧 暂时屏蔽：处理划痕检测模型文件路径的特殊逻辑
         /// 恢复到最简单状态，避免复杂的路径处理逻辑
@@ -3815,35 +3510,41 @@ namespace WpfApp2.UI
                         {
                             // 获取3张图片路径
                             var imagePaths = GetCurrentImagePaths();
-                            bool allPathsValid = !string.IsNullOrWhiteSpace(imagePaths.Item1) && File.Exists(imagePaths.Item1) &&
-                                               !string.IsNullOrWhiteSpace(imagePaths.Item2) && File.Exists(imagePaths.Item2) &&
-                                               !string.IsNullOrWhiteSpace(imagePaths.Item3) && File.Exists(imagePaths.Item3);
+                            int requiredSources = GetRequired2DSourceCount();
+                            bool allPathsValid = !string.IsNullOrWhiteSpace(imagePaths.Item1) && File.Exists(imagePaths.Item1);
+                            if (requiredSources > 1)
+                            {
+                                allPathsValid = allPathsValid &&
+                                                !string.IsNullOrWhiteSpace(imagePaths.Item2) && File.Exists(imagePaths.Item2);
+                            }
+                            if (requiredSources > 2)
+                            {
+                                allPathsValid = allPathsValid &&
+                                                !string.IsNullOrWhiteSpace(imagePaths.Item3) && File.Exists(imagePaths.Item3);
+                            }
                             
                             if (allPathsValid)
                             {
                                 // 创建ImageGroupSet并保存
-                                _currentImageGroup = new ImageGroupSet
-                                {
-                                    Source1Path = imagePaths.Item1,
-                                    Source2_1Path = imagePaths.Item2,
-                                    Source2_2Path = imagePaths.Item3,
-                                    BaseName = Path.GetFileNameWithoutExtension(imagePaths.Item1)
-                                };
+                                _currentImageGroup = BuildImageGroupFromPaths(
+                                    imagePaths.Item1,
+                                    requiredSources > 1 ? imagePaths.Item2 : null,
+                                    requiredSources > 2 ? imagePaths.Item3 : null);
                                 _imageRenderer?.DisplayImageGroup(_currentImageGroup);
                                 
-                                PageManager.Page1Instance?.LogUpdate($"已从模板加载完整的3张图片组: {_currentImageGroup.BaseName}");
-                                LogMessage($"模板加载: 3张图片全部加载成功", LogLevel.Info);
+                                PageManager.Page1Instance?.LogUpdate($"已从模板加载完整的{requiredSources}张图片组: {_currentImageGroup.BaseName}");
+                                LogMessage($"模板加载: {requiredSources}张图片全部加载成功", LogLevel.Info);
                             }
                             else
                             {
                                 // 部分图片缺失或不存在，弹窗告警
                                 var missingFiles = new List<string>();
                                 if (string.IsNullOrWhiteSpace(imagePaths.Item1) || !File.Exists(imagePaths.Item1))
-                                    missingFiles.Add($"图像源1: {imagePaths.Item1 ?? "未设置"}");
-                                if (string.IsNullOrWhiteSpace(imagePaths.Item2) || !File.Exists(imagePaths.Item2))
-                                    missingFiles.Add($"图像源2_1: {imagePaths.Item2 ?? "未设置"}");
-                                if (string.IsNullOrWhiteSpace(imagePaths.Item3) || !File.Exists(imagePaths.Item3))
-                                    missingFiles.Add($"图像源2_2: {imagePaths.Item3 ?? "未设置"}");
+                                    missingFiles.Add($"{GetPreferredSourceFolderName(0)}: {imagePaths.Item1 ?? "未设置"}");
+                                if (requiredSources > 1 && (string.IsNullOrWhiteSpace(imagePaths.Item2) || !File.Exists(imagePaths.Item2)))
+                                    missingFiles.Add($"{GetPreferredSourceFolderName(1)}: {imagePaths.Item2 ?? "未设置"}");
+                                if (requiredSources > 2 && (string.IsNullOrWhiteSpace(imagePaths.Item3) || !File.Exists(imagePaths.Item3)))
+                                    missingFiles.Add($"{GetPreferredSourceFolderName(2)}: {imagePaths.Item3 ?? "未设置"}");
                                 
                                 string errorMsg = $"模板加载错误：部分图片文件缺失或不存在！\n\n" +
                                                 $"缺失的文件：\n{string.Join("\n", missingFiles)}\n\n" +
@@ -3855,8 +3556,8 @@ namespace WpfApp2.UI
                         }
                         catch (Exception ex)
                         {
-                            LogMessage($"加载3张图片路径失败: {ex.Message}", LogLevel.Error);
-                            ScrollableMessageWindow.Show($"加载3张图片时发生错误: {ex.Message}\n\n请检查模板配置。", 
+                            LogMessage($"加载{GetRequired2DSourceCount()}张图片路径失败: {ex.Message}", LogLevel.Error);
+                            ScrollableMessageWindow.Show($"加载图片时发生错误: {ex.Message}\n\n请检查模板配置。", 
                                           "加载错误", false);
                         }
                     }
@@ -3888,10 +3589,7 @@ namespace WpfApp2.UI
                                     string warningMsg = $"模板加载警告：无法自动匹配其他图片！\n\n" +
                                                       $"当前图片: {Path.GetFileName(imagePath)}\n" +
                                                       $"需要在以下文件夹结构中找到匹配图片：\n" +
-                                                      $"父目录/\n" +
-                                                      $"├── 图像源1/\n" +
-                                                      $"├── 图像源2_1/\n" +
-                                                      $"└── 图像源2_2/\n\n" +
+                                                      $"{BuildSourceFolderStructureHint()}\n\n" +
                                                       $"目前只加载了一张图片，可能影响检测效果。\n" +
                                                       $"建议手动选择完整的图片组。";
                                     
@@ -3926,32 +3624,6 @@ namespace WpfApp2.UI
                     }
                 }
 
-                // 添加: 检查并应用匹配模板路径参数
-                string matchTemplatePath = GetMatchTemplatePathFromConfig();
-                if (!string.IsNullOrWhiteSpace(matchTemplatePath))
-                {
-                    if (File.Exists(matchTemplatePath))
-                    {
-                        try
-                        {
-                            var matchTool = (IMVSHPFeatureMatchModuCs.IMVSHPFeatureMatchModuTool)VmSolution.Instance["校准.PKG匹配"];
-                            if (matchTool != null)
-                            {
-                                matchTool.ImportModelData(new string[] { matchTemplatePath });
-                                PageManager.Page1Instance?.LogUpdate($"已加载匹配模板: {Path.GetFileName(matchTemplatePath)}");
-                            }
-                        }
-                        catch (Exception ex)
-                        {
-                            LogMessage($"加载匹配模板失败: {ex.Message}", LogLevel.Error);
-                        }
-                    }
-                    else
-                    {
-                        LogMessage($"匹配模板文件不存在: {matchTemplatePath}", LogLevel.Warning);
-                    }
-                }
-
                 // 加载模板完成后，标记为已保存状态（加载的模板内容未修改）
                 MarkAsSaved();
             }
@@ -3961,229 +3633,6 @@ namespace WpfApp2.UI
             }
         }
 
-
-        private void load_vm_solution_async()
-        {
-            string vmFilePath = GetVmSolutionFilePath();
-
-            if (string.IsNullOrEmpty(vmFilePath))
-            {
-                // 用户取消选择或未找到有效文件，退出应用程序
-                LogManager.Critical("未选择VM解决方案文件，应用程序将退出", "VM解决方案加载");
-                Application.Current.Dispatcher.Invoke(() => Application.Current.Shutdown());
-                return;
-            }
-
-            try
-            {
-                // 显示加载提示
-                Dispatcher.Invoke(() =>
-                {
-                    PageManager.Page1Instance?.LogUpdate("正在加载算法平台，请稍候...");
-                    // 可以在这里禁用其他相关控件
-                });
-
-                // 同步加载VM解决方案
-                VmSolution.Load(vmFilePath);
-
-                // 回到UI线程处理其他初始化
-                Dispatcher.Invoke(() =>
-                {
-                    // 按照官方示例模式，初始化时也重新获取并绑定流程实例
-                    var PictureProcedure = VmSolution.Instance["输出图显示"] as VmProcedure;
-                    var calibrationProcedure = VmSolution.Instance["校准"] as VmProcedure;
-                    if (calibrationProcedure != null)
-                    {
-                        PageManager.Page1Instance.render1.ModuleSource = PictureProcedure;
-                        PageManager.Page1Instance.coating.ModuleSource = calibrationProcedure;
-                    }
-
-                    // VM加载成功，保存最后成功加载的文件路径到配置
-                    try
-                    {
-                        SaveVmFilePathToConfig(vmFilePath);
-                    }
-                    catch (Exception ex)
-                    {
-                        // 保存配置失败不影响主流程，只记录日志
-                        PageManager.Page1Instance?.LogUpdate($"保存VM文件路径配置失败: {ex.Message}");
-                    }
-
-                    // 如果成功，更新日志
-                    PageManager.Page1Instance.LogUpdate($"算法平台加载成功: {Path.GetFileName(vmFilePath)}");
-
-                    // VM加载完成后，初始化Page1的图片保存设置
-                    try
-                    {
-                        PageManager.Page1Instance?.InitializeImageSaveSettings();
-                    }
-                    catch (Exception ex)
-                    {
-                        PageManager.Page1Instance?.LogUpdate($"初始化图片保存设置失败: {ex.Message}");
-                    }
-
-                    // 使用线程安全的方式确保事件处理器只绑定一次
-                    lock (_eventBindingLock)
-                    {
-                        if (!_isEventHandlerBound)
-                        {
-                            //注册回调函数
-                            VmSolution.OnWorkStatusEvent += VmSolution_OnWorkStatusEvent;
-                            _isEventHandlerBound = true;
-                            LogMessage("VM事件处理器已绑定", LogLevel.Info);
-                        }
-                        else
-                        {
-                            LogMessage("VM事件处理器已存在，跳过重复绑定", LogLevel.Info);
-                        }
-                    }
-
-                    // 启用控件（如果需要的话可以在这里启用其他控件）
-                    PageManager.Page1Instance?.LogUpdate("算法平台初始化完成");
-                }, DispatcherPriority.Normal);
-
-            }
-            catch (VmException ex)
-            {
-                string errorMessage = $"加载VM解决方案失败！错误代码: {Convert.ToString(ex.errorCode, 16)}。这是核心检测流程无法启动的严重错误，应用程序将退出。";
-                LogManager.Critical(errorMessage, "VM解决方案加载");
-
-                // 加载失败也退出应用程序
-                Application.Current.Dispatcher.Invoke(() => Application.Current.Shutdown());
-            }
-            catch (Exception ex)
-            {
-                string errorMessage = $"加载VM解决方案时出现异常: {ex.Message}。这是核心检测流程无法启动的严重错误，应用程序将退出。";
-                LogManager.Critical(errorMessage, "VM解决方案加载");
-
-                // 加载失败也退出应用程序
-                Application.Current.Dispatcher.Invoke(() => Application.Current.Shutdown());
-            }
-        }
-
-        // 保留原有的同步方法作为备用或兼容
-        [Obsolete("请使用load_vm_solution_async方法")]
-        private void load_vm_solution()
-        {
-            string vmFilePath = GetVmSolutionFilePath();
-            
-            if (string.IsNullOrEmpty(vmFilePath))
-            {
-                // 用户取消选择或未找到有效文件，退出应用程序
-                LogManager.Critical("未选择VM解决方案文件，应用程序将退出", "VM解决方案加载");
-                Application.Current.Shutdown();
-                return;
-            }
-
-            try
-            {
-                VmSolution.Load(vmFilePath);
-
-                // 按照官方示例模式，初始化时也重新获取并绑定流程实例
-                var PictureProcedure = VmSolution.Instance["输出图显示"] as VmProcedure;
-                var calibrationProcedure = VmSolution.Instance["校准"] as VmProcedure;
-                if (calibrationProcedure != null)
-                {
-                    PageManager.Page1Instance.render1.ModuleSource = PictureProcedure;
-                    PageManager.Page1Instance.coating.ModuleSource = calibrationProcedure;
-                }
-
-                // VM加载成功，保存最后成功加载的文件路径到配置
-                try
-                {
-                    SaveVmFilePathToConfig(vmFilePath);
-                }
-                catch (Exception ex)
-                {
-                    // 保存配置失败不影响主流程，只记录日志
-                    PageManager.Page1Instance?.LogUpdate($"保存VM文件路径配置失败: {ex.Message}");
-                }
-
-                // 如果成功，更新日志
-                PageManager.Page1Instance.LogUpdate($"算法平台加载成功: {Path.GetFileName(vmFilePath)}");
-
-                // VM加载完成后，初始化Page1的图片保存设置
-                try
-                {
-                    PageManager.Page1Instance?.InitializeImageSaveSettings();
-                }
-                catch (Exception ex)
-                {
-                    PageManager.Page1Instance?.LogUpdate($"初始化图片保存设置失败: {ex.Message}");
-                }
-
-                // 使用线程安全的方式确保事件处理器只绑定一次
-                lock (_eventBindingLock)
-                {
-                    if (!_isEventHandlerBound)
-                    {
-                        //注册回调函数
-                        VmSolution.OnWorkStatusEvent += VmSolution_OnWorkStatusEvent;
-                        _isEventHandlerBound = true;
-                        LogMessage("VM事件处理器已绑定", LogLevel.Info);
-                    }
-                    else
-                    {
-                        LogMessage("VM事件处理器已存在，跳过重复绑定", LogLevel.Info);
-                    }
-                }
-
-            }
-            catch (VmException ex)
-            {
-                string errorMessage = $"加载VM解决方案失败！错误代码: {Convert.ToString(ex.errorCode, 16)}。这是核心检测流程无法启动的严重错误，应用程序将退出。";
-                LogManager.Critical(errorMessage, "VM解决方案加载");
-                
-                // 加载失败也退出应用程序
-                Application.Current.Shutdown();
-            }
-            catch (Exception ex)
-            {
-                string errorMessage = $"加载VM解决方案时出现异常: {ex.Message}。这是核心检测流程无法启动的严重错误，应用程序将退出。";
-                LogManager.Critical(errorMessage, "VM解决方案加载");
-                
-                // 加载失败也退出应用程序
-                Application.Current.Shutdown();
-            }
-        }
-
-        /// <summary>
-        /// 清理事件处理器绑定（在应用程序退出时调用）
-        /// </summary>
-        public static void CleanupEventHandlers()
-        {
-            lock (_eventBindingLock)
-            {
-                if (_isEventHandlerBound)
-                {
-                    try
-                    {
-                        VmSolution.OnWorkStatusEvent -= VmSolution_OnWorkStatusEvent;
-                        _isEventHandlerBound = false;
-                        // 注意：这里不能调用LogMessage，因为可能在应用程序关闭过程中
-                    }
-                    catch (Exception)
-                    {
-                        // 忽略清理过程中的异常
-                    }
-                }
-                
-                // 重置VM加载状态，允许下次启动时重新加载
-                _isVmSolutionLoaded = false;
-            }
-        }
-
-        /// <summary>
-        /// 重置VM解决方案加载状态（用于调试或特殊情况）
-        /// </summary>
-        public static void ResetVmSolutionLoadStatus()
-        {
-            lock (_eventBindingLock)
-            {
-                _isVmSolutionLoaded = false;
-                Instance?.LogMessage("VM解决方案加载状态已重置", LogLevel.Info);
-            }
-        }
 
         /// <summary>
         /// 清理实例资源（在页面被替换前调用，防止内存泄漏）
@@ -4221,26 +3670,13 @@ namespace WpfApp2.UI
                     LogMessage("清理3D视图资源时出错: " + ex.Message, LogLevel.Warning);
                 }
 
-                // 6. 清理VmRenderControl绑定（释放VM模块引用）
-                try
-                {
-                    if (VmRender1 != null) VmRender1.ModuleSource = null;
-                    if (VmRender2_1 != null) VmRender2_1.ModuleSource = null;
-                    if (VmRender2_2 != null) VmRender2_2.ModuleSource = null;
-                    if (VmParamsConfigWithRenderControl != null) VmParamsConfigWithRenderControl.ModuleSource = null;
-                }
-                catch (Exception ex)
-                {
-                    LogMessage($"清理VmRenderControl绑定时出错: {ex.Message}", LogLevel.Warning);
-                }
-
-                // 7. 清理当前图像组引用
+                // 6. 清理当前图像组引用
                 _currentImageGroup = null;
 
-                // 8. 清理当前模板引用
+                // 7. 清理当前模板引用
                 currentTemplate = null;
 
-                // 9. 清理静态实例引用（如果当前实例是静态引用的实例）
+                // 8. 清理静态实例引用（如果当前实例是静态引用的实例）
                 if (Instance == this)
                 {
                     Instance = null;
@@ -4252,628 +3688,6 @@ namespace WpfApp2.UI
             {
                 LogMessage($"清理实例资源时出错: {ex.Message}", LogLevel.Error);
             }
-        }
-
-        /// <summary>
-        /// 获取VM解决方案文件路径
-        /// </summary>
-        /// <returns>有效的VM解决方案文件绝对路径，如果用户取消或未找到有效文件则返回null</returns>
-        public string GetVmSolutionFilePath()
-        {
-            // 优先从配置文件读取上次使用的路径
-            string lastUsedPath = ReadVmFilePathFromConfig();
-            if (!string.IsNullOrEmpty(lastUsedPath) && File.Exists(lastUsedPath))
-            {
-                PageManager.Page1Instance?.LogUpdate($"自动加载上次使用的VM文件: {lastUsedPath}");
-                return lastUsedPath;
-            }
-
-            // 如果配置文件中没有或文件不存在，弹窗要求用户选择
-            PageManager.Page1Instance?.LogUpdate($"未找到上次使用的VM文件，需要手动选择");
-
-            MessageBoxResult result = ScrollableMessageWindow.Show(
-                $"未找到上次使用的VM解决方案文件。\n\n是否手动选择VM解决方案文件？\n\n点击「是」选择文件，点击「否」退出程序。",
-                "VM文件缺失",
-                true);
-
-            if (result == MessageBoxResult.Cancel)
-            {
-                return null; // 用户选择退出
-            }
-
-            // 用户选择手动指定文件
-            return SelectVmSolutionFile();
-        }
-
-        /// <summary>
-        /// 弹出文件选择对话框选择VM解决方案文件
-        /// </summary>
-        /// <returns>选择的VM解决方案文件绝对路径，如果用户取消则返回null</returns>
-        private string SelectVmSolutionFile()
-        {
-            while (true)
-            {
-                Microsoft.Win32.OpenFileDialog dialog = new Microsoft.Win32.OpenFileDialog
-                {
-                    Filter = "VM解决方案文件|*.sol|所有文件|*.*",
-                    Title = "选择VM解决方案文件",
-                    DefaultExt = ".sol",
-                    InitialDirectory = AppDomain.CurrentDomain.BaseDirectory // 设置初始目录为软件启动文件夹
-                };
-
-                if (dialog.ShowDialog() == true)
-                {
-                    string selectedPath = dialog.FileName;
-                    string absolutePath = Path.GetFullPath(selectedPath);
-                    
-                    // 验证文件格式
-                    if (!Path.GetExtension(absolutePath).Equals(".sol", StringComparison.OrdinalIgnoreCase))
-                    {
-                        MessageBoxResult retryResult = ScrollableMessageWindow.Show(
-                            $"选择的文件格式不正确！\n\n文件: {absolutePath}\n\n" +
-                            $"要求: 必须是.sol格式的VM解决方案文件\n\n" +
-                            $"是否重新选择？点击「否」将退出程序。",
-                            "文件格式错误",
-                            true);
-                        
-                        if (retryResult == MessageBoxResult.Cancel)
-                        {
-                            return null; // 用户选择退出
-                        }
-                        
-                        continue; // 重新选择
-                    }
-                    
-                    // 验证文件是否存在
-                    if (!File.Exists(absolutePath))
-                    {
-                        MessageBoxResult retryResult = ScrollableMessageWindow.Show(
-                            $"选择的文件不存在！\n\n文件: {absolutePath}\n\n" +
-                            $"是否重新选择？点击「否」将退出程序。",
-                            "文件不存在",
-                            true);
-                        
-                        if (retryResult == MessageBoxResult.Cancel)
-                        {
-                            return null; // 用户选择退出
-                        }
-                        
-                        continue; // 重新选择
-                    }
-                    
-                                         PageManager.Page1Instance?.LogUpdate($"用户选择VM文件: {absolutePath}");
-                     return absolutePath;
-                }
-                else
-                {
-                    // 用户取消选择
-                    MessageBoxResult exitResult = ScrollableMessageWindow.Show(
-                        "未选择VM解决方案文件。\n\n程序无法继续运行，是否退出？",
-                        "确认退出",
-                        true);
-                    
-                    if (exitResult == MessageBoxResult.OK)
-                    {
-                        return null; // 用户确认退出
-                    }
-                    
-                    // 用户选择重新选择文件
-                    continue;
-                }
-            }
-        }
-
-        /// <summary>
-        /// 从配置文件读取VM文件路径
-        /// </summary>
-        /// <returns>配置文件中保存的VM文件路径，如果读取失败或文件不存在则返回null</returns>
-        private string ReadVmFilePathFromConfig()
-        {
-            try
-            {
-                string configDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Config");
-                string configFilePath = Path.Combine(configDir, "VmSolutionPath.txt");
-                
-                if (!File.Exists(configFilePath))
-                {
-                    return null;
-                }
-
-                string[] lines = File.ReadAllLines(configFilePath, Encoding.UTF8);
-                
-                // 查找不以#开头的行（实际路径行）
-                foreach (string line in lines)
-                {
-                    string trimmedLine = line.Trim();
-                    if (!string.IsNullOrEmpty(trimmedLine) && !trimmedLine.StartsWith("#"))
-                    {
-                        // 验证路径格式
-                        if (Path.IsPathRooted(trimmedLine) && trimmedLine.EndsWith(".sol", StringComparison.OrdinalIgnoreCase))
-                        {
-                            return trimmedLine;
-                        }
-                    }
-                }
-                
-                return null;
-            }
-            catch (Exception ex)
-            {
-                PageManager.Page1Instance?.LogUpdate($"读取VM文件路径配置失败: {ex.Message}");
-                return null;
-            }
-        }
-
-        /// <summary>
-        /// 保存VM文件路径到配置文件
-        /// 保存最后成功加载的VM解决方案文件路径，供下次启动时参考或故障恢复使用
-        /// </summary>
-        /// <param name="vmFilePath">成功加载的VM文件绝对路径</param>
-        private void SaveVmFilePathToConfig(string vmFilePath)
-        {
-            try
-            {
-                string configDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Config");
-                if (!Directory.Exists(configDir))
-                    Directory.CreateDirectory(configDir);
-
-                // 创建配置内容，包含路径和时间戳
-                string configContent = $"# VM解决方案文件配置\n" +
-                                     $"# 最后成功加载时间: {DateTime.Now:yyyy-MM-dd HH:mm:ss}\n" +
-                                     $"# 文件路径 (绝对路径)\n" +
-                                     $"{vmFilePath}\n" +
-                                     $"# 文件名: {Path.GetFileName(vmFilePath)}\n" +
-                                     $"# 文件大小: {(File.Exists(vmFilePath) ? new FileInfo(vmFilePath).Length : 0)} 字节";
-
-                string configFilePath = Path.Combine(configDir, "VmSolutionPath.txt");
-                File.WriteAllText(configFilePath, configContent, Encoding.UTF8);
-                
-                PageManager.Page1Instance?.LogUpdate($"VM文件路径已保存到配置: {Path.GetFileName(configFilePath)}");
-            }
-            catch (Exception ex)
-            {
-                // 配置保存失败不影响主流程
-                PageManager.Page1Instance?.LogUpdate($"保存VM文件路径配置失败: {ex.Message}");
-            }
-        }
-
-        private static void VmSolution_OnWorkStatusEvent(ImvsSdkDefine.IMVS_MODULE_WORK_STAUS WorkStatuInfo)
-        {
-            // 10009流程：定拍/飞拍相机设定异常监测（只要收到该流程回调就提示）
-            if (WorkStatuInfo.nProcessID == 10009)
-            {
-                Application.Current?.Dispatcher?.BeginInvoke(new Action(() =>
-                {
-                    try
-                    {
-                        if (_isProcess10009WarningDialogShowing)
-                        {
-                            return;
-                        }
-
-                        _isProcess10009WarningDialogShowing = true;
-                        LogManager.Warning("10009流程：检测到定拍或飞拍相机设定异常，准备弹窗提示", "VM回调");
-
-                        var result = ScrollableMessageWindow.Show(
-                            "定拍或飞拍相机设定异常，请进入“硬件配置”界面查看",
-                            "相机设定异常",
-                            showCancel: true,
-                            okButtonText: "进入硬件配置",
-                            cancelButtonText: "关闭",
-                            autoCloseSeconds: 0);
-
-                        if (result == MessageBoxResult.OK)
-                        {
-                            NavigateToHardwareConfigPageFromVmCallback();
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        LogManager.Error($"10009流程：显示弹窗失败 - {ex.Message}", "VM回调");
-                    }
-                    finally
-                    {
-                        _isProcess10009WarningDialogShowing = false;
-                    }
-                }), DispatcherPriority.Background);
-
-                return;
-            }
-
-            if (WorkStatuInfo.nWorkStatus == 0) // 流程执行完成
-            {
-                try
-                {
-                    switch (WorkStatuInfo.nProcessID)
-                    {
-                        case 10001: // 主要检测流程
-                            // ✅ 按官方示例：立即设置完成标志
-                            Page1.SetVmCallbackReceived();
-                            
-                            // 通知系统测试窗口VM回调完成（如果窗口存在）
-                            try
-                            {
-                                WpfApp2.UI.SystemTestWindow.NotifyVMCallbackCompleted();
-                            }
-                            catch
-                            {
-                                // 系统测试窗口可能未打开，忽略异常
-                            }
-                            
-                            // ✅ 按官方示例：VM数据获取在回调函数内直接同步进行
-                            string defectType = null;
-                            try
-                            {
-                                defectType = AlgorithmGlobalVariables.Get("异常类型");
-                                Page1.SetCached2DDetectionResult(defectType);
-                            }
-                            catch (Exception vmEx)
-                            {
-                                LogManager.Error($"获取VM全局变量失败: {vmEx.Message}", "VM回调");
-                            }
-                            
-                            // ✅ 按官方示例：只有UI更新才异步处理
-                            if (defectType != null)
-                            {
-                                Task.Run(() =>
-                                {
-                                    try
-                                    {
-                                        Instance?.ReadMeasurementDataFromVM();
-                                        LogManager.Info($"2D检测结果已读取（等待统一判定）: {defectType}", "VM回调");
-                                    }
-                                    catch (Exception ex)
-                                    {
-                                        LogManager.Error($"UI更新失败: {ex.Message}", "VM回调");
-                                    }
-                                });
-                            }
-                            break;
-                            
-                        case 10000: // IO复位流程
-                            Task.Run(() =>
-                            {
-                                try
-                                {
-                                    WpfApp2.SMTGPIO.IOManager.ResetAllOutputs();
-                                    LogManager.Info("10000流程：IO已自动复位", "VM回调");
-                                }
-                                catch (Exception ex)
-                                {
-                                    LogManager.Error($"10000流程：IO复位失败 - {ex.Message}", "VM回调");
-                                }
-                            });
-                            break;
-                            
-                        case 10004: // 错误复位流程
-                            Application.Current.Dispatcher.BeginInvoke(new Action(() =>
-                            {
-                                try
-                                {
-                                    ScrollableMessageWindow.Show(
-                                        "✅ 初始化/错误复位完成\n\n操作结果：\n• VM初始化流程执行完成\n• IO设备NG输出已设置\n• 队列清空操作完成\n\n系统已恢复到错误复位状态。",
-                                        "错误复位完成",
-                                        showCancel: false,
-                                        okButtonText: "确定",
-                                        cancelButtonText: "取消",
-                                        autoCloseSeconds: 3); // 3秒后自动关闭
-
-                                    LogManager.Info("10004流程：错误复位完成弹窗已显示（3秒后自动关闭）", "VM回调");
-                                }
-                                catch (Exception ex)
-                                {
-                                    LogManager.Error($"10004流程：显示弹窗失败 - {ex.Message}", "VM回调");
-                                }
-                            }), DispatcherPriority.Background);
-                            break;
-                            
-                        case 10006: // VM存图流程
-                            Task.Run(() =>
-                            {
-                                try
-                                {
-                                    LogManager.Info("10006流程：VM存图流程执行完成", "VM回调");
-                                    LogManager.Info("VM存图完成，系统准备处理下一次检测", "VM回调");
-                                }
-                                catch (Exception ex)
-                                {
-                                    LogManager.Error($"10006流程：VM存图完成处理失败 - {ex.Message}", "VM回调");
-                                }
-                            });
-                            break;
-                             
-                        default:
-                            break;
-                    }
-                }
-                catch (Exception ex)
-                {
-                    LogManager.Error($"VM回调异常: {ex.Message}", "VM回调");
-                    Task.Run(() =>
-                    {
-                        Application.Current.Dispatcher.BeginInvoke(new Action(() =>
-                        {
-                            ScrollableMessageWindow.Show("VM回调处理失败: " + ex.Message, "系统错误", false);
-                        }), DispatcherPriority.Background);
-                    });
-                }
-            }
-        }
-
-        /// <summary>
-        /// VM回调场景下跳转到硬件配置页面
-        /// </summary>
-        private static void NavigateToHardwareConfigPageFromVmCallback()
-        {
-            try
-            {
-                var mainWindow = Application.Current?.Windows?.OfType<MainWindow>().FirstOrDefault();
-                if (mainWindow == null)
-                {
-                    LogManager.Error("无法找到主窗口，无法跳转到硬件配置页面", "VM回调");
-                    return;
-                }
-
-                if (mainWindow.frame_HardwareConfigPage == null)
-                {
-                    LogManager.Warning("系统尚未完全初始化，无法跳转到硬件配置页面", "VM回调");
-                    MessageBox.Show("系统尚未完全初始化，请稍等片刻后重试", "提示", MessageBoxButton.OK, MessageBoxImage.Information);
-                    return;
-                }
-
-                mainWindow.ContentC.Content = mainWindow.frame_HardwareConfigPage;
-                LogManager.Info("已跳转到硬件配置页面（来源：10009告警弹窗）", "VM回调");
-            }
-            catch (Exception ex)
-            {
-                LogManager.Error($"跳转到硬件配置页面失败: {ex.Message}", "VM回调");
-                MessageBox.Show($"跳转到硬件配置页面失败: {ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
-        }
-
-
-
-        /// <summary>
-        /// 简化的2D图片转存处理（VM回调完成后直接处理）
-        /// </summary>
-        /// <param name="isOK">统一判定结果</param>
-        /// <param name="defectType">缺陷类型</param>
-        public static async Task Handle2DImageTransfer(bool isOK, string defectType)
-        {
-            try
-            {
-                string temp2DDirectory = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Temp2DImages");
-                
-                if (!Directory.Exists(temp2DDirectory))
-                {
-                    LogManager.Warning("2D临时目录不存在，跳过2D图片转存", "2D图片转存");
-                    return;
-                }
-
-                // 简单等待VM释放文件（避免占用冲突）
-                await Task.Delay(100);
-
-                // 简单直接：获取文件列表，无复杂等待
-                var files = Directory.GetFiles(temp2DDirectory, "*.*");
-                
-                if (files.Length == 0)
-                {
-                    LogManager.Warning("Temp2DImages目录中没有找到图片文件", "2D图片转存");
-                    return;
-                }
-
-                // 判断是否需要保存
-                bool shouldSave = ShouldSave2DImages(isOK);
-                
-                if (!shouldSave)
-                {
-                    Clear2DTemporaryDirectory();
-                    return;
-                }
-
-                // 需要保存，移动到最终目录
-                await Move2DImagesIndependent(defectType);
-            }
-            catch (Exception ex)
-            {
-                LogManager.Error($"处理2D图片转存时出错: {ex.Message}", "2D图片转存");
-                Clear2DTemporaryDirectory();
-            }
-        }
-
-        /// <summary>
-        /// 判断是否应该保存2D图片
-        /// </summary>
-        private static bool ShouldSave2DImages(bool isOK)
-        {
-            try
-            {
-                bool saveAllImages = false;
-                
-                Application.Current.Dispatcher.Invoke(() =>
-                {
-                    saveAllImages = PageManager.Page1Instance?.ImageSaveModeToggle?.IsChecked == true;
-                });
-
-                return saveAllImages || !isOK; // 保存所有图片 或 仅保存NG图片
-            }
-            catch (Exception ex)
-            {
-                LogManager.Error($"判断2D保存策略失败: {ex.Message}", "2D图片转存");
-                return false; // 出错时默认不保存
-            }
-        }
-
-        /// <summary>
-        /// 移动2D图片到最终目录
-        /// </summary>
-        private static async Task Move2DImagesIndependent(string defectType)
-        {
-            await Task.Run(() =>
-            {
-                try
-                {
-                    string safeDefectType = SanitizeFileName(defectType);
-                    int currentImageNumber = GetCurrentImageNumber();
-                    // 存图序号不再补零：期望 a_1 而不是 a_0001
-                    string imageNumberStr = currentImageNumber.ToString();
-                    string rootDirectory = GetImageSaveRootDirectory();
-
-                    Move2DImagesCore(rootDirectory, safeDefectType, imageNumberStr);
-                }
-                catch (Exception ex)
-                {
-                    LogManager.Error($"移动2D图片失败: {ex.Message}", "2D图片转存");
-                }
-            });
-        }
-
-        /// <summary>
-        /// 移动2D图片的核心逻辑（带简单重试机制）
-        /// </summary>
-        private static void Move2DImagesCore(string rootDirectory, string defectType, string imageNumberStr)
-        {
-            try
-            {
-                string temp2DDirectory = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Temp2DImages");
-                
-                if (!Directory.Exists(temp2DDirectory))
-                    return;
-
-                var files = Directory.GetFiles(temp2DDirectory, "*.*");
-                if (files.Length == 0)
-                    return;
-
-                foreach (var file in files)
-                {
-                    string fileName = Path.GetFileNameWithoutExtension(file);
-                    string fileExtension = Path.GetExtension(file);
-                    
-                    string targetFolder;
-                    string newFileName;
-                    
-                    // 根据文件名确定目标文件夹和新文件名
-                    if (fileName.Equals("a", StringComparison.OrdinalIgnoreCase))
-                    {
-                        targetFolder = Path.Combine(rootDirectory, defectType, "图像源1");
-                        newFileName = $"a_{imageNumberStr}{fileExtension}";
-                    }
-                    else if (fileName.Equals("b", StringComparison.OrdinalIgnoreCase))
-                    {
-                        targetFolder = Path.Combine(rootDirectory, defectType, "图像源2_1");
-                        newFileName = $"b_{imageNumberStr}{fileExtension}";
-                    }
-                    else if (fileName.Equals("c", StringComparison.OrdinalIgnoreCase))
-                    {
-                        targetFolder = Path.Combine(rootDirectory, defectType, "图像源2_2");
-                        newFileName = $"c_{imageNumberStr}{fileExtension}";
-                    }
-                    else
-                    {
-                        LogManager.Warning($"未知2D图片文件名: '{fileName}'，跳过", "2D图片转存");
-                        continue;
-                    }
-                    
-                    // 确保目标文件夹存在
-                    EnsureDirectoryExists(targetFolder);
-                    
-                    string finalPath = Path.Combine(targetFolder, newFileName);
-                    
-                    // 简单重试机制：最多试3次，每次间隔100ms
-                    bool moveSuccess = false;
-                    for (int retry = 0; retry < 3; retry++)
-                    {
-                    try
-                    {
-                        if (!File.Exists(file))
-                                break;
-                        
-                            // 删除目标文件（如果存在）
-                        if (File.Exists(finalPath))
-                            File.Delete(finalPath);
-                        
-                        File.Move(file, finalPath);
-                            moveSuccess = true;
-                            break;
-                    }
-                    catch (Exception moveEx)
-                    {
-                            if (retry == 2) // 最后一次尝试失败
-                            {
-                                LogManager.Error($"移动2D图片失败(重试{retry + 1}次): {Path.GetFileName(file)} - {moveEx.Message}", "2D图片转存");
-                            }
-                            else
-                            {
-                                // 等待后重试
-                                System.Threading.Thread.Sleep(100);
-                            }
-                        }
-                    }
-                }
-                }
-                catch (Exception ex)
-                {
-                LogManager.Error($"处理2D图片核心逻辑失败: {ex.Message}", "2D图片转存");
-                }
-            }
-            
-
-
-        /// <summary>
-        /// 清理2D临时目录中的文件
-        /// </summary>
-        private static void Clear2DTemporaryDirectory()
-        {
-            try
-            {
-                string temp2DDirectory = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Temp2DImages");
-                
-                if (!Directory.Exists(temp2DDirectory))
-                    return;
-                
-                var files = Directory.GetFiles(temp2DDirectory, "*.*");
-                
-                foreach (var file in files)
-                {
-                    try
-                    {
-                        File.Delete(file);
-                    }
-                    catch (Exception ex)
-                    {
-                        LogManager.Warning($"删除临时文件失败: {Path.GetFileName(file)} - {ex.Message}", "2D图片转存");
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                LogManager.Error($"清理2D临时目录失败: {ex.Message}", "2D图片转存");
-            }
-        }
-
-        /// <summary>
-        /// 清理文件名中的非法字符，生成安全的文件夹名
-        /// </summary>
-        private static string SanitizeFileName(string fileName)
-        {
-            if (string.IsNullOrEmpty(fileName))
-                return "未知";
-                
-            // 替换非法字符为下划线
-            char[] invalidChars = Path.GetInvalidFileNameChars();
-            foreach (char c in invalidChars)
-            {
-                fileName = fileName.Replace(c, '_');
-            }
-            
-            // 移除前后空白字符
-            fileName = fileName.Trim();
-            
-            // 如果为空则使用默认名称
-            if (string.IsNullOrEmpty(fileName))
-                return "未知";
-                
-            return fileName;
         }
 
         /// <summary>
@@ -4978,7 +3792,7 @@ namespace WpfApp2.UI
         }
 
         /// <summary>
-        /// 读取VM全局变量"异常类型"
+        /// 读取算法全局变量"异常类型"
         /// </summary>
         /// <param name="updateStatistics">是否更新统计信息，默认为true</param>
         public void ReadDefectTypeFromGlobalVariable(bool updateStatistics = true)
@@ -5074,7 +3888,7 @@ namespace WpfApp2.UI
                 // 计算良率
                 yieldRate = (double)okCount / totalCount * 100;
 
-                // 在更新UI前自增图号（每次处理VM回调后）
+                // 在更新UI前自增图号（每次处理检测结果后）
                 PageManager.Page1Instance?.IncrementAndUpdateImageNumber();
 
                 // 更新UI
@@ -5474,100 +4288,6 @@ namespace WpfApp2.UI
         }
 
         /// <summary>
-        /// 从VM全局变量读取数据，转换为指定单位并更新DataGrid1
-        /// </summary>
-        public void ReadMeasurementDataFromVM()
-        {
-            try
-            {
-                // 按照官方示例模式，重新获取"校准"流程实例
-                var calibrationProcedure = VmSolution.Instance["校准"] as VmProcedure;
-                if (calibrationProcedure == null)
-                {
-                    LogMessage("无法获取'校准'流程实例，无法读取测量数据", LogLevel.Error);
-                    return;
-                }
-
-
-                // IMVSBlobFindModuCs.BlobFindParam blobFindModule =
-                //     (IMVSBlobFindModuCs.BlobFindParam)calibrationProcedure["主振瑕疵"];
-                // var Area = blobFindModule.ModuRoiManager.
-                // //输出Area[0]
-                // MessageBox.Show(Area[0].ToString());
-
-
-
-                string outTable = "";
-                string outTable0 = "";
-                string outTable1 = "";
-                
-                // 尝试获取"out"输出
-                try
-                {
-                    outTable = calibrationProcedure.ModuResult.GetOutputString("out").astStringVal[0].strValue;
-                }
-                catch (Exception ex)
-                {
-                    LogMessage($"获取out输出失败: {ex.Message}", LogLevel.Warning);
-                }
-                
-                // 尝试获取"out0"输出
-                try
-                {
-                    outTable0 = calibrationProcedure.ModuResult.GetOutputString("out0").astStringVal[0].strValue;
-                }
-                catch (Exception ex)
-                {
-                    LogMessage($"获取out0输出失败: {ex.Message}", LogLevel.Warning);
-                }
-                
-                // 根据档案配置决定是否读取"out1"输出
-                if (CurrentMeasurementOutputCount > 1)
-                {
-                    try
-                    {
-                        outTable1 = calibrationProcedure.ModuResult.GetOutputString("out1").astStringVal[0].strValue;
-                        LogMessage($"双涂布模板已获取out1输出数据", LogLevel.Info);
-                    }
-                    catch (Exception ex)
-                    {
-                        LogMessage($"获取out1输出失败: {ex.Message}", LogLevel.Warning);
-                    }
-                }
-                
-                // 合并输出数据
-                string combinedData = "";
-                List<string> validOutputs = new List<string>();
-                
-                if (!string.IsNullOrWhiteSpace(outTable))
-                    validOutputs.Add(outTable);
-                if (!string.IsNullOrWhiteSpace(outTable0))
-                    validOutputs.Add(outTable0);
-                if (!string.IsNullOrWhiteSpace(outTable1))
-                    validOutputs.Add(outTable1);
-                
-                if (validOutputs.Count > 0)
-                {
-                    combinedData = string.Join(";", validOutputs);
-                }
-                
-                if (!string.IsNullOrWhiteSpace(combinedData))
-                {
-                    // 解析数据并更新DataGrid
-                    UpdateDataGridWithMeasurements(combinedData);
-                }
-                else
-                {
-                    LogMessage("没有获取到任何有效的输出数据", LogLevel.Warning);
-                }
-            }
-            catch (Exception ex)
-            {
-                LogMessage($"读取测量数据失败: {ex.Message}", LogLevel.Error);
-            }
-        }
-
-        /// <summary>
         /// 将像素(pixel)转换为指定的长度单位
         /// </summary>
         /// <param name="pixels">像素值</param>
@@ -5773,7 +4493,7 @@ namespace WpfApp2.UI
                     return;
                 }
 
-                // 🔧 重要修复：VM回调中不使用异步操作，但UI访问使用同步Dispatcher.Invoke
+                // 🔧 重要修复：回调中不使用异步操作，但UI访问使用同步Dispatcher.Invoke
                 Page1 page1 = null;
                 Application.Current.Dispatcher.Invoke(() =>
                 {
@@ -5839,8 +4559,8 @@ namespace WpfApp2.UI
                                 LowerLimit = lowerLimit,
                                 UpperLimit = upperLimit,
                                 IsOutOfRange = isOutOfRange,
-                                Is3DItem = false, // 通过VM流程输出的项目标记为非3D项目
-                                ToolIndex = -1    // 使用-1标识VM流程输出的项目
+                                Is3DItem = false, // 通过2D流程输出的项目标记为非3D项目
+                                ToolIndex = -1    // 使用-1标识2D流程输出的项目
                             };
 
                             twoDItems.Add(detectionItem);
@@ -5935,25 +4655,7 @@ namespace WpfApp2.UI
 
                         // 保存参数
                         SaveStepParameters(currentStep);
-
-                        // 立即应用选中的模板文件
-                        try
-                        {
-                            var matchTool = (IMVSHPFeatureMatchModuCs.IMVSHPFeatureMatchModuTool)VmSolution.Instance["校准.PKG匹配"];
-                            if (matchTool != null && File.Exists(templatePath))
-                            {
-                                matchTool.ImportModelData(new string[] { templatePath });
-                                PageManager.Page1Instance?.LogUpdate($"已设置匹配模板路径: {templatePath}");
-                            }
-                            else if (!File.Exists(templatePath))
-                            {
-                                MessageBox.Show($"模板文件不存在: {templatePath}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
-                            }
-                        }
-                        catch (Exception ex)
-                        {
-                                MessageBox.Show($"设置匹配模板失败: {ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
-                        }
+                        PageManager.Page1Instance?.LogUpdate($"已设置匹配模板路径: {templatePath}");
                     }
                     // 如果当前是镀膜PKG位置匹配步骤
                     else if (stepConfigurations[currentStep].StepType == StepType.CoatingPkgMatching &&
@@ -5964,25 +4666,7 @@ namespace WpfApp2.UI
 
                         // 保存参数
                         SaveStepParameters(currentStep);
-
-                        // 立即应用选中的模板文件
-                        try
-                        {
-                            var matchTool = (IMVSHPFeatureMatchModuCs.IMVSHPFeatureMatchModuTool)VmSolution.Instance["校准.异图PKG匹配"];
-                            if (matchTool != null && File.Exists(templatePath))
-                            {
-                                matchTool.ImportModelData(new string[] { templatePath });
-                                PageManager.Page1Instance?.LogUpdate($"已设置镀膜PKG模板路径: {templatePath}");
-                            }
-                            else if (!File.Exists(templatePath))
-                            {
-                                MessageBox.Show($"模板文件不存在: {templatePath}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
-                            }
-                        }
-                        catch (Exception ex)
-                        {
-                            MessageBox.Show($"设置镀膜PKG模板失败: {ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
-                        }
+                        PageManager.Page1Instance?.LogUpdate($"已设置镀膜PKG模板路径: {templatePath}");
                     }
                 }
             }
@@ -6072,25 +4756,7 @@ namespace WpfApp2.UI
 
                         // 保存参数
                         SaveStepParameters(currentStep);
-
-                        // 立即应用选中的模板文件
-                        try
-                        {
-                            var matchTool = (IMVSHPFeatureMatchModuCs.IMVSHPFeatureMatchModuTool)VmSolution.Instance["校准.BLK匹配"];
-                            if (matchTool != null && File.Exists(templatePath))
-                            {
-                                matchTool.ImportModelData(new string[] { templatePath });
-                                PageManager.Page1Instance?.LogUpdate($"已设置BLK匹配模板路径: {templatePath}");
-                            }
-                            else if (!File.Exists(templatePath))
-                            {
-                                MessageBox.Show($"模板文件不存在: {templatePath}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
-                            }
-                        }
-                        catch (Exception ex)
-                        {
-                            MessageBox.Show($"设置BLK匹配模板失败: {ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
-                        }
+                        PageManager.Page1Instance?.LogUpdate($"已设置BLK匹配模板路径: {templatePath}");
                     }
                 }
             }
@@ -6131,25 +4797,7 @@ namespace WpfApp2.UI
 
                         // 保存参数
                         SaveStepParameters(currentStep);
-
-                        // 立即应用选中的模板文件
-                        try
-                        {
-                            var matchTool = (IMVSHPFeatureMatchModuCs.IMVSHPFeatureMatchModuTool)VmSolution.Instance["校准.纯镀膜匹配"];
-                            if (matchTool != null && File.Exists(templatePath))
-                            {
-                                matchTool.ImportModelData(new string[] { templatePath });
-                                PageManager.Page1Instance?.LogUpdate($"已设置镀膜匹配模板路径: {templatePath}");
-                            }
-                            else if (!File.Exists(templatePath))
-                            {
-                                MessageBox.Show($"模板文件不存在: {templatePath}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
-                            }
-                        }
-                        catch (Exception ex)
-                        {
-                            MessageBox.Show($"设置镀膜匹配模板失败: {ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
-                        }
+                        PageManager.Page1Instance?.LogUpdate($"已设置镀膜匹配模板路径: {templatePath}");
                     }
                 }
             }
@@ -7460,101 +6108,6 @@ namespace WpfApp2.UI
         }
 
         /// <summary>
-        /// 设置3个图像源模块到对应的VmRenderControl
-        /// </summary>
-        private void SetupMultiImageRenderControls()
-        {
-            try
-            {
-                // 绑定图像源1到第一个VmRenderControl
-                var imageSource1 = VmSolution.Instance["获取路径图像.图1"] as ImageSourceModuleCs.ImageSourceModuleTool;
-                if (imageSource1 != null)
-                {
-                    VmRender1.ModuleSource = imageSource1;
-                }
-
-                // 绑定图像源2_1到第二个VmRenderControl
-                var imageSource2_1 = VmSolution.Instance["获取路径图像.图2_1"] as ImageSourceModuleCs.ImageSourceModuleTool;
-                if (imageSource2_1 != null)
-                {
-                    VmRender2_1.ModuleSource = imageSource2_1;
-                }
-
-                // 绑定图像源2_2到第三个VmRenderControl
-                var imageSource2_2 = VmSolution.Instance["获取路径图像.图2_2"] as ImageSourceModuleCs.ImageSourceModuleTool;
-                if (imageSource2_2 != null)
-                {
-                    VmRender2_2.ModuleSource = imageSource2_2;
-                }
-            }
-            catch (Exception ex)
-            {
-                LogMessage($"设置多图像渲染控件失败: {ex.Message}", LogLevel.Error);
-            }
-        }
-
-        /// <summary>
-        /// 设置3张图片路径到对应的VM模块
-        /// </summary>
-        private void SetImagePathsToVM()
-        {
-            try
-            {
-                // 优先使用已自动匹配的图片组
-                if (_currentImageGroup != null && _currentImageGroup.IsValid)
-                {
-                    // 设置图像源1路径
-                    var imageSource1 = VmSolution.Instance["获取路径图像.图1"] as ImageSourceModuleCs.ImageSourceModuleTool;
-                    imageSource1?.SetImagePath(_currentImageGroup.Source1Path);
-                    LogMessage($"图像源1路径已设置: {_currentImageGroup.Source1Path}", LogLevel.Info);
-
-                    // 设置图像源2_1路径
-                    var imageSource2_1 = VmSolution.Instance["获取路径图像.图2_1"] as ImageSourceModuleCs.ImageSourceModuleTool;
-                    imageSource2_1?.SetImagePath(_currentImageGroup.Source2_1Path);
-                    LogMessage($"图像源2_1路径已设置: {_currentImageGroup.Source2_1Path}", LogLevel.Info);
-
-                    // 设置图像源2_2路径
-                    var imageSource2_2 = VmSolution.Instance["获取路径图像.图2_2"] as ImageSourceModuleCs.ImageSourceModuleTool;
-                    imageSource2_2?.SetImagePath(_currentImageGroup.Source2_2Path);
-                    LogMessage($"图像源2_2路径已设置: {_currentImageGroup.Source2_2Path}", LogLevel.Info);
-                }
-                else
-                {
-                    // fallback：从第0步的"图片路径"参数获取单个路径
-                    string singleImagePath = GetParameterValue(0, "图片路径", "");
-                    
-                    if (!string.IsNullOrWhiteSpace(singleImagePath) && File.Exists(singleImagePath))
-                    {
-                        LogMessage($"尝试从单个图片路径自动匹配: {singleImagePath}", LogLevel.Info);
-                        
-                        // 尝试自动匹配图片组
-                        var matchedGroup = AutoMatchImageGroup(singleImagePath);
-                        if (matchedGroup != null && matchedGroup.IsValid)
-                        {
-                            _currentImageGroup = matchedGroup;
-                            // 递归调用，这次会走上面的分支
-                            SetImagePathsToVM();
-                            return;
-                        }
-                        else
-                        {
-                            LogMessage("无法从单个图片路径自动匹配到完整的图片组", LogLevel.Warning);
-                        }
-                    }
-                    else
-                    {
-                        LogMessage("未找到有效的图片路径配置，请先在\"图片选择\"步骤中选择图片", LogLevel.Warning);
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                LogMessage($"设置图像路径到VM失败: {ex.Message}", LogLevel.Error);
-                throw;
-            }
-        }
-
-        /// <summary>
         /// 获取当前步骤的3个图像路径
         /// </summary>
         /// <returns>三个图像路径的元组</returns>
@@ -7588,7 +6141,11 @@ namespace WpfApp2.UI
                 }
 
                 // 如果指定步骤的控件中没有值，尝试从模板参数中获取
-                if (string.IsNullOrWhiteSpace(path1) || string.IsNullOrWhiteSpace(path2_1) || string.IsNullOrWhiteSpace(path2_2))
+                int requiredSources = GetRequired2DSourceCount();
+                bool needsFallback = string.IsNullOrWhiteSpace(path1) ||
+                                     (requiredSources > 1 && string.IsNullOrWhiteSpace(path2_1)) ||
+                                     (requiredSources > 2 && string.IsNullOrWhiteSpace(path2_2));
+                if (needsFallback)
                 {
                     // 将步骤索引转换为StepType
                     if (stepIndex >= 0 && stepIndex < stepConfigurations.Count)
@@ -7616,6 +6173,69 @@ namespace WpfApp2.UI
             return (path1, path2_1, path2_2);
         }
 
+        private int GetRequired2DSourceCount()
+        {
+            var count = ImageSourceNaming.GetActiveSourceCount();
+            if (count <= 0)
+            {
+                count = 1;
+            }
+
+            return Math.Min(count, 3);
+        }
+
+        private string ResolveSourceFolder(string parentDir, int index)
+        {
+            foreach (var candidate in ImageSourceNaming.GetFolderCandidates(index))
+            {
+                var candidateDir = Path.Combine(parentDir, candidate);
+                if (Directory.Exists(candidateDir))
+                {
+                    return candidateDir;
+                }
+            }
+
+            return null;
+        }
+
+        private string GetPreferredSourceFolderName(int index)
+        {
+            var candidates = ImageSourceNaming.GetFolderCandidates(index);
+            return candidates.FirstOrDefault() ?? $"图像源{index + 1}";
+        }
+
+        private string BuildSourceFolderStructureHint()
+        {
+            int required = GetRequired2DSourceCount();
+            var lines = new List<string> { "父目录/" };
+            for (int i = 0; i < required; i++)
+            {
+                string prefix = i == required - 1 ? "└──" : "├──";
+                lines.Add($"{prefix} {GetPreferredSourceFolderName(i)}/");
+            }
+
+            return string.Join("\n", lines);
+        }
+
+        private bool HasRequired2DPaths(string source1, string source2_1, string source2_2)
+        {
+            int required = GetRequired2DSourceCount();
+            if (required <= 1)
+            {
+                return !string.IsNullOrWhiteSpace(source1);
+            }
+
+            if (required == 2)
+            {
+                return !string.IsNullOrWhiteSpace(source1) &&
+                       !string.IsNullOrWhiteSpace(source2_1);
+            }
+
+            return !string.IsNullOrWhiteSpace(source1) &&
+                   !string.IsNullOrWhiteSpace(source2_1) &&
+                   !string.IsNullOrWhiteSpace(source2_2);
+        }
+
         private void EnsureCurrentImageGroupFromStep(int stepIndex)
         {
             if (_currentImageGroup != null && _currentImageGroup.IsValid)
@@ -7632,7 +6252,7 @@ namespace WpfApp2.UI
 
             if (!string.IsNullOrWhiteSpace(source1) && File.Exists(source1))
             {
-                if (!string.IsNullOrWhiteSpace(source2_1) && !string.IsNullOrWhiteSpace(source2_2))
+                if (HasRequired2DPaths(source1, source2_1, source2_2))
                 {
                     var restoredGroup = BuildImageGroupFromPaths(source1, source2_1, source2_2);
                     if (restoredGroup != null && restoredGroup.IsValid)
@@ -7923,11 +6543,9 @@ namespace WpfApp2.UI
                 // // 设置到界面
                 // inputParameterControls[currentStep]["图片路径"].Text = lastImageGroup.Source1Path;
                 
-                // // 设置到VM模块
-                // SetImagePathsToVM();
+                // 已完成：当前图像组已应用到UI与算法输入
                 
-                // // 设置到VmRenderControl显示
-                // SetupMultiImageRenderControls();
+                
                 
                 // // 保存参数
                 // SaveStepParameters(currentStep);
@@ -8024,7 +6642,7 @@ namespace WpfApp2.UI
                     _currentImageGroup = null;
                     
                     LogMessage($"未找到匹配的图片组: {Path.GetFileName(selectedFile)}", LogLevel.Warning);
-                    MessageBox.Show("未找到匹配的图片组，请检查文件夹结构。\n\n要求：图片应位于以下结构的文件夹中：\n父目录/\n├── 图像源1/\n├── 图像源2_1/\n└── 图像源2_2/", 
+                    MessageBox.Show($"未找到匹配的图片组，请检查文件夹结构。\n\n要求：图片应位于以下结构的文件夹中：\n{BuildSourceFolderStructureHint()}", 
                         "选择图片", MessageBoxButton.OK, MessageBoxImage.Warning);
                 }
             }
@@ -8179,7 +6797,7 @@ namespace WpfApp2.UI
                         _currentImageGroup = null;
                         
                         LogMessage($"未找到匹配的图片组: {Path.GetFileName(selectedFile)}", LogLevel.Warning);
-                        MessageBox.Show("未找到匹配的图片组，请检查文件夹结构。\n\n要求：图片应位于以下结构的文件夹中：\n父目录/\n├── 图像源1/\n├── 图像源2_1/\n└── 图像源2_2/", "选择图片", MessageBoxButton.OK, MessageBoxImage.Warning);
+                        MessageBox.Show($"未找到匹配的图片组，请检查文件夹结构。\n\n要求：图片应位于以下结构的文件夹中：\n{BuildSourceFolderStructureHint()}", "选择图片", MessageBoxButton.OK, MessageBoxImage.Warning);
                     }
                 }
             }
@@ -8242,7 +6860,7 @@ namespace WpfApp2.UI
 
                 if (string.IsNullOrWhiteSpace(source1Path) || !File.Exists(source1Path))
                 {
-                    MessageBox.Show("请先选择图像源1，然后再进行自动匹配", "自动匹配", MessageBoxButton.OK, MessageBoxImage.Information);
+                    MessageBox.Show($"请先选择{GetPreferredSourceFolderName(0)}，然后再进行自动匹配", "自动匹配", MessageBoxButton.OK, MessageBoxImage.Information);
                     return;
                 }
 
@@ -8355,24 +6973,30 @@ namespace WpfApp2.UI
         {
             try
             {
-                // 在三个图像源目录中分别查找指定后缀的.bmp文件
-                var source1Dir = Path.Combine(parentDir, "图像源1");
-                var source2_1Dir = Path.Combine(parentDir, "图像源2_1");
-                var source2_2Dir = Path.Combine(parentDir, "图像源2_2");
-
-                string source1Path = null;
-                string source2_1Path = null;
-                string source2_2Path = null;
+                int requiredSources = GetRequired2DSourceCount();
                 string baseName = "";
+                var imageGroup = new ImageGroupSet();
 
-                // 查找图像源1文件
-                if (Directory.Exists(source1Dir))
+                for (int i = 0; i < requiredSources; i++)
                 {
-                    var source1Files = Directory.GetFiles(source1Dir, $"*{suffix}.bmp");
-                    if (source1Files.Length > 0)
+                    var sourceDir = ResolveSourceFolder(parentDir, i);
+                    if (string.IsNullOrEmpty(sourceDir))
                     {
-                        source1Path = source1Files[0];
-                        var fileName = Path.GetFileNameWithoutExtension(source1Path);
+                        continue;
+                    }
+
+                    var sourceFiles = Directory.GetFiles(sourceDir, $"*{suffix}.bmp");
+                    if (sourceFiles.Length == 0)
+                    {
+                        continue;
+                    }
+
+                    var selectedPath = sourceFiles[0];
+                    imageGroup.SetSource(i, selectedPath);
+
+                    if (i == 0 && string.IsNullOrEmpty(baseName))
+                    {
+                        var fileName = Path.GetFileNameWithoutExtension(selectedPath);
                         var match = System.Text.RegularExpressions.Regex.Match(fileName, @"^(.+)_\d+$");
                         if (match.Success)
                         {
@@ -8381,38 +7005,11 @@ namespace WpfApp2.UI
                     }
                 }
 
-                // 查找图像源2_1文件
-                if (Directory.Exists(source2_1Dir))
-                {
-                    var source2_1Files = Directory.GetFiles(source2_1Dir, $"*{suffix}.bmp");
-                    if (source2_1Files.Length > 0)
-                    {
-                        source2_1Path = source2_1Files[0];
-                    }
-                }
+                imageGroup.BaseName = string.IsNullOrEmpty(baseName) ? $"{Path.GetFileName(parentDir)}{suffix}" : $"{baseName}{suffix}";
 
-                // 查找图像源2_2文件
-                if (Directory.Exists(source2_2Dir))
+                // 检查是否找到了完整的所需图片
+                if (imageGroup.Has2DImages)
                 {
-                    var source2_2Files = Directory.GetFiles(source2_2Dir, $"*{suffix}.bmp");
-                    if (source2_2Files.Length > 0)
-                    {
-                        source2_2Path = source2_2Files[0];
-                    }
-                }
-
-                // 检查是否找到了完整的三张图片
-                if (!string.IsNullOrEmpty(source1Path) && 
-                    !string.IsNullOrEmpty(source2_1Path) && 
-                    !string.IsNullOrEmpty(source2_2Path))
-                {
-                    var imageGroup = new ImageGroupSet
-                    {
-                        Source1Path = source1Path,
-                        Source2_1Path = source2_1Path,
-                        Source2_2Path = source2_2Path,
-                        BaseName = string.IsNullOrEmpty(baseName) ? $"{Path.GetFileName(parentDir)}{suffix}" : $"{baseName}{suffix}"
-                    };
                     
                     // 🔧 关键修复：复用现有的3D图片匹配函数
                     // 如果启用了3D检测，则查找匹配的3D图片
@@ -8476,18 +7073,23 @@ namespace WpfApp2.UI
                 // 创建"匹配模板"文件夹
                 string matchTemplateDir = Path.Combine(baseDir, "匹配模板");
                 
-                // 创建图像源文件夹
-                string source1Dir = Path.Combine(timeStampDir, "图像源1");
-                string source2_1Dir = Path.Combine(timeStampDir, "图像源2_1");
-                string source2_2Dir = Path.Combine(timeStampDir, "图像源2_2");
+                // 创建图像源文件夹（动态数量）
+                int requiredSources = GetRequired2DSourceCount();
+                var sourceDirs = new List<string>();
+                for (int i = 0; i < requiredSources; i++)
+                {
+                    string sourceDir = Path.Combine(timeStampDir, GetPreferredSourceFolderName(i));
+                    sourceDirs.Add(sourceDir);
+                }
                 
                 // 🔧 修正：创建3D文件夹（统一的3D文件夹，不是分开的Height和Gray）
                 string threeDDir = Path.Combine(timeStampDir, "3D");
                 
                 // 创建所有必要的文件夹
-                Directory.CreateDirectory(source1Dir);
-                Directory.CreateDirectory(source2_1Dir);
-                Directory.CreateDirectory(source2_2Dir);
+                foreach (var sourceDir in sourceDirs)
+                {
+                    Directory.CreateDirectory(sourceDir);
+                }
                 Directory.CreateDirectory(threeDDir);
                 Directory.CreateDirectory(matchTemplateDir);
                 
@@ -8504,27 +7106,27 @@ namespace WpfApp2.UI
                 if (!string.IsNullOrEmpty(originalGroup.Source1Path) && File.Exists(originalGroup.Source1Path))
                 {
                     string fileName = Path.GetFileName(originalGroup.Source1Path);
-                    newSource1Path = Path.Combine(source1Dir, fileName);
+                    newSource1Path = Path.Combine(sourceDirs[0], fileName);
                     File.Copy(originalGroup.Source1Path, newSource1Path, true);
-                    LogMessage($"已复制图像源1: {fileName}", LogLevel.Info);
+                    LogMessage($"已复制{GetPreferredSourceFolderName(0)}: {fileName}", LogLevel.Info);
                 }
                 
                 // 复制图像源2_1
-                if (!string.IsNullOrEmpty(originalGroup.Source2_1Path) && File.Exists(originalGroup.Source2_1Path))
+                if (requiredSources > 1 && !string.IsNullOrEmpty(originalGroup.Source2_1Path) && File.Exists(originalGroup.Source2_1Path))
                 {
                     string fileName = Path.GetFileName(originalGroup.Source2_1Path);
-                    newSource2_1Path = Path.Combine(source2_1Dir, fileName);
+                    newSource2_1Path = Path.Combine(sourceDirs[1], fileName);
                     File.Copy(originalGroup.Source2_1Path, newSource2_1Path, true);
-                    LogMessage($"已复制图像源2_1: {fileName}", LogLevel.Info);
+                    LogMessage($"已复制{GetPreferredSourceFolderName(1)}: {fileName}", LogLevel.Info);
                 }
                 
                 // 复制图像源2_2
-                if (!string.IsNullOrEmpty(originalGroup.Source2_2Path) && File.Exists(originalGroup.Source2_2Path))
+                if (requiredSources > 2 && !string.IsNullOrEmpty(originalGroup.Source2_2Path) && File.Exists(originalGroup.Source2_2Path))
                 {
                     string fileName = Path.GetFileName(originalGroup.Source2_2Path);
-                    newSource2_2Path = Path.Combine(source2_2Dir, fileName);
+                    newSource2_2Path = Path.Combine(sourceDirs[2], fileName);
                     File.Copy(originalGroup.Source2_2Path, newSource2_2Path, true);
-                    LogMessage($"已复制图像源2_2: {fileName}", LogLevel.Info);
+                    LogMessage($"已复制{GetPreferredSourceFolderName(2)}: {fileName}", LogLevel.Info);
                 }
                 
                 // 🔧 修正：复制3D图像到统一的3D文件夹（复用现有设计）
@@ -8551,16 +7153,20 @@ namespace WpfApp2.UI
                 }
                 
                 // 验证所有文件都成功复制
-                if (!string.IsNullOrEmpty(newSource1Path) && 
-                    !string.IsNullOrEmpty(newSource2_1Path) && 
-                    !string.IsNullOrEmpty(newSource2_2Path))
+                bool hasAll2D = requiredSources <= 1
+                    ? !string.IsNullOrEmpty(newSource1Path)
+                    : requiredSources == 2
+                        ? !string.IsNullOrEmpty(newSource1Path) && !string.IsNullOrEmpty(newSource2_1Path)
+                        : !string.IsNullOrEmpty(newSource1Path) && !string.IsNullOrEmpty(newSource2_1Path) && !string.IsNullOrEmpty(newSource2_2Path);
+
+                if (hasAll2D)
                 {
                     // 创建新的图片组对象，使用模板文件夹中的路径
                     var templateImageGroup = new ImageGroupSet
                     {
                         Source1Path = newSource1Path,
-                        Source2_1Path = newSource2_1Path,
-                        Source2_2Path = newSource2_2Path,
+                        Source2_1Path = requiredSources > 1 ? newSource2_1Path : null,
+                        Source2_2Path = requiredSources > 2 ? newSource2_2Path : null,
                         BaseName = originalGroup.BaseName,
                         // 🔧 新增：包含复制后的3D图像路径
                         HeightImagePath = newHeightImagePath,
@@ -9076,35 +7682,6 @@ namespace WpfApp2.UI
             catch (Exception ex)
             {
                 LogMessage($"切换到3D视图失败: {ex.Message}", LogLevel.Error);
-            }
-        }
-
-        /// <summary>
-        /// 切换到VM视图
-        /// </summary>
-        private void SwitchToVMView()
-        {
-            try
-            {
-                ThreeDContainer.Visibility = Visibility.Collapsed;
-                
-                // 根据当前步骤决定显示单图还是多图
-                if (currentStep == 0) // 图片选择步骤显示多图
-                {
-                    SingleImageContainer.Visibility = Visibility.Collapsed;
-                    MultiImageContainer.Visibility = Visibility.Visible;
-                }
-                else // 其他步骤显示单图
-                {
-                    SingleImageContainer.Visibility = Visibility.Visible;
-                    MultiImageContainer.Visibility = Visibility.Collapsed;
-                }
-                
-                LogMessage("已切换到VM视图", LogLevel.Info);
-            }
-            catch (Exception ex)
-            {
-                LogMessage($"切换到VM视图失败: {ex.Message}", LogLevel.Error);
             }
         }
 
@@ -9711,7 +8288,7 @@ namespace WpfApp2.UI
 
             try
             {
-                // 从检测结果DataGrid读取数据，而不是从VM全局变量
+                // 从检测结果DataGrid读取数据，而不是从全局变量
                 var configDataGrid = this.FindName("ConfigDataGrid") as DataGrid;
                 if (configDataGrid == null)
                 {
@@ -10510,4 +9087,6 @@ namespace WpfApp2.UI
 
 
 }
+
+
 

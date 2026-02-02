@@ -1,12 +1,7 @@
 ﻿using System;
 using System.Windows;
 using System.Windows.Controls;
-using VM.Core;
-using VM.PlatformSDKCS;
 using WpfApp2.Algorithms;
-using ImageSourceModuleCs;
-using SaveImageCs;
-using VMControls.WPF.Release;
 using static WpfApp2.UI.Page1;
 using WpfApp2.Models;
 using WpfApp2.UI.Models;
@@ -25,8 +20,6 @@ namespace WpfApp2.UI
     /// </summary>
     public partial class CameraConfigPage : Page
     {
-        private VmProcedure flyingCameraProcedure;   // 飞拍相机流程
-        private VmProcedure fixedCameraProcedure;    // 定拍相机流程
         private OPTControllerAPI optController; // 环形光源控制器 (192.168.1.16)
         private OPTControllerAPI coaxialOptController; // 同轴光源控制器 (192.168.1.20)
         private bool isLightControllerConnected = false; // 环形光源控制器连接状态
@@ -44,9 +37,6 @@ namespace WpfApp2.UI
         private bool is45DegreeEnabled = false;
         private bool is0DegreeEnabled = false;
 
-        // 加载状态标志
-        private bool isVmSolutionLoading = false;
-        private bool isVmSolutionLoaded = false;
 
         // 图像选择状态 (1-飞拍, 2-定拍1, 3-定拍2)
         private int lidImageSelection = 2;     // LID图像默认选择定拍1
@@ -61,7 +51,7 @@ namespace WpfApp2.UI
             optController = new OPTControllerAPI(); // 初始化环形光源控制器
             coaxialOptController = new OPTControllerAPI(); // 初始化同轴光源控制器
 
-            // 不在构造函数中加载VM解决方案，改为异步加载
+            // 渲染控件绑定延后到页面加载完成后执行
             InitializeCameraParameters();
             InitializeLightController(); // 初始化环形光源控制器
             InitializeCoaxialLightController(); // 初始化同轴光源控制器
@@ -76,169 +66,21 @@ namespace WpfApp2.UI
         /// <summary>
         /// 页面加载完成事件处理器
         /// </summary>
-        private async void CameraConfigPage_Loaded(object sender, RoutedEventArgs e)
+        private void CameraConfigPage_Loaded(object sender, RoutedEventArgs e)
         {
-            // 异步加载VM解决方案
-            await InitializeVmSolutionAsync();
-
-            // 延迟一小段时间，确保VM解决方案已完全加载
             Dispatcher.BeginInvoke(new Action(() =>
             {
                 BindRenderControls();
-
-                // 初始化按钮状态
                 UpdateButtonStates();
             }), System.Windows.Threading.DispatcherPriority.Background);
         }
 
         /// <summary>
-        /// 异步初始化VM解决方案
-        /// </summary>
-        private async Task InitializeVmSolutionAsync()
-        {
-            if (isVmSolutionLoading || isVmSolutionLoaded)
-                return;
-
-            isVmSolutionLoading = true;
-
-            try
-            {
-                // 显示加载提示
-                LogMessage("正在加载算法平台，请稍候...");
-                ShowLoadingIndicator(true);
-
-                // 在后台线程加载VM解决方案
-                await Task.Run(() =>
-                {
-                    // 加载VM解决方案（如果尚未加载）
-                    if (VmSolution.Instance == null)
-                    {
-                        VmSolution.Load("双深度_V4.4.0.sol");
-                    }
-                });
-
-                // 回到UI线程获取流程和变量
-                await Dispatcher.InvokeAsync(() =>
-                {
-                    // 获取流程
-                    flyingCameraProcedure = VmSolution.Instance["获取飞拍图像"] as VmProcedure;
-                    fixedCameraProcedure = VmSolution.Instance["获取定拍图像"] as VmProcedure;
-
-                    LogMessage("VM解决方案初始化成功");
-                }, DispatcherPriority.Normal);
-
-                isVmSolutionLoaded = true;
-            }
-            catch (Exception ex)
-            {
-                LogMessage($"VM解决方案初始化失败: {ex.Message}");
-                await Dispatcher.InvokeAsync(() =>
-                {
-                    System.Windows.MessageBox.Show($"VM初始化失败: {ex.Message}", "初始化错误", MessageBoxButton.OK, MessageBoxImage.Error);
-                });
-            }
-            finally
-            {
-                isVmSolutionLoading = false;
-                ShowLoadingIndicator(false);
-            }
-        }
-
-        /// <summary>
-        /// 显示或隐藏加载指示器
-        /// </summary>
-        private void ShowLoadingIndicator(bool show)
-        {
-            Dispatcher.Invoke(() =>
-            {
-                // 如果有加载提示控件，在这里控制其可见性
-                // 也可以禁用/启用相关控件
-                if (show)
-                {
-                    // 禁用相机相关的控件
-                    if (LightTestButton != null)
-                        LightTestButton.IsEnabled = false;
-
-                    // 可以添加一个加载提示文本
-                    LogMessage("正在加载算法平台,请耐心等待，这可能需要几秒钟...");
-                }
-                else
-                {
-                    // 启用相机相关的控件
-                    if (LightTestButton != null)
-                        LightTestButton.IsEnabled = true;
-
-                    LogMessage("算法平台加载完成");
-                }
-            });
-        }
-
-        /// <summary>
-        /// 绑定渲染控件到对应的VM模块
+        /// 绑定渲染控件（平台不直接绑定算法模块）
         /// </summary>
         private void BindRenderControls()
         {
-            try
-            {
-                if (VmSolution.Instance == null)
-                {
-                    LogMessage("VM解决方案未加载，跳过渲染控件绑定");
-                    return;
-                }
-
-                // 绑定飞拍相机渲染控件
-                var flyingNames = new[] { "飞拍相机", "相机", "图像源", "ImageSource", "Camera" };
-                foreach (var name in flyingNames)
-                {
-                    var module = VmSolution.Instance[$"获取飞拍图像.{name}"];
-                    if (module != null)
-                    {
-                        if (module is ImageSourceModuleTool imageSource)
-                        {
-                            FlyingCameraRender.ModuleSource = imageSource;
-                            LogMessage("飞拍相机渲染控件绑定成功");
-                            break;
-                        }
-                        else if (module is SaveImageTool saveImage)
-                        {
-                            FlyingCameraRender.ModuleSource = saveImage;
-                            LogMessage("飞拍相机渲染控件绑定成功");
-                            break;
-                        }
-                    }
-                }
-
-                // 绑定定拍相机1渲染控件
-                var fixedNames = new[] { "定拍1", "定拍2", "相机1", "相机2", "Camera1", "Camera2", "SaveImage1", "SaveImage2" };
-                foreach (var name in fixedNames)
-                {
-                    var module = VmSolution.Instance[$"获取定拍图像.{name}"];
-                    if (module != null && module is SaveImageTool saveImage1 && name.Contains("1"))
-                    {
-                        FixedCamera1Render.ModuleSource = saveImage1;
-                        LogMessage("定拍相机1渲染控件绑定成功");
-                        break;
-                    }
-                }
-
-                // 绑定定拍相机2渲染控件
-                foreach (var name in fixedNames)
-                {
-                    var module = VmSolution.Instance[$"获取定拍图像.{name}"];
-                    if (module != null && module is SaveImageTool saveImage2 && name.Contains("2"))
-                    {
-                        FixedCamera2Render.ModuleSource = saveImage2;
-                        LogMessage("定拍相机2渲染控件绑定成功");
-                        break;
-                    }
-                }
-
-                LogMessage("渲染控件绑定完成");
-            }
-            catch (Exception ex)
-            {
-                LogMessage($"绑定渲染控件时出错: {ex.Message}");
-            }
+            LogMessage("渲染控件绑定已跳过（平台不直接绑定算法模块）");
         }
 
         /// <summary>
@@ -1871,8 +1713,7 @@ namespace WpfApp2.UI
                 lidImageSelection = lidSelection;
                 coatingImageSelection = coatingSelection;
 
-                // 更新VM全局变量
-                UpdateImageSelectionToVM();
+                UpdateImageSelectionState();
 
                 // 更新按钮状态
                 UpdateButtonStates();
@@ -1901,18 +1742,18 @@ namespace WpfApp2.UI
         }
 
         /// <summary>
-        /// 刷新VM模块绑定
+        /// 刷新渲染控件绑定
         /// </summary>
-        public void RefreshVmBindings()
+        public void RefreshRenderBindings()
         {
             try
             {
                 BindRenderControls();
-                LogMessage("VM模块绑定已刷新");
+                LogMessage("渲染控件绑定已刷新");
             }
             catch (Exception ex)
             {
-                LogMessage($"刷新VM模块绑定失败: {ex.Message}");
+                LogMessage($"刷新渲染控件绑定失败: {ex.Message}");
             }
         }
 
@@ -2139,8 +1980,7 @@ namespace WpfApp2.UI
                 // 设置LID图像选择为飞拍（1）
                 lidImageSelection = 1;
 
-                // 更新VM全局变量
-                UpdateImageSelectionToVM();
+                UpdateImageSelectionState();
 
                 // 更新按钮状态
                 UpdateButtonStates();
@@ -2170,8 +2010,7 @@ namespace WpfApp2.UI
                 // 设置镀膜图像选择为飞拍（1）
                 coatingImageSelection = 1;
 
-                // 更新VM全局变量
-                UpdateImageSelectionToVM();
+                UpdateImageSelectionState();
 
                 // 更新按钮状态
                 UpdateButtonStates();
@@ -2201,8 +2040,7 @@ namespace WpfApp2.UI
                 // 设置LID图像选择为定拍1（2）
                 lidImageSelection = 2;
 
-                // 更新VM全局变量
-                UpdateImageSelectionToVM();
+                UpdateImageSelectionState();
 
                 // 更新按钮状态
                 UpdateButtonStates();
@@ -2232,8 +2070,7 @@ namespace WpfApp2.UI
                 // 设置镀膜图像选择为定拍2（3）
                 coatingImageSelection = 3;
 
-                // 更新VM全局变量
-                UpdateImageSelectionToVM();
+                UpdateImageSelectionState();
 
                 // 更新按钮状态
                 UpdateButtonStates();
@@ -2254,23 +2091,19 @@ namespace WpfApp2.UI
         }
 
         /// <summary>
-        /// 更新图像选择到VM全局变量
+        /// 更新图像选择状态到算法全局变量
         /// </summary>
-        private void UpdateImageSelectionToVM()
+        private void UpdateImageSelectionState()
         {
             try
             {
-                // 更新BLK图选择全局变量（算法层解耦）
                 AlgorithmGlobalVariables.Set("BLK图选择", lidImageSelection.ToString());
-                LogMessage($"✅ 已更新算法全局变量 BLK图选择={lidImageSelection}");
-
-                // 更新镀膜图选择全局变量（算法层解耦）
                 AlgorithmGlobalVariables.Set("镀膜图选择", coatingImageSelection.ToString());
-                LogMessage($"✅ 已更新算法全局变量 镀膜图选择={coatingImageSelection}");
+                LogMessage($"✅ 已更新算法全局变量 BLK图选择={lidImageSelection}, 镀膜图选择={coatingImageSelection}");
             }
             catch (Exception ex)
             {
-                LogMessage($"更新图像选择到算法全局变量失败: {ex.Message}");
+                LogMessage($"更新图像选择失败: {ex.Message}");
             }
         }
 
@@ -2320,5 +2153,6 @@ namespace WpfApp2.UI
         #endregion
     }
 } 
+
 
 

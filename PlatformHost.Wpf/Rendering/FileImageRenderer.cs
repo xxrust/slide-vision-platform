@@ -24,9 +24,9 @@ namespace WpfApp2.Rendering
 
             ShowPreviewImages();
 
-            SetImageSource(_context.PreviewViewer1, group?.Source1Path);
-            SetImageSource(_context.PreviewViewer2_1, group?.Source2_1Path);
-            SetImageSource(_context.PreviewViewer2_2, group?.Source2_2Path);
+            SetImageSource(_context.PreviewViewer1, group?.GetPath(0));
+            SetImageSource(_context.PreviewViewer2, group?.Source2Path);
+            SetImageSource(_context.PreviewViewer3, group?.Source3Path);
         }
 
         public void Clear()
@@ -37,8 +37,8 @@ namespace WpfApp2.Rendering
             }
 
             SetImageSource(_context.PreviewViewer1, null);
-            SetImageSource(_context.PreviewViewer2_1, null);
-            SetImageSource(_context.PreviewViewer2_2, null);
+            SetImageSource(_context.PreviewViewer2, null);
+            SetImageSource(_context.PreviewViewer3, null);
         }
 
         private void ShowPreviewImages()
@@ -48,13 +48,9 @@ namespace WpfApp2.Rendering
                 return;
             }
 
-            if (_context.VmRender1 != null) _context.VmRender1.Visibility = Visibility.Collapsed;
-            if (_context.VmRender2_1 != null) _context.VmRender2_1.Visibility = Visibility.Collapsed;
-            if (_context.VmRender2_2 != null) _context.VmRender2_2.Visibility = Visibility.Collapsed;
-
             if (_context.PreviewViewer1 != null) _context.PreviewViewer1.Visibility = Visibility.Visible;
-            if (_context.PreviewViewer2_1 != null) _context.PreviewViewer2_1.Visibility = Visibility.Visible;
-            if (_context.PreviewViewer2_2 != null) _context.PreviewViewer2_2.Visibility = Visibility.Visible;
+            if (_context.PreviewViewer2 != null) _context.PreviewViewer2.Visibility = Visibility.Visible;
+            if (_context.PreviewViewer3 != null) _context.PreviewViewer3.Visibility = Visibility.Visible;
         }
 
         private static void SetImageSource(WpfApp2.UI.Controls.ImageInspectionViewer target, string path)
@@ -74,3 +70,4 @@ namespace WpfApp2.Rendering
         }
     }
 }
+

@@ -104,6 +104,14 @@ namespace WpfApp2.Models
                 config.DefaultProfileId = config.Profiles.FirstOrDefault()?.Id;
             }
 
+            foreach (var profile in config.Profiles)
+            {
+                if (profile.ImageSources == null || profile.ImageSources.Count == 0)
+                {
+                    profile.ImageSources = CreateDefaultImageSources();
+                }
+            }
+
             return config;
         }
 
@@ -145,6 +153,7 @@ namespace WpfApp2.Models
                         {
                             StepType.ImageSelection.ToString(),
                             StepType.DemoSetup.ToString(),
+                            StepType.DemoCalculation.ToString(),
                             StepType.DemoSummary.ToString(),
                             StepType.TemplateName.ToString()
                         },
@@ -154,7 +163,8 @@ namespace WpfApp2.Models
                             { "PIPELINE", "quick" }
                         },
                         DefaultTemplateName = "Template-Basic",
-                        MeasurementOutputCount = 1
+                        MeasurementOutputCount = 1,
+                        ImageSources = CreateDefaultImageSources()
                     },
                     new TemplateProfileDefinition
                     {
@@ -175,7 +185,8 @@ namespace WpfApp2.Models
                             { "PIPELINE", "default" }
                         },
                         DefaultTemplateName = "Template-Standard",
-                        MeasurementOutputCount = 1
+                        MeasurementOutputCount = 1,
+                        ImageSources = CreateDefaultImageSources()
                     },
                     new TemplateProfileDefinition
                     {
@@ -197,10 +208,23 @@ namespace WpfApp2.Models
                             { "PIPELINE", "extended" }
                         },
                         DefaultTemplateName = "Template-3D",
-                        MeasurementOutputCount = 1
+                        MeasurementOutputCount = 1,
+                        ImageSources = CreateDefaultImageSources()
                     }
                 },
                 LegacyMappings = new List<LegacyProfileMapping>()
+            };
+        }
+
+        private static List<ImageSourceDefinition> CreateDefaultImageSources()
+        {
+            return new List<ImageSourceDefinition>
+            {
+                new ImageSourceDefinition
+                {
+                    Id = "Image1",
+                    DisplayName = "图像1"
+                }
             };
         }
     }
@@ -228,6 +252,9 @@ namespace WpfApp2.Models
         [JsonProperty(Order = 7)]
         public int MeasurementOutputCount { get; set; } = 1;
 
+        [JsonProperty(Order = 8)]
+        public List<ImageSourceDefinition> ImageSources { get; set; } = new List<ImageSourceDefinition>();
+
         public List<StepType> GetStepTypes()
         {
             var stepTypes = new List<StepType>();
@@ -251,6 +278,15 @@ namespace WpfApp2.Models
 
             return stepTypes;
         }
+    }
+
+    public sealed class ImageSourceDefinition
+    {
+        [JsonProperty(Order = 1)]
+        public string Id { get; set; }
+
+        [JsonProperty(Order = 2)]
+        public string DisplayName { get; set; }
     }
 
     public sealed class LegacyProfileMapping

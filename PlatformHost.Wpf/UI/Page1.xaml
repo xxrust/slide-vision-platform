@@ -4,8 +4,8 @@
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
       xmlns:local="clr-namespace:WpfApp2.UI"
-      xmlns:Release="clr-namespace:VMControls.WPF.Release"
       xmlns:ScottPlot="clr-namespace:ScottPlot.WPF;assembly=ScottPlot.WPF"
+      xmlns:controls="clr-namespace:WpfApp2.UI.Controls"
       mc:Ignorable="d" 
       d:DesignHeight="1024" d:DesignWidth="1920"
       Title="Page1">
@@ -442,32 +442,36 @@
                 <!-- 第1列：2x2格子布局 -->
                 <Grid Grid.Column="0">
                     <Grid.RowDefinitions>
-                        <!-- 上行：两个VM渲染框 -->
+                        <!-- 上行：两个渲染框 -->
                         <RowDefinition Height="500" />
                         <!-- 下行：3D渲染框 + 数据分析区域 -->
                         <RowDefinition Height="500" />
                     </Grid.RowDefinitions>
 
-                    <!-- 上行：两个相同大小的VM渲染框 -->
+                    <!-- 上行：两个相同大小的渲染框 -->
                     <Grid Grid.Row="0">
                         <Grid.ColumnDefinitions>
-                            <!-- 左上：大VM渲染界面 -->
+                            <!-- 左上：大渲染界面 -->
                             <ColumnDefinition Width="625" />
-                            <!-- 右上：小VM界面 -->
+                            <!-- 右上：小渲染界面 -->
                             <ColumnDefinition Width="625" />
                         </Grid.ColumnDefinitions>
 
-                        <!-- 左上：大VM渲染界面 -->
+                        <!-- 左上：大渲染界面 -->
                         <Grid Grid.Column="0">
                             <StackPanel Margin="3">
-                                <Release:VmRenderControl x:Name="render1" Height="494"/>
+                                <Grid>
+                                    <controls:ImageInspectionViewer x:Name="RenderPreviewMain"/>
+                                </Grid>
                             </StackPanel>
                         </Grid>
 
-                        <!-- 右上：小VM界面 -->
+                        <!-- 右上：小渲染界面 -->
                         <Grid Grid.Column="1">
                             <StackPanel Margin="3">
-                                <Release:VmRenderControl x:Name="coating" Height="494"/>
+                                <Grid>
+                                    <controls:ImageInspectionViewer x:Name="RenderPreviewStep"/>
+                                </Grid>
                             </StackPanel>
                         </Grid>
                     </Grid>

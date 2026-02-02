@@ -1,16 +1,16 @@
 {
   "version": 2,
-  "dgSpecHash": "zKOtcUETLWg=",
+  "dgSpecHash": "EdAiMMkcDMM=",
   "success": true,
-  "projectFilePath": "E:\\posen_project\\点胶检测\\上位机程序\\WpfApp2\\Algorithms\\GlueInspect.Algorithm.OpenCV\\GlueInspect.Algorithm.OpenCV.csproj",
+  "projectFilePath": "E:\\posen_project\\点胶检测\\上位机程序\\WpfApp2\\Platform\\PlatformHost.Wpf\\Algorithms\\GlueInspect.Algorithm.OpenCV\\GlueInspect.Algorithm.OpenCV.csproj",
   "expectedPackageFiles": [
-    "C:\\Users\\liangyuhang\\.nuget\\packages\\opencvsharp4\\4.11.0.20250507\\opencvsharp4.4.11.0.20250507.nupkg.sha512",
-    "C:\\Users\\liangyuhang\\.nuget\\packages\\opencvsharp4.runtime.win\\4.11.0.20250507\\opencvsharp4.runtime.win.4.11.0.20250507.nupkg.sha512",
-    "C:\\Users\\liangyuhang\\.nuget\\packages\\system.buffers\\4.6.1\\system.buffers.4.6.1.nupkg.sha512",
-    "C:\\Users\\liangyuhang\\.nuget\\packages\\system.memory\\4.6.3\\system.memory.4.6.3.nupkg.sha512",
-    "C:\\Users\\liangyuhang\\.nuget\\packages\\system.numerics.vectors\\4.6.1\\system.numerics.vectors.4.6.1.nupkg.sha512",
-    "C:\\Users\\liangyuhang\\.nuget\\packages\\system.runtime.compilerservices.unsafe\\6.1.2\\system.runtime.compilerservices.unsafe.6.1.2.nupkg.sha512",
-    "C:\\Users\\liangyuhang\\.nuget\\packages\\system.valuetuple\\4.6.1\\system.valuetuple.4.6.1.nupkg.sha512"
+    "C:\\Users\\liangyuhang\\.nuget\\packages\\opencvsharp4\\4.10.0.20240616\\opencvsharp4.4.10.0.20240616.nupkg.sha512",
+    "C:\\Users\\liangyuhang\\.nuget\\packages\\opencvsharp4.runtime.win\\4.10.0.20240616\\opencvsharp4.runtime.win.4.10.0.20240616.nupkg.sha512",
+    "C:\\Users\\liangyuhang\\.nuget\\packages\\system.buffers\\4.5.1\\system.buffers.4.5.1.nupkg.sha512",
+    "C:\\Users\\liangyuhang\\.nuget\\packages\\system.memory\\4.5.5\\system.memory.4.5.5.nupkg.sha512",
+    "C:\\Users\\liangyuhang\\.nuget\\packages\\system.numerics.vectors\\4.5.0\\system.numerics.vectors.4.5.0.nupkg.sha512",
+    "C:\\Users\\liangyuhang\\.nuget\\packages\\system.runtime.compilerservices.unsafe\\6.0.0\\system.runtime.compilerservices.unsafe.6.0.0.nupkg.sha512",
+    "C:\\Users\\liangyuhang\\.nuget\\packages\\system.valuetuple\\4.5.0\\system.valuetuple.4.5.0.nupkg.sha512"
   ],
   "logs": []
 }
