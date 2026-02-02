@@ -334,12 +334,6 @@
     <Compile Include="UI\LJDeveloperUserProjectSelectWindow.xaml.cs">
       <DependentUpon>LJDeveloperUserProjectSelectWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UI\ThreeDMappingAnalysisWindow.xaml.cs">
-      <DependentUpon>ThreeDMappingAnalysisWindow.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="UI\ThreeDCalibrationWindow.xaml.cs">
-      <DependentUpon>ThreeDCalibrationWindow.xaml</DependentUpon>
-    </Compile>
     <Compile Include="UI\ValidatorMachineParametersWindow.xaml.cs">
       <DependentUpon>ValidatorMachineParametersWindow.xaml</DependentUpon>
     </Compile>
@@ -508,14 +502,6 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="UI\LJDeveloperUserProjectSelectWindow.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="UI\ThreeDMappingAnalysisWindow.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="UI\ThreeDCalibrationWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

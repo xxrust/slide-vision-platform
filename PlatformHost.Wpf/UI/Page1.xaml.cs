@@ -976,18 +976,6 @@ namespace WpfApp2.UI
         }
 
         /// <summary>
-        /// 颜色配置按钮点击事件处理器
-        /// </summary>
-        private void ColorConfigButton_Click(object sender, RoutedEventArgs e)
-        {
-            MessageBox.Show(
-                "3D视图颜色配置已迁移为独立进程（Host/Tool）。\n当前版本主程序不再直接加载Keyence 3D颜色配置窗口。",
-                "3D提示",
-                MessageBoxButton.OK,
-                MessageBoxImage.Information);
-        }
-
-        /// <summary>
         /// 刷新当前检测结果的显示效果（应用新的颜色配置）
         /// </summary>
         public void RefreshCurrentDetectionDisplay()
@@ -8589,40 +8577,6 @@ namespace WpfApp2.UI
             };
             mainPanel.Children.Add(fixedShotTestButton);
 
-            // 3D映射分析按钮
-            var mappingAnalysisButton = new Button
-            {
-                Content = "🛰️ 3D映射分析",
-                Height = 35,
-                Margin = new Thickness(0, 5, 0, 0),
-                Background = new SolidColorBrush(Color.FromRgb(0, 188, 212)),
-                Foreground = Brushes.White,
-                FontSize = 12,
-                FontWeight = FontWeights.Bold
-            };
-            mappingAnalysisButton.Click += (s, e) => {
-                window.Close();
-                Open3DMappingAnalysisWindow();
-            };
-            mainPanel.Children.Add(mappingAnalysisButton);
-
-            // 3D定标按钮
-            var calibrationButton = new Button
-            {
-                Content = "?? 3D定标",
-                Height = 35,
-                Margin = new Thickness(0, 5, 0, 0),
-                Background = new SolidColorBrush(Color.FromRgb(0, 123, 255)),
-                Foreground = Brushes.White,
-                FontSize = 12,
-                FontWeight = FontWeights.Bold
-            };
-            calibrationButton.Click += (s, e) => {
-                window.Close();
-                Open3DCalibrationWindow();
-            };
-            mainPanel.Children.Add(calibrationButton);
-
             // 自动删图按钮
             var autoDeleteButton = new Button
             {
@@ -8784,49 +8738,6 @@ namespace WpfApp2.UI
             {
                 LogUpdate($"打开验收标准与CICD窗口失败: {ex.Message}");
                 MessageBox.Show($"打开验收标准与CICD窗口失败: {ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
-        }
-
-        /// <summary>
-        /// 打开3D映射分析窗口
-        /// </summary>
-        private void Open3DMappingAnalysisWindow()
-        {
-            try
-            {
-                var snapshot = CreateChipHeightAnalysisSnapshot();
-                var analysisWindow = new ThreeDMappingAnalysisWindow(snapshot)
-                {
-                    Owner = Window.GetWindow(this)
-                };
-                analysisWindow.ShowDialog();
-                LogUpdate("已打开3D映射分析窗口");
-            }
-            catch (Exception ex)
-            {
-                LogUpdate($"打开3D映射分析窗口失败: {ex.Message}");
-                MessageBox.Show($"打开3D映射分析窗口失败: {ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
-        }
-
-        /// <summary>
-        /// 打开3D定标窗口
-        /// </summary>
-        private void Open3DCalibrationWindow()
-        {
-            try
-            {
-                var calibrationWindow = new ThreeDCalibrationWindow
-                {
-                    Owner = Window.GetWindow(this)
-                };
-                calibrationWindow.ShowDialog();
-                LogUpdate("已打开3D定标窗口");
-            }
-            catch (Exception ex)
-            {
-                LogUpdate($"打开3D定标窗口失败: {ex.Message}");
-                MessageBox.Show($"打开3D定标窗口失败: {ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 

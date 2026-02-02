@@ -99,8 +99,6 @@ E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\PlatformHost.Wpf\
 E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\PlatformHost.Wpf\obj\Release\UI\FixedShotTestWindow.baml
 E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\PlatformHost.Wpf\obj\Release\UI\Create3DTemplateGuideWindow.baml
 E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\PlatformHost.Wpf\obj\Release\UI\LJDeveloperUserProjectSelectWindow.baml
-E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\PlatformHost.Wpf\obj\Release\UI\ThreeDMappingAnalysisWindow.baml
-E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\PlatformHost.Wpf\obj\Release\UI\ThreeDCalibrationWindow.baml
 E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\PlatformHost.Wpf\obj\Release\UI\ValidatorMachineParametersWindow.baml
 E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\PlatformHost.Wpf\obj\Release\UI\ValidatorMachineResultsWindow.baml
 E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\PlatformHost.Wpf\obj\Release\UI\SystemTestWindow.baml
@@ -143,8 +141,6 @@ E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\PlatformHost.Wpf\
 E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\PlatformHost.Wpf\obj\Release\UI\FixedShotTestWindow.g.cs
 E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\PlatformHost.Wpf\obj\Release\UI\Create3DTemplateGuideWindow.g.cs
 E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\PlatformHost.Wpf\obj\Release\UI\LJDeveloperUserProjectSelectWindow.g.cs
-E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\PlatformHost.Wpf\obj\Release\UI\ThreeDMappingAnalysisWindow.g.cs
-E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\PlatformHost.Wpf\obj\Release\UI\ThreeDCalibrationWindow.g.cs
 E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\PlatformHost.Wpf\obj\Release\UI\ValidatorMachineParametersWindow.g.cs
 E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\PlatformHost.Wpf\obj\Release\UI\ValidatorMachineResultsWindow.g.cs
 E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\PlatformHost.Wpf\obj\Release\UI\SystemTestWindow.g.cs
