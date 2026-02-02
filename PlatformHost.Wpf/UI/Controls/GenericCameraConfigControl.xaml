@@ -46,6 +46,17 @@
                 </Setter.Value>
             </Setter>
         </Style>
+        <Style x:Key="TriggerSourceComboBoxStyle" TargetType="ComboBox" BasedOn="{StaticResource InputComboBox}">
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="Foreground" Value="Black"/>
+            <Setter Property="ItemContainerStyle">
+                <Setter.Value>
+                    <Style TargetType="ComboBoxItem">
+                        <Setter Property="Foreground" Value="Black"/>
+                    </Style>
+                </Setter.Value>
+            </Setter>
+        </Style>
         <Style x:Key="ToggleCheckBox" TargetType="CheckBox">
             <Setter Property="Foreground" Value="White"/>
             <Setter Property="VerticalAlignment" Value="Center"/>
@@ -121,7 +132,7 @@
                 </Grid.RowDefinitions>
 
                 <TextBlock Grid.Row="0" Grid.Column="0" Text="触发源" Style="{StaticResource LabelText}"/>
-                <ComboBox Grid.Row="0" Grid.Column="1" x:Name="TriggerSourceComboBox" Style="{StaticResource InputComboBox}"/>
+                <ComboBox Grid.Row="0" Grid.Column="1" x:Name="TriggerSourceComboBox" Style="{StaticResource TriggerSourceComboBoxStyle}"/>
                 <TextBlock Grid.Row="0" Grid.Column="3" Text="触发使能" Style="{StaticResource LabelText}"/>
                 <CheckBox Grid.Row="0" Grid.Column="4" x:Name="TriggerEnableCheckBox" Content="启用" Style="{StaticResource ToggleCheckBox}"/>
 

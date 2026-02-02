@@ -82,36 +82,24 @@ namespace WpfApp2.UI
         {
             try
             {
-                var cameras = CameraCatalogManager.GetCameras();
-
-                if (cameras.Count >= 1 && FlyingCameraTitle != null)
+                if (FixedCamera1Title != null)
                 {
-                    FlyingCameraTitle.Text = cameras[0].Name;
-                    FlyingCameraPanel.Visibility = Visibility.Visible;
-                }
-                else if (FlyingCameraPanel != null)
-                {
-                    FlyingCameraPanel.Visibility = Visibility.Collapsed;
+                    FixedCamera1Title.Text = "图像源1";
                 }
 
-                if (cameras.Count >= 2 && FixedCamera1Title != null)
+                if (FixedCamera2Title != null)
                 {
-                    FixedCamera1Title.Text = cameras[1].Name;
+                    FixedCamera2Title.Text = "图像源2";
+                }
+
+                if (FixedCamera1Panel != null)
+                {
                     FixedCamera1Panel.Visibility = Visibility.Visible;
                 }
-                else if (FixedCamera1Panel != null)
-                {
-                    FixedCamera1Panel.Visibility = Visibility.Collapsed;
-                }
 
-                if (cameras.Count >= 3 && FixedCamera2Title != null)
+                if (FixedCamera2Panel != null)
                 {
-                    FixedCamera2Title.Text = cameras[2].Name;
                     FixedCamera2Panel.Visibility = Visibility.Visible;
-                }
-                else if (FixedCamera2Panel != null)
-                {
-                    FixedCamera2Panel.Visibility = Visibility.Collapsed;
                 }
             }
             catch (Exception ex)

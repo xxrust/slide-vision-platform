@@ -28,5 +28,20 @@
       "TriggerEnabled": true,
       "TriggerDelayUs": 0.0
     }
+  },
+  {
+    "Role": 0,
+    "CameraId": "Default",
+    "DisplayName": "默认相机",
+    "Vendor": "Hikvision",
+    "Model": "FlyingCam",
+    "SerialNumber": "",
+    "Settings": {
+      "ExposureTimeUs": 1000.0,
+      "Gain": 1.0,
+      "TriggerSource": 1,
+      "TriggerEnabled": true,
+      "TriggerDelayUs": 0.0
+    }
   }
 ]

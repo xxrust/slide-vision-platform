@@ -118,8 +118,7 @@ namespace WpfApp2.Hardware
         {
             return new List<CameraDefinition>
             {
-                new CameraDefinition { Id = "Flying", Name = "飞拍相机" },
-                new CameraDefinition { Id = "Fixed", Name = "定拍相机" }
+                new CameraDefinition { Id = "Default", Name = "默认相机" }
             };
         }
     }

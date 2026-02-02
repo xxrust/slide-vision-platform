@@ -1,12 +1,8 @@
 ﻿{
   "Cameras": [
     {
-      "Id": "Flying",
-      "Name": "飞拍相机"
-    },
-    {
-      "Id": "Fixed",
-      "Name": "定拍相机"
+      "Id": "Default",
+      "Name": "默认相机"
     }
   ]
 }

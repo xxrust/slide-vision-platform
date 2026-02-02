@@ -1,80 +1,33 @@
-本项目图像输入数量的修改方式（默认 1 张，最大 10 张）
+﻿相机配置方式说明
 
 目标
-- 默认只输入 1 张图像。
-- 通过配置 JSON 改动即可切换为 2 张或更多（最多 10），系统 UI/流程自动适配。
+- 硬件配置页的相机数量与名称由配置文件控制。
+- 相机基础参数（厂商/型号/序列号/曝光/增益/触发等）保存到独立配置文件。
 
-改动入口（首选）
-1) 配置文件：`PlatformHost.Wpf/Config/TemplateHierarchy.json`
-   - 每个 Profile 的 `ImageSources` 列表决定输入图数量与名称。
-   - `Id` / `DisplayName` 可任意命名，`_1`、`_2` 只是普通名称，不做特殊处理。
-   - 示例（1 张）：
-     - ImageSources: [{ Id: "Image1", DisplayName: "图像1" }]
-   - 示例（2 张）：
-     - ImageSources:
-       - { Id: "Image1", DisplayName: "图像1" }
-       - { Id: "Image2", DisplayName: "图像2" }
-   - 示例（4 张）：
-     - ImageSources:
-       - { Id: "Image1", DisplayName: "图像1" }
-       - { Id: "Image2", DisplayName: "图像2" }
-       - { Id: "Image3", DisplayName: "图像3" }
-       - { Id: "Image4", DisplayName: "图像4" }
+配置入口（首选）
+1) 相机目录配置（数量与名称）
+   - 文件：`PlatformHost.Wpf/Config/CameraCatalog.json`
+   - 结构：
+     {
+       "Cameras": [
+         { "Id": "Default", "Name": "默认相机" }
+       ]
+     }
+   - 说明：
+     - `Id` 用于相机参数配置的唯一标识，`Name` 用于 UI 显示。
+     - 增删列表项即可改变相机数量与名称。
 
-2) 默认回退配置（无 JSON 或 JSON 缺失时生效）
-   - `PlatformHost.Wpf/UI/Models/TemplateHierarchyConfig.cs`
-   - `CreateDefaultImageSources()` 返回默认图像源列表。
-   - 需要保持与 JSON 一致（目前默认 1 张）。
+2) 相机参数配置保存位置
+   - 文件：运行时写入 `Config/GenericCameraProfiles.json`
+   - 说明：每个相机会保存厂商/型号/序列号/曝光/增益/触发/延时等参数。
 
-核心适配逻辑（了解即可）
-- `PlatformHost.Wpf/UI/ImageSourceNaming.cs`
-  - `GetActiveSourceCount()` 读取当前 Profile 的图像数量（最少 1，最多 10）。
-  - `GetFolderCandidates(index)` 只使用 DisplayName / Id + 兜底名称：
-    - `图像源{n}`、`Image{n}`。
-  - 不再对 `_1` / `_2` 做任何特殊处理。
+UI 关联
+- 硬件配置页（HardwareConfigPage）：
+  - 按 `CameraCatalog.json` 渲染相机卡片列表；每页 2 台，超出可翻页。
+- 相机参数配置页（CameraConfigPage）：
+  - 标题与显示可按需调整；当前固定显示“图像源1/图像源2”。
 
-- `PlatformHost.Wpf/UI/Page1.xaml.cs`
-  - `GetRequired2DSourceCount()` 会将数量限制为 10。
-  - `BuildAlgorithmInput()` 以 `Source1..SourceN` 写入算法输入。
-  - `ImageGroupSet` 内部支持 10 路路径（`GetPath/SetSource`）。
-
-- `PlatformHost.Wpf/UI/TemplateConfigPage.xaml.cs`
-  - 图片预览布局：
-    - 1 张：`SingleImageContainer` 全屏占用。
-    - 2+ 张：`MultiImageContainer` 动态行高；4 张即 2x2。
-  - 图片标题颜色为绿色。
-  - 图像路径参数保存键：`图像源{n}路径`（n 从 1 开始）。
-  - 兼容读取旧键：`图像源2_1路径` / `图像源2_2路径`（仅回退，不再当特殊语义）。
-  - 点击“执行”会刷新 DataGrid 并更新预览。
-
-渲染图绑定（当前实现）
-- `TemplateConfigPage` 会读取 `Page1.LastAlgorithmResult.DebugInfo` 并绑定渲染图。
-- 每个步骤可配置参数：`渲染图Key`（字符串）
-  - 允许值示例：`Render.Composite` / `Render.Edge` / `OpenCV.Render.Preprocess`
-  - 也可以直接写 `Composite/Edge/Preprocess/Input`，系统会自动补 `Render.` 前缀。
-- 未配置 `渲染图Key` 时：
-  - 预设映射：ImageSelection/预处理/边缘/测量 与 Render.Input/Preprocess/Edge/Composite
-  - 其他步骤自动回退到可用的渲染图（优先 Composite）。
-
-目录约定与兼容
-- 推荐目录名：与 `DisplayName` 保持一致。
-- 兜底名称：`图像源{n}` / `Image{n}`。
-- 3D 目录固定为 `3D`。
-
-常见操作步骤（改为 2 张 / 4 张 / 10 张）
-1) 修改 `PlatformHost.Wpf/Config/TemplateHierarchy.json` 的 `ImageSources` 列表数量（最多 10）。
-2) 需要默认改动时同步 `TemplateHierarchyConfig.CreateDefaultImageSources()`。
-3) 确保模板/样本目录存在对应数量的图像源子目录（名称与 DisplayName 或兜底名一致）。
-4) 重新编译验证。
-
-编译命令（Release）
-- 常规：
-  - `D:\CodingSys\Microsoft Visual Studio\2022\Community\MSBuild\Current\Bin\MSBuild.exe .\GlueInspect.Platform.sln /p:Configuration=Release /m`
-- 若遇到 `GlueInspect.pdb` 被占用（锁定写入）：
-  - 关闭占用进程或删除 `PlatformHost.Wpf/obj/Release/GlueInspect.pdb` 后重编。
-  - 或用无 PDB 输出：
-    - `...\MSBuild.exe .\GlueInspect.Platform.sln /p:Configuration=Release /p:DebugType=None /p:DebugSymbols=false /m`
-
-注意事项
-- 修改图像源数量后，建议检查模板配置页的预览布局与自动匹配提示。
-- 如果模板中仍有旧键，会在读取时兼容；保存后统一使用 `图像源{n}路径`。
+常见操作步骤
+1) 修改 `PlatformHost.Wpf/Config/CameraCatalog.json` 的 `Cameras` 列表。
+2) 重新编译并运行主程序。
+3) 在硬件配置页修改相机参数并保存，生成/更新 `GenericCameraProfiles.json`。

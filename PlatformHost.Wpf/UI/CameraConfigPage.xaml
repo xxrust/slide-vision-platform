@@ -71,201 +71,10 @@
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="10"/>
                 <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="10"/>
-                <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
 
-            <!-- 飞拍相机配置区域 -->
-            <Border x:Name="FlyingCameraPanel" Grid.Column="0" 
-                    Background="#FF2A2A2A" 
-                    CornerRadius="10" 
-                    BorderBrush="#FF444444" 
-                    BorderThickness="2"
-                    Padding="20">
-                <Grid>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="400"/>
-                        <RowDefinition Height="*"/>
-                    </Grid.RowDefinitions>
-
-                    <!-- 飞拍相机标题 -->
-                    <TextBlock x:Name="FlyingCameraTitle" Grid.Row="0" 
-                               Text="飞拍相机" 
-                               FontSize="24" 
-                               FontWeight="Bold" 
-                               Foreground="#FF00D4FF" 
-                               HorizontalAlignment="Center" 
-                               Margin="0,0,0,20"/>
-
-                    <!-- 飞拍相机画面显示区域 -->
-                    <Border Grid.Row="1" 
-                            Background="#FF1A1A1A" 
-                            BorderBrush="#FF555555" 
-                            BorderThickness="2" 
-                            CornerRadius="5">
-                        <controls:ImageInspectionViewer x:Name="FlyingCameraRender"/>
-                    </Border>
-
-                    <!-- 飞拍相机参数配置区域 -->
-                    <StackPanel Grid.Row="2" Margin="0,20,0,0">
-                        <!-- 45度和0度光使能 -->
-                        <Grid Margin="0,0,0,15">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="120"/>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="*"/>
-                            </Grid.ColumnDefinitions>
-                            <TextBlock Grid.Column="0"
-                                       Text="光源使能:"
-                                       Foreground="White"
-                                       FontSize="16"
-                                       VerticalAlignment="Center"/>
-                            <CheckBox Grid.Column="1"
-                                      x:Name="Enable45DegreeCheckBox"
-                                      Content="45度光"
-                                      Foreground="White"
-                                      FontSize="14"
-                                      VerticalAlignment="Center"
-                                      HorizontalAlignment="Left"
-                                      Margin="0,0,10,0"
-                                      Checked="Enable45DegreeCheckBox_Checked"
-                                      Unchecked="Enable45DegreeCheckBox_Unchecked"/>
-                            <CheckBox Grid.Column="2"
-                                      x:Name="Enable0DegreeCheckBox"
-                                      Content="0度光"
-                                      Foreground="White"
-                                      FontSize="14"
-                                      VerticalAlignment="Center"
-                                      HorizontalAlignment="Left"
-                                      Checked="Enable0DegreeCheckBox_Checked"
-                                      Unchecked="Enable0DegreeCheckBox_Unchecked"/>
-                        </Grid>
-
-                        <!-- 曝光时间 -->
-                        <Grid Margin="0,0,0,15">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="120"/>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="60"/>
-                                <ColumnDefinition Width="25"/>
-                            </Grid.ColumnDefinitions>
-                            <TextBlock Grid.Column="0" 
-                                       Text="飞拍曝光时间:" 
-                                       Foreground="White" 
-                                       FontSize="16" 
-                                       VerticalAlignment="Center"/>
-                            <Slider Grid.Column="1" 
-                                    x:Name="FlyingExposureSlider" 
-                                    Minimum="5" 
-                                    Maximum="10" 
-                                    Value="8" 
-                                    TickFrequency="1"
-                                    IsSnapToTickEnabled="True"
-                                    VerticalAlignment="Center"
-                                    ValueChanged="FlyingExposureSlider_ValueChanged"/>
-                            <TextBox Grid.Column="2" 
-                                     x:Name="FlyingExposureTextBox" 
-                                     Text="8" 
-                                     FontSize="14" 
-                                     Padding="5" 
-                                     Background="#FF333333" 
-                                     Foreground="White" 
-                                     BorderBrush="#FF555555"
-                                     TextAlignment="Center"
-                                     TextChanged="FlyingExposureTextBox_TextChanged"/>
-                            <TextBlock Grid.Column="3"
-                                       Text="us"
-                                       Foreground="#FF888888"
-                                       FontSize="12"
-                                       VerticalAlignment="Center"
-                                       Margin="5,0,0,0"/>
-                        </Grid>
-
-                        <!-- 延迟时间 -->
-                        <Grid Margin="0,0,0,15">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="120"/>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="60"/>
-                                <ColumnDefinition Width="25"/>
-                            </Grid.ColumnDefinitions>
-                            <TextBlock Grid.Column="0" 
-                                       Text="飞拍延迟时间:" 
-                                       Foreground="White" 
-                                       FontSize="16" 
-                                       VerticalAlignment="Center"/>
-                            <Slider Grid.Column="1" 
-                                    x:Name="FlyingDelaySlider" 
-                                    Minimum="0" 
-                                    Maximum="10000" 
-                                    Value="0" 
-                                    TickFrequency="1"
-                                    IsSnapToTickEnabled="True"
-                                    VerticalAlignment="Center"
-                                    ValueChanged="FlyingDelaySlider_ValueChanged"/>
-                            <TextBox Grid.Column="2" 
-                                     x:Name="FlyingDelayTextBox" 
-                                     Text="0" 
-                                     FontSize="14" 
-                                     Padding="5" 
-                                     Background="#FF333333" 
-                                     Foreground="White" 
-                                     BorderBrush="#FF555555"
-                                     TextAlignment="Center"
-                                     TextChanged="FlyingDelayTextBox_TextChanged"/>
-                            <TextBlock Grid.Column="3"
-                                       Text="us"
-                                       Foreground="#FF888888"
-                                       FontSize="12"
-                                       VerticalAlignment="Center"
-                                       Margin="5,0,0,0"/>
-                        </Grid>
-
-                        <!-- 操作按钮 -->
-                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,20,0,0">
-                            <Button x:Name="FlyingApplyButton"
-                                    Click="FlyingApplyButton_Click"
-                                    Content="应用参数"
-                                    Width="240"
-                                    Padding="15,8"
-                                    Background="#FF007BFF"
-                                    Foreground="White"
-                                    BorderThickness="0"
-                                    FontSize="14"/>
-                        </StackPanel>
-
-                        <!-- 图像选择按钮 - 作为BLK图像 -->
-                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,10,0,0">
-                            <Button x:Name="FlyingAsLidButton"
-                                    Click="FlyingAsLidButton_Click"
-                                    Content="作为BLK图像"
-                                    Width="240"
-                                    Padding="15,8"
-                                    Background="#FF6C757D"
-                                    Foreground="White"
-                                    BorderThickness="0"
-                                    FontSize="14"/>
-                        </StackPanel>
-
-                        <!-- 图像选择按钮 - 作为镀膜图像 -->
-                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,10,0,0">
-                            <Button x:Name="FlyingAsCoatingButton"
-                                    Click="FlyingAsCoatingButton_Click"
-                                    Content="作为镀膜图像"
-                                    Width="240"
-                                    Padding="15,8"
-                                    Background="#FF6C757D"
-                                    Foreground="White"
-                                    BorderThickness="0"
-                                    FontSize="14"/>
-                        </StackPanel>
-                    </StackPanel>
-                </Grid>
-            </Border>
-
             <!-- 定拍相机1配置区域 -->
-            <Border x:Name="FixedCamera1Panel" Grid.Column="2" 
+            <Border x:Name="FixedCamera1Panel" Grid.Column="0" 
                     Background="#FF2A2A2A" 
                     CornerRadius="10" 
                     BorderBrush="#FF444444" 
@@ -280,7 +89,7 @@
 
                     <!-- 定拍相机1标题 -->
                     <TextBlock x:Name="FixedCamera1Title" Grid.Row="0" 
-                               Text="定拍相机 参数1" 
+                               Text="图像源1" 
                                FontSize="24" 
                                FontWeight="Bold" 
                                Foreground="#FF00D4FF" 
@@ -408,7 +217,7 @@
             </Border>
 
             <!-- 定拍相机2配置区域 -->
-            <Border x:Name="FixedCamera2Panel" Grid.Column="4" 
+            <Border x:Name="FixedCamera2Panel" Grid.Column="2" 
                     Background="#FF2A2A2A" 
                     CornerRadius="10" 
                     BorderBrush="#FF444444" 
@@ -423,7 +232,7 @@
 
                     <!-- 定拍相机2标题 -->
                     <TextBlock x:Name="FixedCamera2Title" Grid.Row="0" 
-                               Text="定拍相机 参数2" 
+                               Text="图像源2" 
                                FontSize="24" 
                                FontWeight="Bold" 
                                Foreground="#FF00D4FF" 
@@ -549,6 +358,20 @@
                     </StackPanel>
                 </Grid>
             </Border>
+
+            <!-- 隐藏的飞拍相机控件占位：用于兼容旧代码引用 -->
+            <Grid Visibility="Collapsed">
+                <controls:ImageInspectionViewer x:Name="FlyingCameraRender"/>
+                <CheckBox x:Name="Enable45DegreeCheckBox"/>
+                <CheckBox x:Name="Enable0DegreeCheckBox"/>
+                <Slider x:Name="FlyingExposureSlider"/>
+                <TextBox x:Name="FlyingExposureTextBox"/>
+                <Slider x:Name="FlyingDelaySlider"/>
+                <TextBox x:Name="FlyingDelayTextBox"/>
+                <Button x:Name="FlyingApplyButton"/>
+                <Button x:Name="FlyingAsLidButton"/>
+                <Button x:Name="FlyingAsCoatingButton"/>
+            </Grid>
         </Grid>
     </Grid>
 </Page> 

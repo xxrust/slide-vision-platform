@@ -121,8 +121,7 @@ namespace WpfApp2.Hardware
 
             return new Dictionary<string, GenericCameraProfile>(StringComparer.OrdinalIgnoreCase)
             {
-                { CameraRole.Flying.ToString(), CreateDefaultProfile(CameraRole.Flying.ToString(), "飞拍相机") },
-                { CameraRole.Fixed.ToString(), CreateDefaultProfile(CameraRole.Fixed.ToString(), "定拍相机") }
+                { "Default", CreateDefaultProfile("Default", "默认相机") }
             };
         }
 
