@@ -37,8 +37,8 @@
                          VerticalContentAlignment="Center"
                          Background="Transparent"
                          BorderThickness="0"
-                         IsReadOnly="True"
-                         IsReadOnlyCaretVisible="True"/>
+                         IsReadOnly="False"
+                         IsReadOnlyCaretVisible="False"/>
             </Border>
         </Grid>
 
