@@ -4567,21 +4567,6 @@ namespace WpfApp2.UI
                             await StartNGImageTesting(modeSelectionWindow.NGImageGroups);
                             break;
 
-                        case ImageTestModeSelectionWindow.TestMode.SevereNGDetection:
-                            // 严重NG检测
-                            await StartTemplateImageTesting(modeSelectionWindow.NGImageGroups, "严重NG检测");
-                            break;
-
-                        case ImageTestModeSelectionWindow.TestMode.ChallengeDetection:
-                            // 挑战件检测
-                            await StartTemplateImageTesting(modeSelectionWindow.NGImageGroups, "挑战件检测");
-                            break;
-
-                        case ImageTestModeSelectionWindow.TestMode.GoodDetection:
-                            // 良品检测
-                            await StartTemplateImageTesting(modeSelectionWindow.NGImageGroups, "良品检测");
-                            break;
-
                         case ImageTestModeSelectionWindow.TestMode.ValidatorMachineDetection:
                             // 验机图片检测 - 使用验机图片集文件夹
                             await StartValidatorMachineDetectionMode(
@@ -4596,21 +4581,6 @@ namespace WpfApp2.UI
                         
                         case ImageTestModeSelectionWindow.TestMode.CicdImageSetTest:
                             await StartCicdImageSetTestMode(modeSelectionWindow.CicdImageSetName);
-                            break;
-
-                        case ImageTestModeSelectionWindow.TestMode.SevereNGCollection:
-                            // 严重NG图集制作
-                            await StartImageCollectionMode("严重NG", "严重NG图集制作");
-                            break;
-
-                        case ImageTestModeSelectionWindow.TestMode.ChallengeCollection:
-                            // 挑战件图集制作
-                            await StartImageCollectionMode("挑战件", "挑战件图集制作");
-                            break;
-
-                        case ImageTestModeSelectionWindow.TestMode.GoodCollection:
-                            // 良品图集制作
-                            await StartImageCollectionMode("良品", "良品图集制作");
                             break;
 
                         case ImageTestModeSelectionWindow.TestMode.ValidatorMachineCollection:

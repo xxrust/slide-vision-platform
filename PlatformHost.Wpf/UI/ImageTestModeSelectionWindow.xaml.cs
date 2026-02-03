@@ -22,15 +22,9 @@ namespace WpfApp2.UI
         {
             CategoryMode,                      // 按类别查找（原有功能）
             NGNumberMode,                      // 按NG编号查找
-            SevereNGDetection,                 // 严重NG检测
-            ChallengeDetection,                // 挑战件检测
-            GoodDetection,                     // 良品检测
             ValidatorMachineDetection,         // 验机图片检测
             SingleSampleDynamicStaticDetection, // 单片动态/静态测试
             CicdImageSetTest,                  // CICD图片集测试
-            SevereNGCollection,                // 严重NG图集制作
-            ChallengeCollection,               // 挑战件图集制作
-            GoodCollection,                    // 良品图集制作
             ValidatorMachineCollection,        // 验机图片集制作
             SingleSampleDynamicStaticCollection, // 单片动态/静态测试集制作
             CicdImageSetCollection             // CICD图片集制作
@@ -198,30 +192,6 @@ namespace WpfApp2.UI
                         }
                     }
                 }
-                else if (SevereNGDetectionRadio.IsChecked == true)
-                {
-                    // 严重NG检测模式
-                    SelectedMode = TestMode.SevereNGDetection;
-                    NGImageGroups = await LoadTemplateImages("严重NG", "严重NG检测");
-                    if (NGImageGroups.Count == 0) return;
-                    LogManager.Info($"用户选择严重NG检测模式，找到 {NGImageGroups.Count} 组图片");
-                }
-                else if (ChallengeDetectionRadio.IsChecked == true)
-                {
-                    // 挑战件检测模式
-                    SelectedMode = TestMode.ChallengeDetection;
-                    NGImageGroups = await LoadTemplateImages("挑战件", "挑战件检测");
-                    if (NGImageGroups.Count == 0) return;
-                    LogManager.Info($"用户选择挑战件检测模式，找到 {NGImageGroups.Count} 组图片");
-                }
-                else if (GoodDetectionRadio.IsChecked == true)
-                {
-                    // 良品检测模式
-                    SelectedMode = TestMode.GoodDetection;
-                    NGImageGroups = await LoadTemplateImages("良品", "良品检测");
-                    if (NGImageGroups.Count == 0) return;
-                    LogManager.Info($"用户选择良品检测模式，找到 {NGImageGroups.Count} 组图片");
-                }
                 else if (ValidatorMachineDetectionRadio.IsChecked == true)
                 {
                     // 验机图片检测模式 - 从验机图片集目录中选择
@@ -314,24 +284,6 @@ namespace WpfApp2.UI
 
                     LogManager.Info("用户取消了CICD图片集选择");
                     return;
-                }
-                else if (SevereNGCollectionRadio.IsChecked == true)
-                {
-                    // 严重NG图集制作模式
-                    SelectedMode = TestMode.SevereNGCollection;
-                    LogManager.Info("用户选择严重NG图集制作模式");
-                }
-                else if (ChallengeCollectionRadio.IsChecked == true)
-                {
-                    // 挑战件图集制作模式
-                    SelectedMode = TestMode.ChallengeCollection;
-                    LogManager.Info("用户选择挑战件图集制作模式");
-                }
-                else if (GoodCollectionRadio.IsChecked == true)
-                {
-                    // 良品图集制作模式
-                    SelectedMode = TestMode.GoodCollection;
-                    LogManager.Info("用户选择良品图集制作模式");
                 }
                 else if (ValidatorMachineCollectionRadio.IsChecked == true)
                 {
