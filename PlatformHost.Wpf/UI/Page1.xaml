@@ -211,30 +211,6 @@
                         </Button>
                     </Border>
 
-                    <!-- 数据分析按钮 - 使用深紫色主题，图表图标 -->
-                    <Border Background="#FF8E44AD" BorderThickness="1" BorderBrush="#FF7D3C98" 
-                            Width="80" Height="40" Margin="8,0" CornerRadius="6">
-                        <Border.Effect>
-                            <DropShadowEffect Color="Black" Direction="315" ShadowDepth="2" Opacity="0.3"/>
-                        </Border.Effect>
-                        <Button x:Name="DataAnalysisButton" Click="DataAnalysisButton_Click" Padding="8" 
-                                Background="Transparent" BorderThickness="0" Cursor="Hand">
-                            <Button.Style>
-                                <Style TargetType="Button">
-                                    <Style.Triggers>
-                                        <Trigger Property="IsMouseOver" Value="True">
-                                            <Setter Property="Background" Value="#FFA569BD"/>
-                                        </Trigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </Button.Style>
-                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                                <TextBlock Text="📊" FontSize="14" Margin="0,0,8,0" VerticalAlignment="Center"/>
-                                <TextBlock Text="统计" VerticalAlignment="Center" FontSize="14" FontWeight="Medium" Foreground="White"/>
-                            </StackPanel>
-                        </Button>
-                    </Border>
-
                     <!-- 存图模式卡片 - 使用深色主题，磁盘图标 -->
                     <Border Background="#FF17A2B8" BorderThickness="1" BorderBrush="#FF138496" 
                             Width="140" Height="40" Margin="8,0" CornerRadius="6">
@@ -309,52 +285,6 @@
                             <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
                                 <TextBlock Text="⚠️" FontSize="14" Margin="0,0,8,0" VerticalAlignment="Center"/>
                                 <TextBlock Text="错误复位" VerticalAlignment="Center" FontSize="14" FontWeight="Bold" Foreground="White"/>
-                            </StackPanel>
-                        </Button>
-                    </Border>
-
-                    <!-- 相机配置按钮 - 使用蓝紫色主题，相机图标 -->
-                    <Border Background="#FF6C5CE7" BorderThickness="1" BorderBrush="#FF5A4FCF" 
-                            Width="40" Height="40" Margin="8,0" CornerRadius="6">
-                        <Border.Effect>
-                            <DropShadowEffect Color="Black" Direction="315" ShadowDepth="2" Opacity="0.3"/>
-                        </Border.Effect>
-                        <Button x:Name="CameraConfigButton" Click="CameraConfigButton_Click" Padding="8" 
-                                Background="Transparent" BorderThickness="0" Cursor="Hand">
-                            <Button.Style>
-                                <Style TargetType="Button">
-                                    <Style.Triggers>
-                                        <Trigger Property="IsMouseOver" Value="True">
-                                            <Setter Property="Background" Value="#FF7F7CE8"/>
-                                        </Trigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </Button.Style>
-                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                                <TextBlock Text="📷" FontSize="14" Margin="0,0,8,0" VerticalAlignment="Center"/>
-                            </StackPanel>
-                        </Button>
-                    </Border>
-
-                    <!-- 硬件配置按钮 - 使用黄色主题，设置图标 -->
-                    <Border Background="#FF084D64" BorderThickness="1" BorderBrush="#FFF39C12" 
-                           Width="40" Height="40" Margin="8,0" CornerRadius="6">
-                        <Border.Effect>
-                            <DropShadowEffect Color="Black" Direction="315" ShadowDepth="2" Opacity="0.3"/>
-                        </Border.Effect>
-                        <Button x:Name="HardwareConfigButton" Click="HardwareConfigButton_Click" Padding="8" 
-                               Background="Transparent" BorderThickness="0" Cursor="Hand">
-                            <Button.Style>
-                                <Style TargetType="Button">
-                                    <Style.Triggers>
-                                        <Trigger Property="IsMouseOver" Value="True">
-                                            <Setter Property="Background" Value="#FFF5B041"/>
-                                        </Trigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </Button.Style>
-                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                                <TextBlock Text="⚙️" FontSize="14" Margin="0,0,8,0" VerticalAlignment="Center"/>
                             </StackPanel>
                         </Button>
                     </Border>

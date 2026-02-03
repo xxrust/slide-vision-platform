@@ -8684,6 +8684,39 @@ namespace WpfApp2.UI
                         return Task.CompletedTask;
                     }),
                 new HelpMenuItem(
+                    "📷",
+                    "相机参数配置",
+                    new SolidColorBrush(Color.FromRgb(108, 92, 231)),
+                    Brushes.White,
+                    () =>
+                    {
+                        window.Close();
+                        CameraConfigButton_Click(null, null);
+                        return Task.CompletedTask;
+                    }),
+                new HelpMenuItem(
+                    "⚙️",
+                    "硬件配置",
+                    new SolidColorBrush(Color.FromRgb(241, 196, 15)),
+                    Brushes.Black,
+                    () =>
+                    {
+                        window.Close();
+                        HardwareConfigButton_Click(null, null);
+                        return Task.CompletedTask;
+                    }),
+                new HelpMenuItem(
+                    "📊",
+                    "统计",
+                    new SolidColorBrush(Color.FromRgb(142, 68, 173)),
+                    Brushes.White,
+                    () =>
+                    {
+                        window.Close();
+                        DataAnalysisButton_Click(null, null);
+                        return Task.CompletedTask;
+                    }),
+                new HelpMenuItem(
                     "📸",
                     "定拍测试",
                     new SolidColorBrush(Color.FromRgb(241, 196, 15)),
