@@ -142,7 +142,7 @@ namespace WpfApp2.UI.Controls {
                 return;
             }
             _contentLoaded = true;
-            System.Uri resourceLocater = new System.Uri("/GlueInspect;component/ui/controls/smartanalysiswidget.xaml", System.UriKind.Relative);
+            System.Uri resourceLocater = new System.Uri("/Slide;component/ui/controls/smartanalysiswidget.xaml", System.UriKind.Relative);
             
             #line 1 "..\..\..\..\UI\Controls\SmartAnalysisWidget.xaml"
             System.Windows.Application.LoadComponent(this, resourceLocater);

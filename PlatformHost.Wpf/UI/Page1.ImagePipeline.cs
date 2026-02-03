@@ -1,12 +1,12 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
-using GlueInspect.Algorithm.Contracts;
-using ContractsAlgorithmInput = GlueInspect.Algorithm.Contracts.AlgorithmInput;
+using Slide.Algorithm.Contracts;
+using ContractsAlgorithmInput = Slide.Algorithm.Contracts.AlgorithmInput;
 using Microsoft.Win32;
 using WpfApp2.Models;
 using WpfApp2.Algorithms;

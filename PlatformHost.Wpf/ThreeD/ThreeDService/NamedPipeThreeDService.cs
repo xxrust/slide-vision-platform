@@ -1,17 +1,17 @@
-using System;
+﻿using System;
 using System.Diagnostics;
 using System.IO;
-using GlueInspect.ThreeD.Contracts;
+using Slide.ThreeD.Contracts;
 
 namespace WpfApp2.ThreeD
 {
     /// <summary>
-    /// NamedPipe client for GlueInspect.ThreeD.Host.exe.
+    /// NamedPipe client for Slide.ThreeD.Host.exe.
     /// This type intentionally stays free of any Keyence/LjDev/Ljd references.
     /// </summary>
     public sealed class NamedPipeThreeDService : IThreeDService
     {
-        public const string DefaultPipeName = "GlueInspect.ThreeD";
+        public const string DefaultPipeName = "Slide.ThreeD";
 
         private readonly string _pipeName;
         private readonly string _hostExePath;
@@ -25,7 +25,7 @@ namespace WpfApp2.ThreeD
             _pipeName = string.IsNullOrWhiteSpace(pipeName) ? DefaultPipeName : pipeName;
 
             var baseDir = AppDomain.CurrentDomain.BaseDirectory;
-            _hostExePath = hostExePath ?? Path.Combine(baseDir, "GlueInspect.ThreeD.Host.exe");
+            _hostExePath = hostExePath ?? Path.Combine(baseDir, "Slide.ThreeD.Host.exe");
             _codeMeterCheckExePath = codeMeterCheckExePath ?? Path.Combine(baseDir, "CodeMeterCheck.exe");
         }
 

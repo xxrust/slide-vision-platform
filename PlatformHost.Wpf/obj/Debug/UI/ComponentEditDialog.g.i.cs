@@ -100,7 +100,7 @@ namespace WpfApp2.UI {
                 return;
             }
             _contentLoaded = true;
-            System.Uri resourceLocater = new System.Uri("/GlueInspect;component/ui/componenteditdialog.xaml", System.UriKind.Relative);
+            System.Uri resourceLocater = new System.Uri("/Slide;component/ui/componenteditdialog.xaml", System.UriKind.Relative);
             
             #line 1 "..\..\..\UI\ComponentEditDialog.xaml"
             System.Windows.Application.LoadComponent(this, resourceLocater);

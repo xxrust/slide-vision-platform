@@ -1,4 +1,4 @@
-﻿# GlueInspect Platform 架构图
+﻿# Slide Platform 架构图
 
 本文档记录通用算法平台与业务项目、算法插件的解耦架构。平台仅提供协议与加载机制，不依赖具体算法框架，业务项目只通过接口调用。
 
@@ -32,7 +32,7 @@
 |  - OpenCV 插件                                               |
 |  - ONNX 插件                                                 |
 |  - 自研插件                                                  |
-|  - 示例插件 (GlueInspect.Algorithm.Sample)                  |
+|  - 示例插件 (Slide.Algorithm.Sample)                  |
 +------------------------------+----------------------------+
 
 +-----------------------------------------------------------+
@@ -70,12 +70,12 @@
 
 ## 示例工程
 
-- 平台解决方案：`Platform/GlueInspect.Platform.sln`
-- 示例插件：`Platform/samples/GlueInspect.Algorithm.Sample`
-- 示例宿主：`Platform/samples/GlueInspect.Platform.SampleHost`
+- 平台解决方案：`Platform/Slide.Platform.sln`
+- 示例插件：`Platform/samples/Slide.Algorithm.Sample`
+- 示例宿主：`Platform/samples/Slide.Platform.SampleHost`
 
 ## 未来扩展
 
 - 支持配置化插件发现（JSON/DB）。
 - 支持插件版本治理与兼容性策略。
-- 支持沙盒运行、隔离与进程化部署（可选）。
+- 支持沙盒运行、隔离与进程化部署（可选）。

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using WpfApp2.Models;
 
 namespace WpfApp2.ThreeD
@@ -15,13 +15,13 @@ namespace WpfApp2.ThreeD
 
         /// <summary>
         /// 3D shielding switch for "run without 3D dongle / SDK".
-        /// Set env var `GLUEINSPECT_DISABLE_3D=1` (or true/yes) to force-disable 3D in main process.
+        /// Set env var `SLIDE_DISABLE_3D=1` (or true/yes) to force-disable 3D in main process.
         /// </summary>
         public static bool Is3DShielded
         {
             get
             {
-                return IsEnvTrue("GLUEINSPECT_DISABLE_3D") || IsEnvTrue("GLUEINSPECT_3D_SHIELD");
+                return IsEnvTrue("SLIDE_DISABLE_3D") || IsEnvTrue("SLIDE_3D_SHIELD");
             }
         }
 

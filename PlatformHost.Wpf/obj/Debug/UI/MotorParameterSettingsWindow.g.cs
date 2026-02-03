@@ -156,7 +156,7 @@ namespace WpfApp2.UI {
                 return;
             }
             _contentLoaded = true;
-            System.Uri resourceLocater = new System.Uri("/GlueInspect;component/ui/motorparametersettingswindow.xaml", System.UriKind.Relative);
+            System.Uri resourceLocater = new System.Uri("/Slide;component/ui/motorparametersettingswindow.xaml", System.UriKind.Relative);
             
             #line 1 "..\..\..\UI\MotorParameterSettingsWindow.xaml"
             System.Windows.Application.LoadComponent(this, resourceLocater);

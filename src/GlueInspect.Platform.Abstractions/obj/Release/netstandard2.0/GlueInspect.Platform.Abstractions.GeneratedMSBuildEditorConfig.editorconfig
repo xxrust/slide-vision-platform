@@ -1,8 +1,0 @@
-is_global = true
-build_property.RootNamespace = GlueInspect.Platform.Abstractions
-build_property.ProjectDir = E:\posen_project\自建算法平台\Platform\src\GlueInspect.Platform.Abstractions\
-build_property.EnableComHosting = 
-build_property.EnableGeneratedComInterfaceComImportInterop = 
-build_property.CsWinRTUseWindowsUIXamlProjections = false
-build_property.EffectiveAnalysisLevelStyle = 
-build_property.EnableCodeStyleSeverity = 

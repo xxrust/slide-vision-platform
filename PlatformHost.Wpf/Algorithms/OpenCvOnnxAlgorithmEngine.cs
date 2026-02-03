@@ -1,7 +1,7 @@
-using System;
+﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
-using GlueInspect.Algorithm.Contracts;
+using Slide.Algorithm.Contracts;
 
 namespace WpfApp2.Algorithms
 {

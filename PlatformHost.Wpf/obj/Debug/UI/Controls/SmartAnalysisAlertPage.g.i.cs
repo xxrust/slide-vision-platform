@@ -124,7 +124,7 @@ namespace WpfApp2.UI.Controls {
                 return;
             }
             _contentLoaded = true;
-            System.Uri resourceLocater = new System.Uri("/GlueInspect;component/ui/controls/smartanalysisalertpage.xaml", System.UriKind.Relative);
+            System.Uri resourceLocater = new System.Uri("/Slide;component/ui/controls/smartanalysisalertpage.xaml", System.UriKind.Relative);
             
             #line 1 "..\..\..\..\UI\Controls\SmartAnalysisAlertPage.xaml"
             System.Windows.Application.LoadComponent(this, resourceLocater);

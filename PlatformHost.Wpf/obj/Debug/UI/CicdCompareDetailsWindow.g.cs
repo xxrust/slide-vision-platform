@@ -260,7 +260,7 @@ namespace WpfApp2.UI {
                 return;
             }
             _contentLoaded = true;
-            System.Uri resourceLocater = new System.Uri("/GlueInspect;component/ui/cicdcomparedetailswindow.xaml", System.UriKind.Relative);
+            System.Uri resourceLocater = new System.Uri("/Slide;component/ui/cicdcomparedetailswindow.xaml", System.UriKind.Relative);
             
             #line 1 "..\..\..\UI\CicdCompareDetailsWindow.xaml"
             System.Windows.Application.LoadComponent(this, resourceLocater);

@@ -60,7 +60,7 @@ namespace WpfApp2.UI {
                 return;
             }
             _contentLoaded = true;
-            System.Uri resourceLocater = new System.Uri("/GlueInspect;component/ui/cicdimagesetparameterswindow.xaml", System.UriKind.Relative);
+            System.Uri resourceLocater = new System.Uri("/Slide;component/ui/cicdimagesetparameterswindow.xaml", System.UriKind.Relative);
             
             #line 1 "..\..\..\UI\CicdImageSetParametersWindow.xaml"
             System.Windows.Application.LoadComponent(this, resourceLocater);

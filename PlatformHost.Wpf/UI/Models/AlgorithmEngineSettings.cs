@@ -1,6 +1,6 @@
-using System;
+﻿using System;
 using System.IO;
-using GlueInspect.Algorithm.Contracts;
+using Slide.Algorithm.Contracts;
 using Newtonsoft.Json;
 
 namespace WpfApp2.UI.Models

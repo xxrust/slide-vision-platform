@@ -102,12 +102,12 @@
 
 - 已验证插件（示例）：
   - OpenCV 插件 DLL：
-    `E:\\posen_project\\点胶检测\\上位机程序\\WpfApp2\\Platform\\plugins\\GlueInspect.Algorithm.OpenCv\\bin\\Debug\\netstandard2.0\\GlueInspect.Algorithm.OpenCv.dll`
+    `E:\\posen_project\\点胶检测\\上位机程序\\WpfApp2\\Platform\\plugins\\Slide.Algorithm.OpenCv\\bin\\Debug\\netstandard2.0\\Slide.Algorithm.OpenCv.dll`
   - ONNX 插件 DLL：
-    `E:\\posen_project\\点胶检测\\上位机程序\\WpfApp2\\Platform\\plugins\\GlueInspect.Algorithm.Onnx\\bin\\Debug\\netstandard2.0\\GlueInspect.Algorithm.Onnx.dll`
+    `E:\\posen_project\\点胶检测\\上位机程序\\WpfApp2\\Platform\\plugins\\Slide.Algorithm.Onnx\\bin\\Debug\\netstandard2.0\\Slide.Algorithm.Onnx.dll`
 
 - 已验证插件运行宿主：
-  `E:\\posen_project\\点胶检测\\上位机程序\\WpfApp2\\Platform\\samples\\GlueInspect.Platform.SampleHost`
+  `E:\\posen_project\\点胶检测\\上位机程序\\WpfApp2\\Platform\\samples\\Slide.Platform.SampleHost`
 
 - 已验证示例资源：
   - OpenCV 输入图像：

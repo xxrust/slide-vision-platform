@@ -1,5 +1,5 @@
-using System;
-using GlueInspect.ThreeD.Contracts;
+﻿using System;
+using Slide.ThreeD.Contracts;
 
 namespace WpfApp2.ThreeD
 {

@@ -15,8 +15,8 @@
 - PlatformHost.Wpf/UI/ConfigPage.xaml(+.cs) (创建流程改为模板档案选择)
 - PlatformHost.Wpf/MainWindow.xaml.cs (加载模板改为 ProfileId)
 - PlatformHost.Wpf/UI/Page1.xaml.cs (算法输入与占位指标改为 ProfileId)
-- PlatformHost.Wpf/Algorithms/GlueInspect.Algorithm.Contracts/AlgorithmContracts.cs (新增 TemplateProfileId/Name)
-- PlatformHost.Wpf/Algorithms/GlueInspect.Algorithm.OpenCV/OpenCvAlgorithmEngine.cs (Demo 逻辑改为 profile-basic)
+- PlatformHost.Wpf/Algorithms/Slide.Algorithm.Contracts/AlgorithmContracts.cs (新增 TemplateProfileId/Name)
+- PlatformHost.Wpf/Algorithms/Slide.Algorithm.OpenCV/OpenCvAlgorithmEngine.cs (Demo 逻辑改为 profile-basic)
 - PlatformHost.Wpf/UI/Ljd3DDetectionWindow.xaml.cs (去 MESA 默认路径)
 - PlatformHost.Wpf/UI/Models/RealTimeDataExportConfig.cs + Config/RealTimeDataExportConfig.json (默认模板名去业务化)
 - skill_开发中.md (补充 TemplateHierarchy.json 与示例业务说明)
@@ -24,4 +24,4 @@
 要求：
 - 如果已完成，保持不改并直接输出 <promise>COMPLETE</promise>。
 - 只修改上述范围内文件。
-- 完成后输出 <promise>COMPLETE</promise>。
+- 完成后输出 <promise>COMPLETE</promise>。

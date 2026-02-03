@@ -1,9 +1,0 @@
-E:\posen_project\点胶检测\上位机程序\WpfApp2\Algorithms\GlueInspect.Algorithm.VM\bin\Release\GlueInspect.Algorithm.VM.dll
-E:\posen_project\点胶检测\上位机程序\WpfApp2\Algorithms\GlueInspect.Algorithm.VM\bin\Release\GlueInspect.Algorithm.VM.pdb
-E:\posen_project\点胶检测\上位机程序\WpfApp2\Algorithms\GlueInspect.Algorithm.VM\bin\Release\GlueInspect.Algorithm.Contracts.dll
-E:\posen_project\点胶检测\上位机程序\WpfApp2\Algorithms\GlueInspect.Algorithm.VM\bin\Release\GlueInspect.Algorithm.Contracts.pdb
-E:\posen_project\点胶检测\上位机程序\WpfApp2\Algorithms\GlueInspect.Algorithm.VM\obj\Release\GlueInspect.Algorithm.VM.csproj.AssemblyReference.cache
-E:\posen_project\点胶检测\上位机程序\WpfApp2\Algorithms\GlueInspect.Algorithm.VM\obj\Release\GlueInspect.Algorithm.VM.csproj.CoreCompileInputs.cache
-E:\posen_project\点胶检测\上位机程序\WpfApp2\Algorithms\GlueInspect.Algorithm.VM\obj\Release\GlueInsp.5FD7514B.Up2Date
-E:\posen_project\点胶检测\上位机程序\WpfApp2\Algorithms\GlueInspect.Algorithm.VM\obj\Release\GlueInspect.Algorithm.VM.dll
-E:\posen_project\点胶检测\上位机程序\WpfApp2\Algorithms\GlueInspect.Algorithm.VM\obj\Release\GlueInspect.Algorithm.VM.pdb

@@ -1,8 +1,8 @@
-using System;
+﻿using System;
 using System.IO;
 using System.IO.Pipes;
 using System.Runtime.Serialization.Json;
-using GlueInspect.ThreeD.Contracts;
+using Slide.ThreeD.Contracts;
 
 namespace WpfApp2.ThreeD
 {

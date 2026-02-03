@@ -1,5 +1,5 @@
 ﻿using System;
-using GlueInspect.Algorithm.Contracts;
+using Slide.Algorithm.Contracts;
 
 namespace WpfApp2.Algorithms
 {
@@ -12,4 +12,4 @@ namespace WpfApp2.Algorithms
 
         public AlgorithmResult Result { get; }
     }
-}
+}
