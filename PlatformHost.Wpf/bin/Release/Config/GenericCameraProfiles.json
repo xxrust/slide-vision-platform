@@ -9,6 +9,8 @@
     "Settings": {
       "ExposureTimeUs": 1000.0,
       "Gain": 1.0,
+      "PixelFormat": "Mono8",
+      "FrameRate": 0.0,
       "TriggerSource": 1,
       "TriggerEnabled": true,
       "TriggerDelayUs": 0.0
@@ -24,6 +26,8 @@
     "Settings": {
       "ExposureTimeUs": 1000.0,
       "Gain": 1.0,
+      "PixelFormat": "Mono8",
+      "FrameRate": 0.0,
       "TriggerSource": 1,
       "TriggerEnabled": true,
       "TriggerDelayUs": 0.0
@@ -33,14 +37,16 @@
     "Role": 0,
     "CameraId": "Default",
     "DisplayName": "默认相机",
-    "Vendor": "Hikvision",
-    "Model": "FlyingCam",
+    "Vendor": "OPT",
+    "Model": "",
     "SerialNumber": "",
     "Settings": {
       "ExposureTimeUs": 1000.0,
       "Gain": 1.0,
+      "PixelFormat": "Mono8",
+      "FrameRate": 0.0,
       "TriggerSource": 1,
-      "TriggerEnabled": true,
+      "TriggerEnabled": false,
       "TriggerDelayUs": 0.0
     }
   }

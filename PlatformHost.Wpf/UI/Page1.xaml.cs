@@ -8734,6 +8734,17 @@ namespace WpfApp2.UI
                         return Task.CompletedTask;
                     }),
                 new HelpMenuItem(
+                    "🔌",
+                    "PLC 串口配置",
+                    new SolidColorBrush(Color.FromRgb(52, 152, 219)),
+                    Brushes.White,
+                    () =>
+                    {
+                        window.Close();
+                        OpenPlcSerialConfigWindow();
+                        return Task.CompletedTask;
+                    }),
+                new HelpMenuItem(
                     "📤",
                     "实时数据导出",
                     new SolidColorBrush(Color.FromRgb(96, 125, 139)),
@@ -9660,6 +9671,33 @@ namespace WpfApp2.UI
             {
                 LogUpdate($"处理数据队列清空操作时出错: {ex.Message}");
                 MessageBox.Show($"操作失败: {ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        /// <summary>
+        /// 打开PLC串口配置窗口
+        /// </summary>
+        private void OpenPlcSerialConfigWindow()
+        {
+            try
+            {
+                var plcConfigWindow = new Window
+                {
+                    Title = "PLC串口配置与测试",
+                    Width = 1200,
+                    Height = 800,
+                    WindowStartupLocation = WindowStartupLocation.CenterOwner,
+                    Owner = Window.GetWindow(this),
+                    Content = new PLCSerialConfigPage()
+                };
+
+                plcConfigWindow.ShowDialog();
+                LogUpdate("已打开PLC串口配置窗口");
+            }
+            catch (Exception ex)
+            {
+                LogUpdate($"打开PLC串口配置窗口失败: {ex.Message}");
+                MessageBox.Show($"打开PLC串口配置窗口失败: {ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 

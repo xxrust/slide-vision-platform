@@ -1841,3 +1841,152 @@
 [2026-02-03 14:19:02] INFO: IO控制器初始化失败，程序将继续运行但IO功能不可用
 [2026-02-03 14:19:03] INFO: 程序启动完成
 [2026-02-03 14:19:03] INFO: 主窗口已创建并显示
+[2026-02-03 14:24:01] INFO: 单实例互斥体已释放
+[2026-02-03 14:24:01] INFO: IO控制器资源已释放
+[2026-02-03 14:24:01] INFO: 程序正常退出
+[2026-02-03 14:32:32] INFO: 程序开始启动
+[2026-02-03 14:32:32] INFO: === 启动诊断开始 ===
+[2026-02-03 14:32:32] INFO: 程序版本: 1.0.0.0
+[2026-02-03 14:32:32] INFO: 操作系统: Microsoft Windows NT 6.2.9200.0
+[2026-02-03 14:32:32] INFO: 系统架构: X64
+[2026-02-03 14:32:32] INFO: 进程架构: X86
+[2026-02-03 14:32:32] INFO: .NET版本: .NET Framework 4.8.9310.0
+[2026-02-03 14:32:32] INFO: 工作目录: E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\PlatformHost.Wpf\bin\Release
+[2026-02-03 14:32:32] INFO: 程序目录: E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\PlatformHost.Wpf\bin\Release
+[2026-02-03 14:32:32] INFO: 用户权限: liangyuhang
+[2026-02-03 14:32:32] INFO: 机器名: 梁宇航
+[2026-02-03 14:32:32] INFO: 检查关键DLL文件:
+[2026-02-03 14:32:32] INFO:   ✓ ScottPlot.dll - 大小: 1124352 bytes, 修改时间: 2025/1/27 5:08:42
+[2026-02-03 14:32:32] INFO:   ✓ ScottPlot.WPF.dll - 大小: 26112 bytes, 修改时间: 2025/1/27 5:09:44
+[2026-02-03 14:32:32] INFO:   ✓ EPPlus.dll - 大小: 1299456 bytes, 修改时间: 2020/1/30 15:13:00
+[2026-02-03 14:32:32] INFO:   ✓ System.Drawing.Common.dll - 大小: 44424 bytes, 修改时间: 2021/1/20 4:29:18
+[2026-02-03 14:32:32] INFO: 
+检查原生DLL文件:
+[2026-02-03 14:32:32] ERROR: Dll/Managed目录不存在 - 这是程序无法启动的主要原因!
+[2026-02-03 14:32:32] INFO: .NET Framework Release版本: 533320
+[2026-02-03 14:32:32] INFO: ✓ .NET Framework 4.7.2或更高版本已安装
+[2026-02-03 14:32:32] INFO: === 系统环境检查完成 ===
+[2026-02-03 14:32:33] INFO: IO控制器初始化失败，程序将继续运行但IO功能不可用
+[2026-02-03 14:32:34] INFO: 程序启动完成
+[2026-02-03 14:32:35] INFO: 主窗口已创建并显示
+[2026-02-03 14:33:41] INFO: 单实例互斥体已释放
+[2026-02-03 14:33:41] INFO: IO控制器资源已释放
+[2026-02-03 14:33:41] INFO: 程序正常退出
+[2026-02-03 17:09:26] INFO: 程序开始启动
+[2026-02-03 17:09:26] INFO: === 启动诊断开始 ===
+[2026-02-03 17:09:26] INFO: 程序版本: 1.0.0.0
+[2026-02-03 17:09:26] INFO: 操作系统: Microsoft Windows NT 6.2.9200.0
+[2026-02-03 17:09:26] INFO: 系统架构: X64
+[2026-02-03 17:09:26] INFO: 进程架构: X86
+[2026-02-03 17:09:26] INFO: .NET版本: .NET Framework 4.8.9310.0
+[2026-02-03 17:09:26] INFO: 工作目录: E:\posen_project\自建算法平台\Platform\PlatformHost.Wpf\bin\Release
+[2026-02-03 17:09:26] INFO: 程序目录: E:\posen_project\自建算法平台\Platform\PlatformHost.Wpf\bin\Release
+[2026-02-03 17:09:26] INFO: 用户权限: liangyuhang
+[2026-02-03 17:09:26] INFO: 机器名: 梁宇航
+[2026-02-03 17:09:26] INFO: 检查关键DLL文件:
+[2026-02-03 17:09:26] INFO:   ✓ ScottPlot.dll - 大小: 1124352 bytes, 修改时间: 2025/1/27 5:08:42
+[2026-02-03 17:09:26] INFO:   ✓ ScottPlot.WPF.dll - 大小: 26112 bytes, 修改时间: 2025/1/27 5:09:44
+[2026-02-03 17:09:26] INFO:   ✓ EPPlus.dll - 大小: 1299456 bytes, 修改时间: 2020/1/30 15:13:00
+[2026-02-03 17:09:26] INFO:   ✓ System.Drawing.Common.dll - 大小: 44424 bytes, 修改时间: 2021/1/20 4:29:18
+[2026-02-03 17:09:26] INFO: 
+检查原生DLL文件:
+[2026-02-03 17:09:26] ERROR: Dll/Managed目录不存在 - 这是程序无法启动的主要原因!
+[2026-02-03 17:09:26] INFO: .NET Framework Release版本: 533320
+[2026-02-03 17:09:26] INFO: ✓ .NET Framework 4.7.2或更高版本已安装
+[2026-02-03 17:09:26] INFO: === 系统环境检查完成 ===
+[2026-02-03 17:09:27] INFO: IO控制器初始化失败，程序将继续运行但IO功能不可用
+[2026-02-03 17:09:28] INFO: 程序启动完成
+[2026-02-03 17:09:29] INFO: 主窗口已创建并显示
+[2026-02-03 18:10:49] INFO: 单实例互斥体已释放
+[2026-02-03 18:10:49] INFO: IO控制器资源已释放
+[2026-02-03 18:10:49] INFO: 程序正常退出
+[2026-02-03 20:52:40] INFO: 程序开始启动
+[2026-02-03 20:52:40] INFO: === 启动诊断开始 ===
+[2026-02-03 20:52:40] INFO: 程序版本: 1.0.0.0
+[2026-02-03 20:52:40] INFO: 操作系统: Microsoft Windows NT 6.2.9200.0
+[2026-02-03 20:52:40] INFO: 系统架构: X64
+[2026-02-03 20:52:40] INFO: 进程架构: X86
+[2026-02-03 20:52:40] INFO: .NET版本: .NET Framework 4.8.9310.0
+[2026-02-03 20:52:40] INFO: 工作目录: E:\posen_project\自建算法平台\Platform\PlatformHost.Wpf\bin\Release
+[2026-02-03 20:52:40] INFO: 程序目录: E:\posen_project\自建算法平台\Platform\PlatformHost.Wpf\bin\Release
+[2026-02-03 20:52:40] INFO: 用户权限: liangyuhang
+[2026-02-03 20:52:40] INFO: 机器名: 梁宇航
+[2026-02-03 20:52:40] INFO: 检查关键DLL文件:
+[2026-02-03 20:52:41] INFO:   ✓ ScottPlot.dll - 大小: 1124352 bytes, 修改时间: 2025/1/27 5:08:42
+[2026-02-03 20:52:41] INFO:   ✓ ScottPlot.WPF.dll - 大小: 26112 bytes, 修改时间: 2025/1/27 5:09:44
+[2026-02-03 20:52:41] INFO:   ✓ EPPlus.dll - 大小: 1299456 bytes, 修改时间: 2020/1/30 15:13:00
+[2026-02-03 20:52:41] INFO:   ✓ System.Drawing.Common.dll - 大小: 44424 bytes, 修改时间: 2021/1/20 4:29:18
+[2026-02-03 20:52:41] INFO: 
+检查原生DLL文件:
+[2026-02-03 20:52:41] ERROR: Dll/Managed目录不存在 - 这是程序无法启动的主要原因!
+[2026-02-03 20:52:41] INFO: .NET Framework Release版本: 533320
+[2026-02-03 20:52:41] INFO: ✓ .NET Framework 4.7.2或更高版本已安装
+[2026-02-03 20:52:41] INFO: === 系统环境检查完成 ===
+[2026-02-03 20:52:42] INFO: IO控制器初始化失败，程序将继续运行但IO功能不可用
+[2026-02-03 20:52:43] INFO: 程序启动完成
+[2026-02-03 20:52:43] INFO: 主窗口已创建并显示
+[2026-02-03 20:53:45] ERROR: 发生UI线程未处理的异常
+Exception: System.BadImageFormatException: 未能加载文件或程序集“SciCamera.Net, Version=1.5.7.2, Culture=neutral, PublicKeyToken=null”或它的某一个依赖项。试图加载格式不正确的程序。
+文件名:“SciCamera.Net, Version=1.5.7.2, Culture=neutral, PublicKeyToken=null”
+   在 WpfApp2.UI.Controls.GenericCameraConfigControl.EnsureLists()
+   在 WpfApp2.UI.Controls.GenericCameraConfigControl.GenericCameraConfigControl_Loaded(Object sender, RoutedEventArgs e) 位置 E:\posen_project\自建算法平台\Platform\PlatformHost.Wpf\UI\Controls\GenericCameraConfigControl.xaml.cs:行号 46
+   在 System.Windows.RoutedEventHandlerInfo.InvokeHandler(Object target, RoutedEventArgs routedEventArgs)
+   在 System.Windows.EventRoute.InvokeHandlersImpl(Object source, RoutedEventArgs args, Boolean reRaised)
+   在 System.Windows.UIElement.RaiseEventImpl(DependencyObject sender, RoutedEventArgs args)
+   在 System.Windows.UIElement.RaiseEvent(RoutedEventArgs e)
+   在 System.Windows.BroadcastEventHelper.BroadcastEvent(DependencyObject root, RoutedEvent routedEvent)
+   在 System.Windows.BroadcastEventHelper.BroadcastLoadedEvent(Object root)
+   在 MS.Internal.LoadedOrUnloadedOperation.DoWork()
+   在 System.Windows.Media.MediaContext.FireLoadedPendingCallbacks()
+   在 System.Windows.Media.MediaContext.FireInvokeOnRenderCallbacks()
+   在 System.Windows.Media.MediaContext.RenderMessageHandlerCore(Object resizedCompositionTarget)
+   在 System.Windows.Media.MediaContext.RenderMessageHandler(Object resizedCompositionTarget)
+   在 System.Windows.Threading.ExceptionWrapper.InternalRealCall(Delegate callback, Object args, Int32 numArgs)
+   在 System.Windows.Threading.ExceptionWrapper.TryCatchWhen(Object source, Delegate callback, Object args, Int32 numArgs, Delegate catchHandler)
+
+=== 预绑定状态信息 ===
+日志: DisplayName = SciCamera.Net, Version=1.5.7.2, Culture=neutral, PublicKeyToken=null
+ (Fully-specified)
+日志: Appbase = file:///E:/posen_project/自建算法平台/Platform/PlatformHost.Wpf/bin/Release/
+日志: 初始 PrivatePath = NULL
+调用程序集: GlueInspect, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null。
+===
+日志: 此绑定从 default 加载上下文开始。
+日志: 正在使用应用程序配置文件: E:\posen_project\自建算法平台\Platform\PlatformHost.Wpf\bin\Release\GlueInspect.exe.Config
+日志: 使用主机配置文件: 
+日志: 使用 C:\Windows\Microsoft.NET\Framework\v4.0.30319\config\machine.config 的计算机配置文件。
+日志: 此时没有为引用应用策略(私有、自定义、分部或基于位置的程序集绑定)。
+日志: 尝试下载新的 URL file:///E:/posen_project/自建算法平台/Platform/PlatformHost.Wpf/bin/Release/SciCamera.Net.DLL。
+错误: 未能完成程序集的安装(hr = 0x8007000b)。探测终止。
+
+[2026-02-03 20:58:09] INFO: 单实例互斥体已释放
+[2026-02-03 20:58:09] INFO: IO控制器资源已释放
+[2026-02-03 20:58:09] INFO: 程序正常退出
+[2026-02-03 20:59:02] INFO: 程序开始启动
+[2026-02-03 20:59:02] INFO: === 启动诊断开始 ===
+[2026-02-03 20:59:02] INFO: 程序版本: 1.0.0.0
+[2026-02-03 20:59:02] INFO: 操作系统: Microsoft Windows NT 6.2.9200.0
+[2026-02-03 20:59:02] INFO: 系统架构: X64
+[2026-02-03 20:59:02] INFO: 进程架构: X64
+[2026-02-03 20:59:02] INFO: .NET版本: .NET Framework 4.8.9310.0
+[2026-02-03 20:59:02] INFO: 工作目录: E:\posen_project\自建算法平台\Platform\PlatformHost.Wpf\bin\Release
+[2026-02-03 20:59:02] INFO: 程序目录: E:\posen_project\自建算法平台\Platform\PlatformHost.Wpf\bin\Release
+[2026-02-03 20:59:02] INFO: 用户权限: liangyuhang
+[2026-02-03 20:59:02] INFO: 机器名: 梁宇航
+[2026-02-03 20:59:02] INFO: 检查关键DLL文件:
+[2026-02-03 20:59:02] INFO:   ✓ ScottPlot.dll - 大小: 1124352 bytes, 修改时间: 2025/1/27 5:08:42
+[2026-02-03 20:59:02] INFO:   ✓ ScottPlot.WPF.dll - 大小: 26112 bytes, 修改时间: 2025/1/27 5:09:44
+[2026-02-03 20:59:02] INFO:   ✓ EPPlus.dll - 大小: 1299456 bytes, 修改时间: 2020/1/30 15:13:00
+[2026-02-03 20:59:02] INFO:   ✓ System.Drawing.Common.dll - 大小: 44424 bytes, 修改时间: 2021/1/20 4:29:18
+[2026-02-03 20:59:02] INFO: 
+检查原生DLL文件:
+[2026-02-03 20:59:02] ERROR: Dll/Managed目录不存在 - 这是程序无法启动的主要原因!
+[2026-02-03 20:59:02] INFO: .NET Framework Release版本: 533320
+[2026-02-03 20:59:02] INFO: ✓ .NET Framework 4.7.2或更高版本已安装
+[2026-02-03 20:59:02] INFO: === 系统环境检查完成 ===
+[2026-02-03 20:59:03] INFO: IO控制器初始化失败，程序将继续运行但IO功能不可用
+[2026-02-03 20:59:04] INFO: 程序启动完成
+[2026-02-03 20:59:04] INFO: 主窗口已创建并显示
+[2026-02-03 21:03:50] INFO: 单实例互斥体已释放
+[2026-02-03 21:03:50] INFO: IO控制器资源已释放
+[2026-02-03 21:03:50] INFO: 程序正常退出

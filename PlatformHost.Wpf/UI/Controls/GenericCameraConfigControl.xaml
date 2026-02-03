@@ -29,33 +29,27 @@
         <Style x:Key="InputComboBox" TargetType="ComboBox">
             <Setter Property="Height" Value="28"/>
             <Setter Property="Margin" Value="0,2,0,8"/>
-            <Setter Property="Background" Value="#FF1E2D3D"/>
-            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="Foreground" Value="Black"/>
             <Setter Property="BorderBrush" Value="#FF3F5873"/>
             <Setter Property="BorderThickness" Value="1"/>
             <Setter Property="Padding" Value="4,2"/>
+            <Setter Property="ItemContainerStyle">
+                <Setter.Value>
+                    <Style TargetType="ComboBoxItem">
+                        <Setter Property="Background" Value="White"/>
+                        <Setter Property="Foreground" Value="Black"/>
+                    </Style>
+                </Setter.Value>
+            </Setter>
         </Style>
         <Style x:Key="VendorComboBoxStyle" TargetType="ComboBox" BasedOn="{StaticResource InputComboBox}">
             <Setter Property="Background" Value="White"/>
             <Setter Property="Foreground" Value="Black"/>
-            <Setter Property="ItemContainerStyle">
-                <Setter.Value>
-                    <Style TargetType="ComboBoxItem">
-                        <Setter Property="Foreground" Value="Black"/>
-                    </Style>
-                </Setter.Value>
-            </Setter>
         </Style>
         <Style x:Key="TriggerSourceComboBoxStyle" TargetType="ComboBox" BasedOn="{StaticResource InputComboBox}">
             <Setter Property="Background" Value="White"/>
             <Setter Property="Foreground" Value="Black"/>
-            <Setter Property="ItemContainerStyle">
-                <Setter.Value>
-                    <Style TargetType="ComboBoxItem">
-                        <Setter Property="Foreground" Value="Black"/>
-                    </Style>
-                </Setter.Value>
-            </Setter>
         </Style>
         <Style x:Key="ToggleCheckBox" TargetType="CheckBox">
             <Setter Property="Foreground" Value="White"/>
@@ -67,6 +61,15 @@
             <Setter Property="MinWidth" Value="110"/>
             <Setter Property="Padding" Value="12,0"/>
             <Setter Property="Background" Value="#FF3498DB"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="BorderThickness" Value="0"/>
+        </Style>
+        <Style x:Key="SmallButton" TargetType="Button">
+            <Setter Property="Height" Value="26"/>
+            <Setter Property="MinWidth" Value="70"/>
+            <Setter Property="Padding" Value="10,0"/>
+            <Setter Property="Background" Value="#FF2ECC71"/>
             <Setter Property="Foreground" Value="White"/>
             <Setter Property="FontWeight" Value="Bold"/>
             <Setter Property="BorderThickness" Value="0"/>
@@ -87,6 +90,8 @@
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
 
                 <TextBlock Grid.Row="0" Grid.Column="0" Text="厂商" Style="{StaticResource LabelText}"/>
@@ -96,6 +101,19 @@
 
                 <TextBlock Grid.Row="1" Grid.Column="0" Text="序列号" Style="{StaticResource LabelText}"/>
                 <TextBox Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="4" x:Name="SerialTextBox" Style="{StaticResource InputTextBox}"/>
+
+                <TextBlock Grid.Row="2" Grid.Column="0" Text="设备列表" Style="{StaticResource LabelText}"/>
+                <ComboBox Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="3" x:Name="DeviceComboBox"
+                          Style="{StaticResource InputComboBox}" DisplayMemberPath="DisplayName"/>
+                <Button Grid.Row="2" Grid.Column="4" x:Name="RefreshDeviceButton" Content="刷新"
+                        Style="{StaticResource SmallButton}" Click="RefreshDeviceButton_Click"/>
+
+                <TextBlock Grid.Row="3" Grid.Column="0" Text="绑定" Style="{StaticResource LabelText}"/>
+                <Button Grid.Row="3" Grid.Column="1" x:Name="BindDeviceButton" Content="绑定设备"
+                        Style="{StaticResource SmallButton}" Click="BindDeviceButton_Click"/>
+                <TextBlock Grid.Row="3" Grid.Column="3" Grid.ColumnSpan="2" x:Name="DeviceStatusText"
+                           Text="未绑定" Foreground="#FF95A5A6" FontSize="12"
+                           VerticalAlignment="Center"/>
             </Grid>
 
             <TextBlock Text="成像参数" Style="{StaticResource SectionTitleText}"/>
@@ -109,12 +127,18 @@
                 </Grid.ColumnDefinitions>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
 
                 <TextBlock Grid.Row="0" Grid.Column="0" Text="曝光(us)" Style="{StaticResource LabelText}"/>
                 <TextBox Grid.Row="0" Grid.Column="1" x:Name="ExposureTextBox" Style="{StaticResource InputTextBox}"/>
                 <TextBlock Grid.Row="0" Grid.Column="3" Text="增益" Style="{StaticResource LabelText}"/>
                 <TextBox Grid.Row="0" Grid.Column="4" x:Name="GainTextBox" Style="{StaticResource InputTextBox}"/>
+
+                <TextBlock Grid.Row="1" Grid.Column="0" Text="像素格式" Style="{StaticResource LabelText}"/>
+                <ComboBox Grid.Row="1" Grid.Column="1" x:Name="PixelFormatComboBox" Style="{StaticResource InputComboBox}"/>
+                <TextBlock Grid.Row="1" Grid.Column="3" Text="帧率(fps)" Style="{StaticResource LabelText}"/>
+                <TextBox Grid.Row="1" Grid.Column="4" x:Name="FrameRateTextBox" Style="{StaticResource InputTextBox}"/>
             </Grid>
 
             <TextBlock Text="触发参数" Style="{StaticResource SectionTitleText}"/>

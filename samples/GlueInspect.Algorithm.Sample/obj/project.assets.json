@@ -202,11 +202,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "E:\\posen_project\\点胶检测\\上位机程序\\WpfApp2\\Platform\\samples\\GlueInspect.Algorithm.Sample\\GlueInspect.Algorithm.Sample.csproj",
+      "projectUniqueName": "E:\\posen_project\\自建算法平台\\Platform\\samples\\GlueInspect.Algorithm.Sample\\GlueInspect.Algorithm.Sample.csproj",
       "projectName": "GlueInspect.Algorithm.Sample",
-      "projectPath": "E:\\posen_project\\点胶检测\\上位机程序\\WpfApp2\\Platform\\samples\\GlueInspect.Algorithm.Sample\\GlueInspect.Algorithm.Sample.csproj",
+      "projectPath": "E:\\posen_project\\自建算法平台\\Platform\\samples\\GlueInspect.Algorithm.Sample\\GlueInspect.Algorithm.Sample.csproj",
       "packagesPath": "C:\\Users\\liangyuhang\\.nuget\\packages\\",
-      "outputPath": "E:\\posen_project\\点胶检测\\上位机程序\\WpfApp2\\Platform\\samples\\GlueInspect.Algorithm.Sample\\obj\\",
+      "outputPath": "E:\\posen_project\\自建算法平台\\Platform\\samples\\GlueInspect.Algorithm.Sample\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "D:\\CodingSys\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -227,8 +227,8 @@
         "netstandard2.0": {
           "targetAlias": "netstandard2.0",
           "projectReferences": {
-            "E:\\posen_project\\点胶检测\\上位机程序\\WpfApp2\\Platform\\src\\GlueInspect.Platform.Abstractions\\GlueInspect.Platform.Abstractions.csproj": {
-              "projectPath": "E:\\posen_project\\点胶检测\\上位机程序\\WpfApp2\\Platform\\src\\GlueInspect.Platform.Abstractions\\GlueInspect.Platform.Abstractions.csproj"
+            "E:\\posen_project\\自建算法平台\\Platform\\src\\GlueInspect.Platform.Abstractions\\GlueInspect.Platform.Abstractions.csproj": {
+              "projectPath": "E:\\posen_project\\自建算法平台\\Platform\\src\\GlueInspect.Platform.Abstractions\\GlueInspect.Platform.Abstractions.csproj"
             }
           }
         }

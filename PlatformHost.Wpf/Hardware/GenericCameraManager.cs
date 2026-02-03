@@ -13,12 +13,14 @@ namespace WpfApp2.Hardware
 
         private static readonly string[] VendorList =
         {
+            "OPT",
             "Basler",
             "Hikvision",
             "Dahua",
             "MindVision",
             "Keyence",
-            "Other"
+            "Other",
+            "Generic"
         };
 
         public static IReadOnlyList<string> SupportedVendors => VendorList;
@@ -152,7 +154,7 @@ namespace WpfApp2.Hardware
                 Role = role,
                 CameraId = cameraId ?? CameraRole.Flying.ToString(),
                 DisplayName = displayName ?? string.Empty,
-                Vendor = "Generic",
+                Vendor = "OPT",
                 Model = role == CameraRole.Flying ? "FlyingCam" : "FixedCam",
                 SerialNumber = string.Empty,
                 Settings = new GenericCameraSettings()
@@ -178,6 +180,8 @@ namespace WpfApp2.Hardware
                 {
                     ExposureTimeUs = profile.Settings?.ExposureTimeUs ?? 0,
                     Gain = profile.Settings?.Gain ?? 0,
+                    PixelFormat = profile.Settings?.PixelFormat ?? "Mono8",
+                    FrameRate = profile.Settings?.FrameRate ?? 0,
                     TriggerSource = profile.Settings?.TriggerSource ?? CameraTriggerSource.External,
                     TriggerEnabled = profile.Settings?.TriggerEnabled ?? false,
                     TriggerDelayUs = profile.Settings?.TriggerDelayUs ?? 0

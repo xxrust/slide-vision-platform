@@ -18,6 +18,8 @@ namespace WpfApp2.Hardware
     {
         public double ExposureTimeUs { get; set; } = 1000;
         public double Gain { get; set; } = 1.0;
+        public string PixelFormat { get; set; } = "Mono8";
+        public double FrameRate { get; set; } = 0;
         public CameraTriggerSource TriggerSource { get; set; } = CameraTriggerSource.External;
         public bool TriggerEnabled { get; set; } = true;
         public double TriggerDelayUs { get; set; } = 0;
