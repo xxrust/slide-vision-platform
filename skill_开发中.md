@@ -31,3 +31,14 @@ UI 关联
 1) 修改 `PlatformHost.Wpf/Config/CameraCatalog.json` 的 `Cameras` 列表。
 2) 重新编译并运行主程序。
 3) 在硬件配置页修改相机参数并保存，生成/更新 `GenericCameraProfiles.json`。
+
+系统名称配置
+- 文件：`PlatformHost.Wpf/Config/SystemBranding.json`
+- 结构：
+  {
+    "SystemName": "点胶检测系统",
+    "ModuleName": ""
+  }
+- 说明：
+  - `SystemName` 用于帮助菜单、版本信息、启动界面等显示。
+  - `ModuleName` 可选：若填写模块名，将优先映射到模块显示名作为系统名。

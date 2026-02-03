@@ -32,9 +32,27 @@ namespace WpfApp2.UI
         public SplashScreen()
         {
             InitializeComponent();
+            ApplySystemBranding();
             SetVersionText();
             InitializeAnimations();
             StartLoadingProcess();
+        }
+
+        private void ApplySystemBranding()
+        {
+            try
+            {
+                var systemName = SystemBrandingManager.GetSystemName();
+                Title = systemName;
+                if (SystemTitleText != null)
+                {
+                    SystemTitleText.Text = systemName;
+                }
+            }
+            catch (Exception ex)
+            {
+                LogManager.Warning($"设置启动界面系统名称失败: {ex.Message}", "SplashScreen");
+            }
         }
 
         private void SetVersionText()

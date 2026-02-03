@@ -46,6 +46,7 @@ namespace WpfApp2
         {
             InitializeComponent();
             ContentC.Content = frame1;
+            Title = SystemBrandingManager.GetSystemName();
 
             // 使用Loaded事件确保UI完全初始化后再加载模板
             this.Loaded += (s, e) =>
@@ -197,7 +198,7 @@ namespace WpfApp2
             {
                 var result = MessageBox.Show(
                     this,
-                    "确认要关闭点胶检测系统吗？",
+                    $"确认要关闭{SystemBrandingManager.GetSystemName()}吗？",
                     "退出确认",
                     MessageBoxButton.YesNo,
                     MessageBoxImage.Question);

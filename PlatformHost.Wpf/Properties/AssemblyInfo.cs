@@ -7,7 +7,7 @@ using System.Windows;
 // 有关程序集的一般信息由以下
 // 控制。更改这些特性值可修改
 // 与程序集关联的信息。
-[assembly: AssemblyTitle("点胶检测系统")]
+[assembly: AssemblyTitle("GlueInspect")]
 [assembly: AssemblyDescription("工业级点胶质量检测解决方案")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Posen Technology")]

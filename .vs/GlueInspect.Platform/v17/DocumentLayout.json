@@ -1,7 +1,16 @@
 {
   "Version": 1,
   "WorkspaceRootPath": "E:\\posen_project\\\u70B9\u80F6\u68C0\u6D4B\\\u4E0A\u4F4D\u673A\u7A0B\u5E8F\\WpfApp2\\Platform\\",
-  "Documents": [],
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{C9F87A87-BE4C-4299-9BEF-68700E0624F3}|PlatformHost.Wpf\\PlatformHost.Wpf.csproj|e:\\posen_project\\\u70B9\u80F6\u68C0\u6D4B\\\u4E0A\u4F4D\u673A\u7A0B\u5E8F\\wpfapp2\\platform\\platformhost.wpf\\config\\systembranding.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
+      "RelativeMoniker": "D:0:0:{C9F87A87-BE4C-4299-9BEF-68700E0624F3}|PlatformHost.Wpf\\PlatformHost.Wpf.csproj|solutionrelative:platformhost.wpf\\config\\systembranding.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{C9F87A87-BE4C-4299-9BEF-68700E0624F3}|PlatformHost.Wpf\\PlatformHost.Wpf.csproj|e:\\posen_project\\\u70B9\u80F6\u68C0\u6D4B\\\u4E0A\u4F4D\u673A\u7A0B\u5E8F\\wpfapp2\\platform\\platformhost.wpf\\config\\templatehierarchy.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
+      "RelativeMoniker": "D:0:0:{C9F87A87-BE4C-4299-9BEF-68700E0624F3}|PlatformHost.Wpf\\PlatformHost.Wpf.csproj|solutionrelative:platformhost.wpf\\config\\templatehierarchy.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
+    }
+  ],
   "DocumentGroupContainers": [
     {
       "Orientation": 0,
@@ -9,11 +18,37 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": -1,
+          "SelectedChildIndex": 1,
           "Children": [
             {
               "$type": "Bookmark",
               "Name": "ST:0:0:{1c4feeaa-4718-4aa9-859d-94ce25d182ba}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "SystemBranding.json",
+              "DocumentMoniker": "E:\\posen_project\\\u70B9\u80F6\u68C0\u6D4B\\\u4E0A\u4F4D\u673A\u7A0B\u5E8F\\WpfApp2\\Platform\\PlatformHost.Wpf\\Config\\SystemBranding.json",
+              "RelativeDocumentMoniker": "PlatformHost.Wpf\\Config\\SystemBranding.json",
+              "ToolTip": "E:\\posen_project\\\u70B9\u80F6\u68C0\u6D4B\\\u4E0A\u4F4D\u673A\u7A0B\u5E8F\\WpfApp2\\Platform\\PlatformHost.Wpf\\Config\\SystemBranding.json",
+              "RelativeToolTip": "PlatformHost.Wpf\\Config\\SystemBranding.json",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAIAAAASAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
+              "WhenOpened": "2026-02-03T01:20:59.942Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "TemplateHierarchy.json",
+              "DocumentMoniker": "E:\\posen_project\\\u70B9\u80F6\u68C0\u6D4B\\\u4E0A\u4F4D\u673A\u7A0B\u5E8F\\WpfApp2\\Platform\\PlatformHost.Wpf\\Config\\TemplateHierarchy.json",
+              "RelativeDocumentMoniker": "PlatformHost.Wpf\\Config\\TemplateHierarchy.json",
+              "ToolTip": "E:\\posen_project\\\u70B9\u80F6\u68C0\u6D4B\\\u4E0A\u4F4D\u673A\u7A0B\u5E8F\\WpfApp2\\Platform\\PlatformHost.Wpf\\Config\\TemplateHierarchy.json",
+              "RelativeToolTip": "PlatformHost.Wpf\\Config\\TemplateHierarchy.json",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
+              "WhenOpened": "2026-02-03T01:20:55.363Z",
+              "EditorCaption": ""
             }
           ]
         }

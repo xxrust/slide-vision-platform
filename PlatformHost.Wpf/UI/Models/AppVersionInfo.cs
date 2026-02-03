@@ -24,7 +24,7 @@ namespace WpfApp2.UI.Models
 
         public static string GetSplashVersionText()
         {
-            return $"{SplashProductName} {SoftwareVersion}";
+            return $"{SystemBrandingManager.GetSystemName()} {SoftwareVersion}";
         }
     }
 }

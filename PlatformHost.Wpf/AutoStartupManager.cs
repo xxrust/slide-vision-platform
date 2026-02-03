@@ -16,7 +16,7 @@ namespace WpfApp2.UI.Models
     public static class AutoStartupManager
     {
         private const string REGISTRY_KEY = @"SOFTWARE\Microsoft\Windows\CurrentVersion\Run";
-        private const string APP_NAME = "点胶检测系统";
+        private static string AppName => SystemBrandingManager.GetSystemName();
         private const string CONFIG_FILE = "Config/AutoStartup.txt";
         
         // 系统就绪检查参数
@@ -49,8 +49,9 @@ namespace WpfApp2.UI.Models
                 }
 
                 // 询问用户是否设置开机启动
+                var appName = AppName;
                 MessageBoxResult result = MessageBox.Show(
-                    "🚀 点胶检测系统 - 开机启动设置\n\n" +
+                    $"🚀 {appName} - 开机启动设置\n\n" +
                     "是否设置开机自动启动？\n\n" +
                     "✅ 优点：\n" +
                     "• 系统启动后自动运行检测程序\n" +
@@ -148,20 +149,20 @@ namespace WpfApp2.UI.Models
                         string scriptPath = CreateSmartStartupScript();
                         if (!string.IsNullOrEmpty(scriptPath))
                         {
-                            key?.SetValue(APP_NAME, $"\"{scriptPath}\"");
+                            key?.SetValue(AppName, $"\"{scriptPath}\"");
                             LogManager.Info($"开机启动已启用，使用智能启动脚本: {scriptPath}", "AutoStartup");
                         }
                         else
                         {
                             // 备用方案：直接启动主程序
                             string exePath = Process.GetCurrentProcess().MainModule.FileName;
-                            key?.SetValue(APP_NAME, $"\"{exePath}\"");
+                            key?.SetValue(AppName, $"\"{exePath}\"");
                             LogManager.Warning("智能启动脚本创建失败，使用直接启动方式", "AutoStartup");
                         }
                     }
                     else
                     {
-                        key?.DeleteValue(APP_NAME, false);
+                        key?.DeleteValue(AppName, false);
                         
                         // 清理智能启动脚本
                         CleanupSmartStartupScript();
@@ -189,11 +190,12 @@ namespace WpfApp2.UI.Models
                 string exePath = Process.GetCurrentProcess().MainModule.FileName;
                 
                 // 创建智能启动批处理脚本
+                var appName = AppName;
                 string scriptContent = $@"@echo off
-REM 点胶检测系统智能启动脚本
+REM {appName}智能启动脚本
 REM 等待系统完全就绪后启动应用程序
 
-echo [%date% %time%] 点胶检测系统智能启动开始... >> ""{Path.Combine(appDir, "startup.log")}""
+echo [%date% %time%] {appName}智能启动开始... >> ""{Path.Combine(appDir, "startup.log")}""
 
 REM 最小延迟15秒，确保系统基本服务启动
 timeout /t 15 /nobreak > nul
@@ -226,12 +228,12 @@ timeout /t 5 /nobreak > nul
 goto WAIT_SYSTEM_READY
 
 :START_APP
-echo [%date% %time%] 系统就绪，启动点胶检测系统... >> ""{Path.Combine(appDir, "startup.log")}""
+echo [%date% %time%] 系统就绪，启动{appName}... >> ""{Path.Combine(appDir, "startup.log")}""
 
 REM 启动应用程序
 start """" ""{exePath}""
 
-echo [%date% %time%] 点胶检测系统启动完成 >> ""{Path.Combine(appDir, "startup.log")}""
+echo [%date% %time%] {appName}启动完成 >> ""{Path.Combine(appDir, "startup.log")}""
 exit
 ";
 
@@ -284,7 +286,7 @@ exit
             {
                 using (RegistryKey key = Registry.CurrentUser.OpenSubKey(REGISTRY_KEY, false))
                 {
-                    object value = key?.GetValue(APP_NAME);
+                    object value = key?.GetValue(AppName);
                     return value != null;
                 }
             }

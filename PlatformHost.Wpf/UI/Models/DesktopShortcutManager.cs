@@ -16,10 +16,15 @@ namespace WpfApp2.UI.Models
         /// <param name="shortcutName">快捷方式名称</param>
         /// <param name="showSuccessMessage">是否显示成功创建的消息</param>
         /// <returns>true: 快捷方式已存在或创建成功; false: 创建失败</returns>
-        public static bool CheckAndCreateDesktopShortcut(string shortcutName = "点胶检测系统", bool showSuccessMessage = false)
+        public static bool CheckAndCreateDesktopShortcut(string shortcutName = null, bool showSuccessMessage = false)
         {
             try
             {
+                if (string.IsNullOrWhiteSpace(shortcutName))
+                {
+                    shortcutName = SystemBrandingManager.GetSystemName();
+                }
+
                 // 获取桌面路径
                 string desktopPath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
                 string shortcutPath = Path.Combine(desktopPath, $"{shortcutName}.lnk");
@@ -86,7 +91,7 @@ namespace WpfApp2.UI.Models
                 // 设置快捷方式属性
                 shortcut.TargetPath = currentExePath;
                 shortcut.WorkingDirectory = workingDirectory;
-                shortcut.Description = "点胶检测系统 - 工业级点胶质量检测解决方案";
+                shortcut.Description = $"{shortcutName} - 工业级点胶质量检测解决方案";
                 
                 // 设置图标（如果图标文件存在）
                 string iconPath = Path.Combine(workingDirectory, "posen.ico");
@@ -112,10 +117,15 @@ namespace WpfApp2.UI.Models
         /// </summary>
         /// <param name="shortcutName">快捷方式名称</param>
         /// <returns>是否删除成功</returns>
-        public static bool RemoveDesktopShortcut(string shortcutName = "点胶检测系统")
+        public static bool RemoveDesktopShortcut(string shortcutName = null)
         {
             try
             {
+                if (string.IsNullOrWhiteSpace(shortcutName))
+                {
+                    shortcutName = SystemBrandingManager.GetSystemName();
+                }
+
                 string desktopPath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
                 string shortcutPath = Path.Combine(desktopPath, $"{shortcutName}.lnk");
 
@@ -140,10 +150,15 @@ namespace WpfApp2.UI.Models
         /// </summary>
         /// <param name="shortcutName">快捷方式名称</param>
         /// <returns>是否存在</returns>
-        public static bool IsDesktopShortcutExists(string shortcutName = "点胶检测系统")
+        public static bool IsDesktopShortcutExists(string shortcutName = null)
         {
             try
             {
+                if (string.IsNullOrWhiteSpace(shortcutName))
+                {
+                    shortcutName = SystemBrandingManager.GetSystemName();
+                }
+
                 string desktopPath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
                 string shortcutPath = Path.Combine(desktopPath, $"{shortcutName}.lnk");
                 return System.IO.File.Exists(shortcutPath);

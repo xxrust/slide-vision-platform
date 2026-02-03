@@ -7,7 +7,7 @@
     xmlns:ScottPlot="clr-namespace:ScottPlot.WPF;assembly=ScottPlot.WPF"
     x:Class="WpfApp2.MainWindow"
     mc:Ignorable="d"
-    Title="点胶检测系统" 
+    Title="" 
     Height="1024" Width="1920" 
     Background="#151515"
     WindowState="Maximized"

@@ -54,8 +54,9 @@ namespace WpfApp2
                     ActivateExistingInstance();
                     
                     // 显示提示信息
+                    var systemName = WpfApp2.UI.Models.SystemBrandingManager.GetSystemName();
                     MessageBox.Show(
-                        "点胶检测系统已经在运行中！\n\n为避免影响工作，系统不允许同时运行多个实例。\n请使用已打开的程序窗口。",
+                        $"{systemName}已经在运行中！\n\n为避免影响工作，系统不允许同时运行多个实例。\n请使用已打开的程序窗口。",
                         "程序已运行",
                         MessageBoxButton.OK,
                         MessageBoxImage.Information);
@@ -203,7 +204,7 @@ namespace WpfApp2
                 UpdateSplashProgress(90, "检查桌面快捷方式...");
                 try
                 {
-                    DesktopShortcutManager.CheckAndCreateDesktopShortcut("点胶检测系统", false);
+                    DesktopShortcutManager.CheckAndCreateDesktopShortcut(null, false);
                 }
                 catch (Exception shortcutEx)
                 {

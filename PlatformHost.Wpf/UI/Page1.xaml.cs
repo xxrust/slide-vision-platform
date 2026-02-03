@@ -646,7 +646,7 @@ namespace WpfApp2.UI
             
             // 初始化日志管理器（从配置文件加载设置）
             LogManager.LoadConfigFromFile();
-            LogManager.Info("点胶检测系统启动", "System");
+            LogManager.Info($"{SystemBrandingManager.GetSystemName()}启动", "System");
              
             // 初始化3D视图
             _3DViewHost.Child = _threeDViewHostChild;
@@ -8484,7 +8484,7 @@ namespace WpfApp2.UI
             // 标题
             var titleBlock = new TextBlock
             {
-                Text = "🔧 点胶检测系统 - 帮助菜单",
+                Text = $"🔧 {SystemBrandingManager.GetSystemName()} - 帮助菜单",
                 FontSize = 16,
                 FontWeight = FontWeights.Bold,
                 Foreground = Brushes.White,
@@ -9078,7 +9078,7 @@ namespace WpfApp2.UI
                 string autoStartStatus = AutoStartupManager.GetAutoStartupStatusDescription();
                 
                 // 构建版本信息
-                string versionInfo = $@"🔧 点胶检测系统 - 版本信息
+                string versionInfo = $@"🔧 {SystemBrandingManager.GetSystemName()} - 版本信息
 
 📋 软件信息:
    • 软件版本: {softwareVersion}
