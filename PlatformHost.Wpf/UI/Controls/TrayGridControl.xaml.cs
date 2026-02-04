@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using System.IO;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using WpfApp2.UI;
 
 namespace WpfApp2.UI.Controls
 {
@@ -42,7 +44,10 @@ namespace WpfApp2.UI.Controls
 
         private readonly Dictionary<(int Row, int Col), CellVisual> _cells = new Dictionary<(int Row, int Col), CellVisual>();
         private readonly Dictionary<(int Row, int Col), string> _cellStates = new Dictionary<(int Row, int Col), string>();
+        private readonly Dictionary<(int Row, int Col), TrayCellInfo> _cellInfo = new Dictionary<(int Row, int Col), TrayCellInfo>();
         private readonly Dictionary<string, ImageSource> _iconCache = new Dictionary<string, ImageSource>(StringComparer.OrdinalIgnoreCase);
+        private TrayCellImageWindow _viewerWindow;
+        private (int Row, int Col)? _viewerPosition;
 
         public TrayGridControl()
         {
@@ -95,6 +100,14 @@ namespace WpfApp2.UI.Controls
 
             _cellStates[(row, col)] = state;
             ApplyCellVisual(cell, state);
+        }
+
+        public void UpdateCellInfo(int row, int col, string result, string imagePath, DateTime detectionTime)
+        {
+            var info = new TrayCellInfo(row, col, result, imagePath, detectionTime);
+            _cellInfo[(row, col)] = info;
+            SetCellStatus(row, col, result);
+            RefreshViewerIfNeeded(info);
         }
 
         private static void OnLayoutChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
@@ -229,12 +242,67 @@ namespace WpfApp2.UI.Controls
 
                     border.Child = image;
                     border.ToolTip = $"{logicalRow},{col}";
+                    border.Tag = (logicalRow, col);
+                    border.MouseLeftButtonUp += OnCellClicked;
                     Grid.SetRow(border, row);
                     Grid.SetColumn(border, col);
                     GridRoot.Children.Add(border);
 
                     _cells[(logicalRow, col)] = new CellVisual(border, image);
                 }
+            }
+        }
+
+        private void OnCellClicked(object sender, MouseButtonEventArgs e)
+        {
+            if (sender is Border border && border.Tag is (int Row, int Col) position)
+            {
+                ShowViewer(position.Row, position.Col);
+            }
+        }
+
+        private void ShowViewer(int row, int col)
+        {
+            if (!_cellInfo.TryGetValue((row, col), out var info))
+            {
+                _cellStates.TryGetValue((row, col), out var state);
+                info = new TrayCellInfo(row, col, state, null, DateTime.UtcNow);
+            }
+
+            if (_viewerWindow == null)
+            {
+                _viewerWindow = new TrayCellImageWindow
+                {
+                    Owner = Window.GetWindow(this)
+                };
+                _viewerWindow.Closed += (_, __) =>
+                {
+                    _viewerWindow = null;
+                    _viewerPosition = null;
+                };
+            }
+
+            if (!_viewerWindow.IsVisible)
+            {
+                _viewerWindow.Show();
+            }
+
+            _viewerWindow.UpdateInfo(info);
+            _viewerWindow.Activate();
+            _viewerPosition = (row, col);
+        }
+
+        private void RefreshViewerIfNeeded(TrayCellInfo info)
+        {
+            if (_viewerWindow == null || !_viewerWindow.IsVisible || !_viewerPosition.HasValue)
+            {
+                return;
+            }
+
+            var position = _viewerPosition.Value;
+            if (position.Row == info.Row && position.Col == info.Col)
+            {
+                _viewerWindow.UpdateInfo(info);
             }
         }
 

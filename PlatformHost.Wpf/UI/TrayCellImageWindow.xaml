@@ -1,0 +1,24 @@
+<Window x:Class="WpfApp2.UI.TrayCellImageWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Tray Cell Viewer"
+        Width="640"
+        Height="480"
+        WindowStartupLocation="CenterOwner">
+    <Grid Margin="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,8">
+            <TextBlock x:Name="PositionText" FontWeight="Bold" Margin="0,0,12,0"/>
+            <TextBlock x:Name="ResultText" Margin="0,0,12,0"/>
+            <TextBlock x:Name="TimeText"/>
+        </StackPanel>
+
+        <Border Grid.Row="1" BorderBrush="LightGray" BorderThickness="1" Background="White">
+            <Image x:Name="CellImage" Stretch="Uniform"/>
+        </Border>
+    </Grid>
+</Window>

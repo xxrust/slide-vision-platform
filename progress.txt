@@ -67,3 +67,11 @@ Thread: https://ampcode.com/threads/$AMP_CURRENT_THREAD_ID
   - Rotation only affects rendering; logical row/col mapping remains unchanged.
   - dev-browser skill unavailable, so browser verification was skipped.
 ---
+## 2026-02-04 08:25:35 +0800 - US-010
+Thread: https://ampcode.com/threads/$AMP_CURRENT_THREAD_ID
+- Added tray cell image viewer window and grid click handling with auto-refresh on updates.
+- Files changed: PlatformHost.Wpf/UI/Controls/TrayGridControl.xaml.cs; PlatformHost.Wpf/UI/TrayCellInfo.cs; PlatformHost.Wpf/UI/TrayCellImageWindow.xaml; PlatformHost.Wpf/UI/TrayCellImageWindow.xaml.cs; prd.json
+- **Learnings for future iterations:**
+  - Viewer refresh hooks rely on UpdateCellInfo to keep image/details current.
+  - dev-browser skill unavailable, so browser verification was skipped.
+---
