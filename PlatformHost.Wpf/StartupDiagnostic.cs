@@ -2,8 +2,7 @@
 using System.IO;
 using System.Reflection;
 using System.Windows;
-using System.Collections.Generic;
-using System.Diagnostics;
+using System.Diagnostics;
 using System.Runtime.InteropServices;
 
 namespace WpfApp2
@@ -246,25 +245,20 @@ namespace WpfApp2
 
         /// <summary>
         /// 显示错误对话框
-        /// </summary>
-        public static void ShowErrorDialog(string message, Exception ex = null)
-        {
-            try
-            {
-                string fullMessage = $"程序启动失败:\n{message}";
-                if (ex != null)
-                {
-                    fullMessage += $"\n\n错误详情:\n{BuildExceptionDetails(ex)}";
-
-                    if (IsMissingSqliteNative(ex))
-                    {
-                        fullMessage += "\n\n可能原因: 缺少 e_sqlite3.dll，请先还原 NuGet 并重新生成。";
-                    }
-                }
-                fullMessage += $"\n\n详细日志已保存到:\n{_logPath}";
-
-                MessageBox.Show(fullMessage, "启动错误", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
+        /// </summary>
+        public static void ShowErrorDialog(string message, Exception ex = null)
+        {
+            try
+            {
+                string fullMessage = $"程序启动失败:\n{message}";
+                if (ex != null)
+                {
+                    fullMessage += $"\n\n错误详情:\n{ex.Message}";
+                }
+                fullMessage += $"\n\n详细日志已保存到:\n{_logPath}";
+
+                MessageBox.Show(fullMessage, "启动错误", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
             catch
             {
                 // 如果连MessageBox都无法显示，则尝试写入文件
@@ -280,44 +274,12 @@ namespace WpfApp2
             }
         }
 
-        /// <summary>
-        /// 获取日志路径
-        /// </summary>
-        public static string GetLogPath()
-        {
-            return _logPath;
-        }
-
-        private static string BuildExceptionDetails(Exception ex)
-        {
-            var lines = new List<string>();
-            var current = ex;
-            var depth = 0;
-
-            while (current != null && depth < 6)
-            {
-                lines.Add($"{current.GetType().Name}: {current.Message}");
-                current = current.InnerException;
-                depth++;
-            }
-
-            return string.Join("\n", lines);
-        }
-
-        private static bool IsMissingSqliteNative(Exception ex)
-        {
-            var current = ex;
-            while (current != null)
-            {
-                if (current is DllNotFoundException && current.Message != null && current.Message.Contains("e_sqlite3"))
-                {
-                    return true;
-                }
-
-                current = current.InnerException;
-            }
-
-            return false;
-        }
-    }
-}
+        /// <summary>
+        /// 获取日志路径
+        /// </summary>
+        public static string GetLogPath()
+        {
+            return _logPath;
+        }
+    }
+} 
