@@ -254,7 +254,7 @@ namespace WpfApp2.UI.Controls
 
                     border.Child = image;
                     border.ToolTip = $"{logicalRow},{col}";
-                    border.Tag = (logicalRow, col);
+                    border.Tag = new CellPosition(logicalRow, col);
                     border.MouseLeftButtonUp += OnCellClicked;
                     Grid.SetRow(border, row);
                     Grid.SetColumn(border, col);
@@ -267,12 +267,20 @@ namespace WpfApp2.UI.Controls
 
         private void OnCellClicked(object sender, MouseButtonEventArgs e)
         {
-            if (sender is Border border && border.Tag is (int Row, int Col) position)
+            if (!(sender is Border border))
             {
-                ShowViewer(position.Row, position.Col);
-                LastClickedPosition = position;
-                CellClicked?.Invoke(this, new TrayCellClickedEventArgs(position.Row, position.Col));
+                return;
             }
+
+            var position = border.Tag as CellPosition;
+            if (position == null)
+            {
+                return;
+            }
+
+            ShowViewer(position.Row, position.Col);
+            LastClickedPosition = (position.Row, position.Col);
+            CellClicked?.Invoke(this, new TrayCellClickedEventArgs(position.Row, position.Col));
         }
 
         private void ShowViewer(int row, int col)
@@ -436,6 +444,18 @@ namespace WpfApp2.UI.Controls
 
             public Border Border { get; }
             public Image Image { get; }
+        }
+
+        private sealed class CellPosition
+        {
+            public CellPosition(int row, int col)
+            {
+                Row = row;
+                Col = col;
+            }
+
+            public int Row { get; }
+            public int Col { get; }
         }
     }
 

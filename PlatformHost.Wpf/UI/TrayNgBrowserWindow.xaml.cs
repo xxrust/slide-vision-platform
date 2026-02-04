@@ -119,9 +119,12 @@ namespace WpfApp2.UI
                         return Array.Empty<TrayNgItem>();
                     }
 
-                    return _historyItems.TryGetValue(trayId, out var items)
-                        ? items
-                        : Array.Empty<TrayNgItem>();
+                    if (_historyItems.TryGetValue(trayId, out var items))
+                    {
+                        return items;
+                    }
+
+                    return new List<TrayNgItem>();
                 }
                 case NgMode.AllHistory:
                     return _allHistoryItems;
