@@ -88,8 +88,8 @@
         "Verify in browser using dev-browser skill"
       ],
       "priority": 6,
-      "passes": false,
-      "notes": "Do not duplicate the help document content in PRD."
+      "passes": true,
+      "notes": "PLC serial entry moved into Device Management; help menu entry removed."
     }
   ]
 }

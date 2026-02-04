@@ -8745,17 +8745,6 @@ namespace WpfApp2.UI
                         return Task.CompletedTask;
                     }),
                 new HelpMenuItem(
-                    "🔌",
-                    "PLC 串口配置",
-                    new SolidColorBrush(Color.FromRgb(52, 152, 219)),
-                    Brushes.White,
-                    () =>
-                    {
-                        window.Close();
-                        OpenPlcSerialConfigWindow();
-                        return Task.CompletedTask;
-                    }),
-                new HelpMenuItem(
                     "📤",
                     "实时数据导出",
                     new SolidColorBrush(Color.FromRgb(96, 125, 139)),

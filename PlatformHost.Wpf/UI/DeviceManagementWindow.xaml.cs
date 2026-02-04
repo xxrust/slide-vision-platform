@@ -28,6 +28,28 @@ namespace WpfApp2.UI
             RefreshDevices();
         }
 
+        private void PlcConfigButton_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                var plcConfigWindow = new Window
+                {
+                    Title = "PLC串口配置与测试",
+                    Width = 1200,
+                    Height = 800,
+                    WindowStartupLocation = WindowStartupLocation.CenterOwner,
+                    Owner = this,
+                    Content = new PLCSerialConfigPage()
+                };
+
+                plcConfigWindow.ShowDialog();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"打开PLC串口配置窗口失败: {ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
         private void CloseButton_Click(object sender, RoutedEventArgs e)
         {
             Close();
