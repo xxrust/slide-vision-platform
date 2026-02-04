@@ -1,0 +1,10 @@
+# Ralph Progress Log
+Started: 2026-02-04 14:30:53 +0800
+---
+## 2026-02-04 14:28:56 +0800 - US-001
+Thread: https://ampcode.com/threads/$AMP_CURRENT_THREAD_ID
+- Implemented device models plus file-based config manager with CRUD and validation.
+- Files changed: PlatformHost.Wpf/UI/Models/DeviceManagement.cs; PlatformHost.Wpf/PlatformHost.Wpf.csproj; Docs/PRD_Device_Management.md; prd.json
+- **Learnings for future iterations:**
+  - Device configs are persisted via JSON under AppDomain.CurrentDomain.BaseDirectory/Config.
+---

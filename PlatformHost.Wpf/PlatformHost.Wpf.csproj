@@ -216,11 +216,12 @@
     <Compile Include="Hardware\OptCameraService.cs" />
     <Compile Include="UI\Models\Class1.cs" />
     <Compile Include="UI\Models\ChipHeightAnalysisSnapshot.cs" />
-    <Compile Include="UI\Models\AlertSettings.cs" />
-    <Compile Include="UI\Models\ModuleDefinition.cs" />
-    <Compile Include="UI\Models\ModuleRegistry.cs" />
-    <Compile Include="UI\Models\SystemBrandingManager.cs" />
-    <Compile Include="UI\Models\TemplateHierarchyConfig.cs" />
+    <Compile Include="UI\Models\AlertSettings.cs" />
+    <Compile Include="UI\Models\ModuleDefinition.cs" />
+    <Compile Include="UI\Models\ModuleRegistry.cs" />
+    <Compile Include="UI\Models\SystemBrandingManager.cs" />
+    <Compile Include="UI\Models\TemplateHierarchyConfig.cs" />
+    <Compile Include="UI\Models\DeviceManagement.cs" />
     <Compile Include="UI\Models\SmartInputParameterDisplayConfig.cs" />
     <Compile Include="UI\Models\RemoteSourceConfig.cs" />
     <Compile Include="UI\Models\RemoteFileMonitorService.cs" />

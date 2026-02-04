@@ -1,0 +1,95 @@
+{
+  "project": "Platform",
+  "branchName": "ralph/device-management-module",
+  "description": "Device management module with file-based persistence and Keyence PLC serial (MVP).",
+  "userStories": [
+    {
+      "id": "US-001",
+      "title": "Implement device models and file-based persistence",
+      "description": "As a developer, I want device configuration stored in a config file so that devices persist across restarts without using a database.",
+      "acceptanceCriteria": [
+        "Define device models (protocol type, name, TCP options, serial options)",
+        "Implement a DeviceConfigManager that loads/saves devices to Config/DeviceManagement.json",
+        "Provide CRUD methods with validation for required fields",
+        "Devices auto-load on first access",
+        "Typecheck passes"
+      ],
+      "priority": 1,
+      "passes": true,
+      "notes": "Persistence uses config file; database is out of scope."
+    },
+    {
+      "id": "US-002",
+      "title": "Expose device manager interface for other modules",
+      "description": "As a system integrator, I want a unified device manager interface so other modules can read/write devices consistently.",
+      "acceptanceCriteria": [
+        "Provide IDeviceManager and IDeviceClient (connect/read/write) abstractions",
+        "Device lookup works by ID or name",
+        "Errors are surfaced with consistent messages and logs",
+        "Typecheck passes"
+      ],
+      "priority": 2,
+      "passes": false,
+      "notes": "Initial implementation can be in-process singleton."
+    },
+    {
+      "id": "US-003",
+      "title": "Render device list with connection status",
+      "description": "As an operator, I want a device list showing connection status so I can quickly see if devices are online.",
+      "acceptanceCriteria": [
+        "Add a Device Management entry and list view",
+        "List shows name, protocol, address/port, and status (Disconnected/Connecting/Connected/Error)",
+        "Devices load on startup into the list",
+        "Typecheck passes",
+        "Verify in browser using dev-browser skill"
+      ],
+      "priority": 3,
+      "passes": false,
+      "notes": "dev-browser skill may be unavailable; document if skipped."
+    },
+    {
+      "id": "US-004",
+      "title": "Add device create/edit/delete UI with validation",
+      "description": "As an engineer, I want to create, edit, and delete devices with validation.",
+      "acceptanceCriteria": [
+        "Provide create/edit dialogs or pages for TCP and Serial",
+        "Validate required fields and format/range (IP, port, serial settings)",
+        "Delete requires confirmation",
+        "Changes persist to config file",
+        "Typecheck passes",
+        "Verify in browser using dev-browser skill"
+      ],
+      "priority": 4,
+      "passes": false,
+      "notes": "Validation rules can be minimal in MVP."
+    },
+    {
+      "id": "US-005",
+      "title": "Integrate Keyence PLC serial device adapter",
+      "description": "As a developer, I want the Keyence PLC serial adapter wired to the device manager so the MVP device can connect and read/write.",
+      "acceptanceCriteria": [
+        "Serial device connects using existing PLCSerialController",
+        "Connection status updates surface in device list",
+        "Read/write commands route through the adapter",
+        "Typecheck passes"
+      ],
+      "priority": 5,
+      "passes": false,
+      "notes": "Only Keyence PLC serial is required for MVP."
+    },
+    {
+      "id": "US-006",
+      "title": "Move PLC serial entry into Device Management",
+      "description": "As a user, I want PLC serial settings accessible from Device Management instead of Help.",
+      "acceptanceCriteria": [
+        "Device Management provides entry to PLC serial settings",
+        "Help menu no longer shows the PLC serial config entry",
+        "Typecheck passes",
+        "Verify in browser using dev-browser skill"
+      ],
+      "priority": 6,
+      "passes": false,
+      "notes": "Do not duplicate the help document content in PRD."
+    }
+  ]
+}
