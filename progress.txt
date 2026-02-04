@@ -26,3 +26,11 @@ Thread: https://ampcode.com/threads/$AMP_CURRENT_THREAD_ID
 - **Learnings for future iterations:**
   - Repository uses ISO-8601 round-trip format for SQLite datetime storage.
 ---
+## 2026-02-04 08:14:47 +0800 - US-005
+Thread: https://ampcode.com/threads/$AMP_CURRENT_THREAD_ID
+- Added Tray component API with events, position parsing, and repository-backed history access.
+- Added xUnit coverage for event flow and error handling.
+- Files changed: src/Slide.Platform.Runtime/Tray/TrayComponent.cs; src/Slide.Platform.Runtime/Tray/TrayEventArgs.cs; src/Slide.Platform.Runtime/Tray/TrayPosition.cs; tests/Slide.Platform.Runtime.Tests/Tray/TrayComponentTests.cs; prd.json
+- **Learnings for future iterations:**
+  - Tray component parses position as either row/col (e.g. 1_2) or index (snake mapping by default).
+---
