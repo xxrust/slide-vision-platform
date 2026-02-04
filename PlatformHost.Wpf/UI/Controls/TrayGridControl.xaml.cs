@@ -34,6 +34,12 @@ namespace WpfApp2.UI.Controls
             typeof(TrayGridControl),
             new PropertyMetadata(true, OnShowOkCellsChanged));
 
+        public static readonly DependencyProperty Rotate90Property = DependencyProperty.Register(
+            nameof(Rotate90),
+            typeof(bool),
+            typeof(TrayGridControl),
+            new PropertyMetadata(false, OnRotateChanged));
+
         private readonly Dictionary<(int Row, int Col), CellVisual> _cells = new Dictionary<(int Row, int Col), CellVisual>();
         private readonly Dictionary<(int Row, int Col), string> _cellStates = new Dictionary<(int Row, int Col), string>();
         private readonly Dictionary<string, ImageSource> _iconCache = new Dictionary<string, ImageSource>(StringComparer.OrdinalIgnoreCase);
@@ -70,6 +76,12 @@ namespace WpfApp2.UI.Controls
         {
             get => (bool)GetValue(ShowOkCellsProperty);
             set => SetValue(ShowOkCellsProperty, value);
+        }
+
+        public bool Rotate90
+        {
+            get => (bool)GetValue(Rotate90Property);
+            set => SetValue(Rotate90Property, value);
         }
 
         public IDictionary<string, TrayDefectVisual> DefectStates { get; }
@@ -110,6 +122,14 @@ namespace WpfApp2.UI.Controls
             }
         }
 
+        private static void OnRotateChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            if (d is TrayGridControl control)
+            {
+                control.ApplyRotation();
+            }
+        }
+
         private void RebuildGrid()
         {
             if (GridRoot == null)
@@ -143,6 +163,7 @@ namespace WpfApp2.UI.Controls
             AddRowHeaders();
             AddCells();
             RefreshCellVisuals();
+            ApplyRotation();
         }
 
         private void AddColumnHeaders()
@@ -283,6 +304,16 @@ namespace WpfApp2.UI.Controls
 
             cell.Image.Source = image;
             cell.Image.Visibility = image == null ? Visibility.Collapsed : Visibility.Visible;
+        }
+
+        private void ApplyRotation()
+        {
+            if (GridRoot == null)
+            {
+                return;
+            }
+
+            GridRoot.LayoutTransform = Rotate90 ? new RotateTransform(90) : Transform.Identity;
         }
 
         private string ResolveIconPath(string iconFileName)

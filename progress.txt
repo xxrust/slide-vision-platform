@@ -59,3 +59,11 @@ Thread: https://ampcode.com/threads/$AMP_CURRENT_THREAD_ID
   - OK suppression dims and disables the cell while keeping NG states visible.
   - dev-browser skill unavailable, so browser verification was skipped.
 ---
+## 2026-02-04 08:22:39 +0800 - US-009
+Thread: https://ampcode.com/threads/$AMP_CURRENT_THREAD_ID
+- Added 90-degree rotation toggle for tray grid display via layout transform.
+- Files changed: PlatformHost.Wpf/UI/Controls/TrayGridControl.xaml.cs; prd.json
+- **Learnings for future iterations:**
+  - Rotation only affects rendering; logical row/col mapping remains unchanged.
+  - dev-browser skill unavailable, so browser verification was skipped.
+---
