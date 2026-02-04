@@ -34,3 +34,11 @@ Thread: https://ampcode.com/threads/$AMP_CURRENT_THREAD_ID
   - Device edit dialog uses simple field validation before passing configs to DeviceManager.
   - dev-browser skill unavailable; UI verification skipped.
 ---
+## 2026-02-04 14:49:24 +0800 - US-005
+Thread: https://ampcode.com/threads/$AMP_CURRENT_THREAD_ID
+- Added Keyence PLC serial client using PLCSerialController for connect/read/write.
+- DeviceManager now creates serial clients for serial devices and keeps TCP stub for others.
+- Files changed: PlatformHost.Wpf/UI/Models/KeyencePlcSerialClient.cs; PlatformHost.Wpf/UI/Models/DeviceManager.cs; PlatformHost.Wpf/PlatformHost.Wpf.csproj; prd.json
+- **Learnings for future iterations:**
+  - Keyence serial client applies port/baud/timeout settings via PLCSerialController before connecting.
+---

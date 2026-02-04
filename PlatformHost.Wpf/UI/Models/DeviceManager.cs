@@ -60,6 +60,11 @@ namespace WpfApp2.UI.Models
         Task<DeviceOperationResult> WriteAsync(string address, object value);
     }
 
+    public interface IConfigurableDeviceClient
+    {
+        void UpdateConfig(DeviceConfig config);
+    }
+
     public interface IDeviceManager
     {
         IReadOnlyList<DeviceConfig> GetDevices();
@@ -77,7 +82,7 @@ namespace WpfApp2.UI.Models
         public static readonly DeviceManager Instance = new DeviceManager();
 
         private readonly object _syncRoot = new object();
-        private readonly Dictionary<string, DeviceClient> _clients = new Dictionary<string, DeviceClient>(StringComparer.OrdinalIgnoreCase);
+        private readonly Dictionary<string, IDeviceClient> _clients = new Dictionary<string, IDeviceClient>(StringComparer.OrdinalIgnoreCase);
 
         private DeviceManager()
         {
@@ -201,23 +206,36 @@ namespace WpfApp2.UI.Models
             {
                 if (_clients.TryGetValue(device.Id, out var client))
                 {
-                    client.UpdateConfig(device);
+                    if (client is IConfigurableDeviceClient configurableClient)
+                    {
+                        configurableClient.UpdateConfig(device);
+                    }
                     return client;
                 }
 
-                client = new DeviceClient(device);
+                client = CreateClient(device);
                 _clients[device.Id] = client;
                 return client;
             }
         }
 
-        private sealed class DeviceClient : IDeviceClient
+        private static IDeviceClient CreateClient(DeviceConfig device)
+        {
+            if (device.ProtocolType == DeviceProtocolType.Serial)
+            {
+                return new KeyencePlcSerialClient(device);
+            }
+
+            return new DefaultDeviceClient(device);
+        }
+
+        private sealed class DefaultDeviceClient : IDeviceClient, IConfigurableDeviceClient
         {
             private DeviceConfig _config;
             private DeviceConnectionStatus _status = DeviceConnectionStatus.Disconnected;
             private string _lastError = string.Empty;
 
-            public DeviceClient(DeviceConfig config)
+            public DefaultDeviceClient(DeviceConfig config)
             {
                 UpdateConfig(config);
             }

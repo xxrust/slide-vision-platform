@@ -223,6 +223,7 @@
     <Compile Include="UI\Models\TemplateHierarchyConfig.cs" />
     <Compile Include="UI\Models\DeviceManagement.cs" />
     <Compile Include="UI\Models\DeviceManager.cs" />
+    <Compile Include="UI\Models\KeyencePlcSerialClient.cs" />
     <Compile Include="UI\Models\SmartInputParameterDisplayConfig.cs" />
     <Compile Include="UI\Models\RemoteSourceConfig.cs" />
     <Compile Include="UI\Models\RemoteFileMonitorService.cs" />

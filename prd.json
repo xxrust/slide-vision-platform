@@ -74,8 +74,8 @@
         "Typecheck passes"
       ],
       "priority": 5,
-      "passes": false,
-      "notes": "Only Keyence PLC serial is required for MVP."
+      "passes": true,
+      "notes": "Keyence PLC serial adapter wired through PLCSerialController."
     },
     {
       "id": "US-006",
