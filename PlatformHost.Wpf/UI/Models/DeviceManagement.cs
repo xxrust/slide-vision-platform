@@ -10,7 +10,76 @@ namespace WpfApp2.UI.Models
     public enum DeviceProtocolType
     {
         Serial,
-        TcpIp
+        TcpIp,
+        Io
+    }
+
+    public enum IoBusType
+    {
+        Unknown,
+        Integrated,
+        PCI,
+        PCIe,
+        USB
+    }
+
+    public sealed class IoDeviceProfile
+    {
+        public string Brand { get; set; } = string.Empty;
+        public string Model { get; set; } = string.Empty;
+        public SMTGPIO.SMTGPIODeviceType DeviceType { get; set; } = SMTGPIO.SMTGPIODeviceType.SCI_EVC3_5;
+        public IoBusType BusType { get; set; } = IoBusType.Unknown;
+
+        public string DisplayName
+        {
+            get
+            {
+                var brandText = string.IsNullOrWhiteSpace(Brand) ? "Unknown" : Brand;
+                var modelText = string.IsNullOrWhiteSpace(Model) ? DeviceType.ToString() : Model;
+                return $"{brandText} {modelText} ({IoDeviceCatalog.FormatBusType(BusType)})";
+            }
+        }
+    }
+
+    public static class IoDeviceCatalog
+    {
+        private static readonly IReadOnlyList<IoDeviceProfile> Profiles = new List<IoDeviceProfile>
+        {
+            new IoDeviceProfile
+            {
+                Brand = "OPT",
+                Model = "EV3-5",
+                DeviceType = SMTGPIO.SMTGPIODeviceType.SCI_EVC3_5,
+                BusType = IoBusType.Integrated
+            }
+        };
+
+        public static IReadOnlyList<IoDeviceProfile> GetProfiles()
+        {
+            return Profiles;
+        }
+
+        public static IoDeviceProfile GetProfile(SMTGPIO.SMTGPIODeviceType deviceType)
+        {
+            return Profiles.FirstOrDefault(profile => profile.DeviceType == deviceType);
+        }
+
+        public static string FormatBusType(IoBusType busType)
+        {
+            switch (busType)
+            {
+                case IoBusType.Integrated:
+                    return "集成";
+                case IoBusType.PCI:
+                    return "PCI";
+                case IoBusType.PCIe:
+                    return "PCIe";
+                case IoBusType.USB:
+                    return "USB";
+                default:
+                    return "未知";
+            }
+        }
     }
 
     public sealed class DeviceSerialOptions
@@ -53,6 +122,23 @@ namespace WpfApp2.UI.Models
         }
     }
 
+    public sealed class DeviceIoOptions
+    {
+        public SMTGPIO.SMTGPIODeviceType DeviceType { get; set; } = SMTGPIO.SMTGPIODeviceType.SCI_EVC3_5;
+        public uint Port { get; set; } = 2;
+        public IoBusType BusType { get; set; } = IoBusType.Unknown;
+
+        public DeviceIoOptions Clone()
+        {
+            return new DeviceIoOptions
+            {
+                DeviceType = DeviceType,
+                Port = Port,
+                BusType = BusType
+            };
+        }
+    }
+
     public sealed class DeviceConfig
     {
         public string Id { get; set; } = Guid.NewGuid().ToString("N");
@@ -62,6 +148,7 @@ namespace WpfApp2.UI.Models
         public DeviceProtocolType ProtocolType { get; set; } = DeviceProtocolType.Serial;
         public DeviceSerialOptions Serial { get; set; } = new DeviceSerialOptions();
         public DeviceTcpOptions Tcp { get; set; } = new DeviceTcpOptions();
+        public DeviceIoOptions Io { get; set; } = new DeviceIoOptions();
         public bool Enabled { get; set; } = true;
 
         public void EnsureDefaults()
@@ -80,6 +167,11 @@ namespace WpfApp2.UI.Models
             {
                 Tcp = new DeviceTcpOptions();
             }
+
+            if (Io == null)
+            {
+                Io = new DeviceIoOptions();
+            }
         }
 
         public DeviceConfig Clone()
@@ -93,6 +185,7 @@ namespace WpfApp2.UI.Models
                 ProtocolType = ProtocolType,
                 Serial = Serial?.Clone() ?? new DeviceSerialOptions(),
                 Tcp = Tcp?.Clone() ?? new DeviceTcpOptions(),
+                Io = Io?.Clone() ?? new DeviceIoOptions(),
                 Enabled = Enabled
             };
         }
@@ -331,12 +424,21 @@ namespace WpfApp2.UI.Models
                 return false;
             }
 
+            if (string.Equals(device.HardwareName, "IO", StringComparison.OrdinalIgnoreCase))
+            {
+                device.ProtocolType = DeviceProtocolType.Io;
+                return ValidateIo(device.Io, out error);
+            }
+
             switch (device.ProtocolType)
             {
                 case DeviceProtocolType.Serial:
                     return ValidateSerial(device.Serial, out error);
                 case DeviceProtocolType.TcpIp:
                     return ValidateTcp(device.Tcp, out error);
+                case DeviceProtocolType.Io:
+                    error = "IO协议仅适用于IO设备";
+                    return false;
                 default:
                     error = "不支持的协议类型";
                     return false;
@@ -373,6 +475,30 @@ namespace WpfApp2.UI.Models
             if (options.StopBits == StopBits.None)
             {
                 error = "停止位无效";
+                return false;
+            }
+
+            return true;
+        }
+
+        private static bool ValidateIo(DeviceIoOptions options, out string error)
+        {
+            error = string.Empty;
+            if (options == null)
+            {
+                error = "IO参数不能为空";
+                return false;
+            }
+
+            if (IoDeviceCatalog.GetProfile(options.DeviceType) == null)
+            {
+                error = "IO设备型号不支持";
+                return false;
+            }
+
+            if (options.Port < 1 || options.Port > 8)
+            {
+                error = "端口号必须在 1-8 之间";
                 return false;
             }
 

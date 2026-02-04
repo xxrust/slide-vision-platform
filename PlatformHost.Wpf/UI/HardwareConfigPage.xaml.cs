@@ -616,42 +616,19 @@ namespace WpfApp2.UI
         {
             try
             {
-                LogMessage("打开GPIO设置窗口");
-                
-                var settingsWindow = new GPIOSettingsWindow();
-                settingsWindow.Owner = Window.GetWindow(this);
-                
-                bool? result = settingsWindow.ShowDialog();
-                
-                if (result == true)
+                LogMessage("打开设备管理窗口");
+
+                var deviceWindow = new DeviceManagementWindow
                 {
-                    LogMessage("GPIO设置已保存");
-                    
-                    // 询问用户是否重新初始化IO控制器
-                    var confirmResult = MessageBox.Show(
-                        "GPIO配置已保存。是否现在重新初始化IO控制器以应用新配置？\n\n注意：这将暂时中断当前的IO控制。", 
-                        "应用新配置", 
-                        MessageBoxButton.YesNo, 
-                        MessageBoxImage.Question);
-                    
-                    if (confirmResult == MessageBoxResult.Yes)
-                    {
-                        ReinitializeIOController();
-                    }
-                    else
-                    {
-                        LogMessage("新配置将在下次初始化IO控制器时生效");
-                    }
-                }
-                else
-                {
-                    LogMessage("GPIO设置已取消");
-                }
+                    Owner = Window.GetWindow(this)
+                };
+
+                deviceWindow.ShowDialog();
             }
             catch (Exception ex)
             {
-                LogMessage($"打开GPIO设置失败: {ex.Message}", LogLevel.Error);
-                MessageBox.Show($"打开GPIO设置失败: {ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+                LogMessage($"打开设备管理失败: {ex.Message}", LogLevel.Error);
+                MessageBox.Show($"打开设备管理失败: {ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 

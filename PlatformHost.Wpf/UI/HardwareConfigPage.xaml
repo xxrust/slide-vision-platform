@@ -324,7 +324,7 @@
                             
                             <!-- 控制按钮 - 一行排列 -->
                             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                                <Button x:Name="GPIOSettingsButton" Content="GPIO设置" Width="65" Height="28" Margin="3"
+                                <Button x:Name="GPIOSettingsButton" Content="设备管理" Width="65" Height="28" Margin="3"
                                         Background="#FF9B59B6" Foreground="White" FontWeight="Bold" FontSize="11" Click="GPIOSettingsButton_Click"/>
                                 
                                 <Button x:Name="AllResetButton" Content="全部复位" Width="65" Height="28" Margin="3"

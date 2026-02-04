@@ -221,6 +221,12 @@ namespace WpfApp2.UI.Models
 
         private static IDeviceClient CreateClient(DeviceConfig device)
         {
+            if (string.Equals(device.HardwareName, "IO", StringComparison.OrdinalIgnoreCase)
+                || device.ProtocolType == DeviceProtocolType.Io)
+            {
+                return new IoDeviceClient(device);
+            }
+
             if (device.ProtocolType == DeviceProtocolType.Serial)
             {
                 return new KeyencePlcSerialClient(device);

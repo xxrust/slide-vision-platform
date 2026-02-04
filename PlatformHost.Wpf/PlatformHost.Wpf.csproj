@@ -255,14 +255,15 @@
     <Compile Include="UI\Models\DetectionDataStorage.cs" />
     <Compile Include="UI\Models\AlgorithmEngineSettings.cs" />
     <Compile Include="UI\Models\LogManager.cs" />
-    <Compile Include="UI\Models\LogViewerManager.cs" />
-    <Compile Include="UI\Models\RealTimeDataLogger.cs" />
-    <Compile Include="UI\Models\RealTimeDataExportConfig.cs" />
-    <Compile Include="UI\Models\CicdAcceptanceCriteriaConfig.cs" />
-    <Compile Include="UI\Models\CicdItemLimitInfo.cs" />
-    <Compile Include="UI\HardwareConfigPage.xaml.cs">
-      <DependentUpon>HardwareConfigPage.xaml</DependentUpon>
-    </Compile>
+    <Compile Include="UI\Models\LogViewerManager.cs" />
+    <Compile Include="UI\Models\RealTimeDataLogger.cs" />
+    <Compile Include="UI\Models\RealTimeDataExportConfig.cs" />
+    <Compile Include="UI\Models\CicdAcceptanceCriteriaConfig.cs" />
+    <Compile Include="UI\Models\CicdItemLimitInfo.cs" />
+    <Compile Include="UI\Models\IoDeviceClient.cs" />
+    <Compile Include="UI\HardwareConfigPage.xaml.cs">
+      <DependentUpon>HardwareConfigPage.xaml</DependentUpon>
+    </Compile>
     <Compile Include="SMTGPIO\SMTGPIOController.cs" />
     <Compile Include="SMTGPIO\IOManager.cs" />
     <Compile Include="SMTGPIO\GPIOConfig.cs" />
@@ -318,6 +319,9 @@
     </Compile>
     <Compile Include="UI\DeviceEditWindow.xaml.cs">
       <DependentUpon>DeviceEditWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\IoTestWindow.xaml.cs">
+      <DependentUpon>IoTestWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI\PlcSerialTestWindow.xaml.cs">
       <DependentUpon>PlcSerialTestWindow.xaml</DependentUpon>
@@ -500,6 +504,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="UI\DeviceEditWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\IoTestWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

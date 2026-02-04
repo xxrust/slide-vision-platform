@@ -1,7 +1,6 @@
 ﻿using System;
+using System.Linq;
 using System.Windows;
-using WpfApp2.UI;
-using System.Threading.Tasks;
 using WpfApp2.UI.Models;
 
 namespace WpfApp2.SMTGPIO
@@ -14,6 +13,9 @@ namespace WpfApp2.SMTGPIO
     {
         private static SMTGPIOController _gpioController;
         private static bool _isInitialized = false;
+        private static DeviceIoOptions _activeIoOptions;
+        private static string _activeDeviceId;
+        private static string _activeDeviceName;
         // 🔧 移除锁对象：private static readonly object _lockObject = new object();
 
         /// <summary>
@@ -40,14 +42,15 @@ namespace WpfApp2.SMTGPIO
 
                 _gpioController = new SMTGPIOController();
                 
-                // 根据配置的设备类型初始化GPIO控制器
-                var cfg = GPIOConfigManager.CurrentConfig;
-                bool initResult = _gpioController.Initialize(cfg.DeviceType);
+                // 根据设备管理配置初始化GPIO控制器
+                var options = ResolveIoOptions(out var source);
+                bool initResult = _gpioController.Initialize(options.DeviceType);
                 
                 if (initResult)
                 {
                     _isInitialized = true;
-                    LogMessage("IO控制器初始化成功", LogLevel.Info);
+                    _activeIoOptions = options;
+                    LogMessage($"IO控制器初始化成功（来源: {source}）", LogLevel.Info);
                     
                     // 初始化后复位所有输出
                     _gpioController.SetAllOutputPinsLow();
@@ -115,7 +118,8 @@ namespace WpfApp2.SMTGPIO
                 }
 
                 var startTime = DateTime.Now;
-                _gpioController.SetDetectionResult(isOK);
+                var options = GetActiveIoOptions();
+                _gpioController.SetDetectionResult(isOK, options?.Port);
                 var duration = (DateTime.Now - startTime).TotalMilliseconds;
                 
                 string resultText = isOK ? "OK" : "NG";
@@ -192,9 +196,9 @@ namespace WpfApp2.SMTGPIO
                     throw new ArgumentException("引脚号必须在1-4之间", nameof(pinNumber));
                 }
 
-                // 使用配置文件中的端口号
-                var config = GPIOConfigManager.CurrentConfig;
-                _gpioController.SetOutputPin(config.Port, (uint)pinNumber, isHigh);
+                var options = GetActiveIoOptions();
+                var port = options?.Port ?? GPIOConfigManager.CurrentConfig.Port;
+                _gpioController.SetOutputPin(port, (uint)pinNumber, isHigh);
                 LogMessage($"IO{pinNumber}已设置为{(isHigh ? "高" : "低")}电平", LogLevel.Info);
             }
             catch (Exception ex)
@@ -232,12 +236,12 @@ namespace WpfApp2.SMTGPIO
                     return new bool[4]; // 返回全为false的数组
                 }
 
-                // 使用配置文件中的端口号
-                var config = GPIOConfigManager.CurrentConfig;
+                var options = GetActiveIoOptions();
+                var port = options?.Port ?? GPIOConfigManager.CurrentConfig.Port;
                 var states = new bool[4];
                 for (int i = 1; i <= 4; i++)
                 {
-                    int level = _gpioController.GetOutputPinLevel(config.Port, (uint)i);
+                    int level = _gpioController.GetOutputPinLevel(port, (uint)i);
                     states[i - 1] = level == 1; // 将int转换为bool，1为true，其他为false
                 }
                 return states;
@@ -310,6 +314,43 @@ namespace WpfApp2.SMTGPIO
             }
         }
 
+        public static bool SetActiveDevice(string deviceId)
+        {
+            if (string.IsNullOrWhiteSpace(deviceId))
+            {
+                _activeDeviceId = null;
+                _activeDeviceName = null;
+                _activeIoOptions = null;
+                return false;
+            }
+
+            var device = DeviceConfigManager.GetDeviceById(deviceId);
+            if (device == null)
+            {
+                LogMessage($"未找到IO设备: {deviceId}", LogLevel.Warning);
+                return false;
+            }
+
+            if (!string.Equals(device.HardwareName, "IO", StringComparison.OrdinalIgnoreCase))
+            {
+                LogMessage($"设备不是IO类型: {device.Name}", LogLevel.Warning);
+                return false;
+            }
+
+            var newOptions = device.Io?.Clone() ?? new DeviceIoOptions();
+            var changed = !IoOptionsEquals(_activeIoOptions, newOptions);
+            _activeDeviceId = device.Id;
+            _activeDeviceName = device.Name;
+            _activeIoOptions = newOptions;
+
+            if (changed && _isInitialized)
+            {
+                Dispose();
+            }
+
+            return true;
+        }
+
         /// <summary>
         /// 日志级别枚举
         /// </summary>
@@ -318,6 +359,72 @@ namespace WpfApp2.SMTGPIO
             Info,
             Warning,
             Error
+        }
+
+        private static DeviceIoOptions GetActiveIoOptions()
+        {
+            if (_activeIoOptions != null)
+            {
+                return _activeIoOptions;
+            }
+
+            ResolveIoOptions(out _);
+            return _activeIoOptions ?? new DeviceIoOptions();
+        }
+
+        private static DeviceIoOptions ResolveIoOptions(out string source)
+        {
+            source = "默认配置";
+            if (_activeIoOptions != null)
+            {
+                source = $"设备管理({_activeDeviceName ?? _activeDeviceId})";
+                return _activeIoOptions;
+            }
+
+            var devices = DeviceConfigManager.GetDevices();
+            var ioDevice = devices.FirstOrDefault(device =>
+                device != null
+                && device.Enabled
+                && string.Equals(device.HardwareName, "IO", StringComparison.OrdinalIgnoreCase));
+
+            if (ioDevice != null)
+            {
+                _activeDeviceId = ioDevice.Id;
+                _activeDeviceName = ioDevice.Name;
+                _activeIoOptions = ioDevice.Io?.Clone() ?? new DeviceIoOptions();
+                source = $"设备管理({ioDevice.Name})";
+                return _activeIoOptions;
+            }
+
+            var legacy = GPIOConfigManager.CurrentConfig;
+            if (legacy != null)
+            {
+                source = "gpio_config.json";
+                _activeIoOptions = new DeviceIoOptions
+                {
+                    DeviceType = legacy.DeviceType,
+                    Port = legacy.Port
+                };
+                return _activeIoOptions;
+            }
+
+            _activeIoOptions = new DeviceIoOptions();
+            return _activeIoOptions;
+        }
+
+        private static bool IoOptionsEquals(DeviceIoOptions left, DeviceIoOptions right)
+        {
+            if (left == null && right == null)
+            {
+                return true;
+            }
+
+            if (left == null || right == null)
+            {
+                return false;
+            }
+
+            return left.DeviceType == right.DeviceType && left.Port == right.Port;
         }
     }
 } 

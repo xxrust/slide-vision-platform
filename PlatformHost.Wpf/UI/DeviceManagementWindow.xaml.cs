@@ -108,6 +108,16 @@ namespace WpfApp2.UI
                 return;
             }
 
+            if (IsIoDevice(selected.Config))
+            {
+                var ioWindow = new IoTestWindow(selected.Config)
+                {
+                    Owner = this
+                };
+                ioWindow.ShowDialog();
+                return;
+            }
+
             if (selected.Config.ProtocolType != DeviceProtocolType.Serial)
             {
                 MessageBox.Show("当前仅支持串口设备测试", "提示", MessageBoxButton.OK, MessageBoxImage.Information);
@@ -142,7 +152,16 @@ namespace WpfApp2.UI
             var protocol = device.ProtocolType.ToString();
             var address = string.Empty;
 
-            if (device.ProtocolType == DeviceProtocolType.Serial)
+            var isIo = IsIoDevice(device);
+            if (isIo)
+            {
+                protocol = "IO";
+                var io = device.Io ?? new DeviceIoOptions();
+                var profile = IoDeviceCatalog.GetProfile(io.DeviceType);
+                var modelText = profile?.DisplayName ?? io.DeviceType.ToString();
+                address = $"{modelText} / Port {io.Port}";
+            }
+            else if (device.ProtocolType == DeviceProtocolType.Serial)
             {
                 var serial = device.Serial ?? new DeviceSerialOptions();
                 address = $"{serial.PortName} / {serial.BaudRate}";
@@ -177,6 +196,17 @@ namespace WpfApp2.UI
                 StatusBrush = GetStatusBrush(status),
                 StatusTooltip = string.IsNullOrWhiteSpace(tooltip) ? null : tooltip
             };
+        }
+
+        private static bool IsIoDevice(DeviceConfig device)
+        {
+            if (device == null)
+            {
+                return false;
+            }
+
+            return string.Equals(device.HardwareName, "IO", StringComparison.OrdinalIgnoreCase)
+                   || device.ProtocolType == DeviceProtocolType.Io;
         }
 
         private static string FormatStatus(DeviceConnectionStatus status)

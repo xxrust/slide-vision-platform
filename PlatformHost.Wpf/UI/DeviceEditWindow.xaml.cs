@@ -2,6 +2,7 @@ using System;
 using System.IO.Ports;
 using System.Windows;
 using System.Windows.Controls;
+using WpfApp2.SMTGPIO;
 using WpfApp2.UI.Models;
 
 namespace WpfApp2.UI
@@ -16,7 +17,14 @@ namespace WpfApp2.UI
             InitializeComponent();
             _workingConfig = config?.Clone() ?? new DeviceConfig();
             HeaderText.Text = isEdit ? "编辑设备" : "新增设备";
+            InitializeIoOptions();
             LoadFromConfig(_workingConfig);
+        }
+
+        private void HardwareComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            UpdateHardwareVisibility();
+            UpdateIoProfileFromSelection();
         }
 
         private void ProtocolComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -49,6 +57,16 @@ namespace WpfApp2.UI
 
             SelectComboBoxItem(ProtocolComboBox, config.ProtocolType.ToString());
 
+            if (config.Io != null)
+            {
+                SelectIoDeviceType(config.Io.DeviceType);
+                IoPortTextBox.Text = config.Io.Port.ToString();
+                if (IoBusTypeText != null)
+                {
+                    IoBusTypeText.Text = IoDeviceCatalog.FormatBusType(config.Io.BusType);
+                }
+            }
+
             var serial = config.Serial ?? new DeviceSerialOptions();
             SerialPortTextBox.Text = serial.PortName ?? string.Empty;
             BaudRateTextBox.Text = serial.BaudRate.ToString();
@@ -62,7 +80,56 @@ namespace WpfApp2.UI
             TcpHostTextBox.Text = tcp.Host ?? string.Empty;
             TcpPortTextBox.Text = tcp.Port.ToString();
 
+            UpdateHardwareVisibility();
             UpdateProtocolVisibility();
+            UpdateIoProfileFromSelection();
+        }
+
+        private void UpdateHardwareVisibility()
+        {
+            var hardware = HardwareComboBox?.Text?.Trim();
+            var isIo = string.Equals(hardware, "IO", StringComparison.OrdinalIgnoreCase);
+
+            if (IoGroup != null)
+            {
+                IoGroup.Visibility = isIo ? Visibility.Visible : Visibility.Collapsed;
+            }
+
+            if (ProtocolComboBox != null)
+            {
+                ProtocolComboBox.Visibility = isIo ? Visibility.Collapsed : Visibility.Visible;
+            }
+
+            if (ProtocolLabel != null)
+            {
+                ProtocolLabel.Visibility = isIo ? Visibility.Collapsed : Visibility.Visible;
+            }
+
+            if (BrandComboBox != null)
+            {
+                BrandComboBox.IsEnabled = false;
+                if (!isIo)
+                {
+                    BrandComboBox.Text = "Keyence";
+                }
+            }
+
+            if (isIo)
+            {
+                if (SerialGroup != null)
+                {
+                    SerialGroup.Visibility = Visibility.Collapsed;
+                }
+
+                if (TcpGroup != null)
+                {
+                    TcpGroup.Visibility = Visibility.Collapsed;
+                }
+            }
+            else
+            {
+                UpdateProtocolVisibility();
+            }
         }
 
         private void UpdateProtocolVisibility()
@@ -72,13 +139,20 @@ namespace WpfApp2.UI
             {
                 return;
             }
+            var isIo = string.Equals(HardwareComboBox?.Text?.Trim(), "IO", StringComparison.OrdinalIgnoreCase);
+            if (isIo)
+            {
+                SerialGroup.Visibility = Visibility.Collapsed;
+                TcpGroup.Visibility = Visibility.Collapsed;
+                return;
+            }
             SerialGroup.Visibility = protocol == DeviceProtocolType.Serial ? Visibility.Visible : Visibility.Collapsed;
             TcpGroup.Visibility = protocol == DeviceProtocolType.TcpIp ? Visibility.Visible : Visibility.Collapsed;
         }
 
         private DeviceProtocolType GetSelectedProtocol()
         {
-            if (ProtocolComboBox.SelectedItem is ComboBoxItem item && item.Tag is string tag)
+            if (ProtocolComboBox.SelectedItem is System.Windows.Controls.ComboBoxItem item && item.Tag is string tag)
             {
                 if (Enum.TryParse(tag, out DeviceProtocolType protocol))
                 {
@@ -106,13 +180,8 @@ namespace WpfApp2.UI
             updated.Name = name;
             updated.Brand = BrandComboBox.Text?.Trim();
             updated.HardwareName = HardwareComboBox.Text?.Trim();
-            updated.ProtocolType = protocol;
-
-            if (string.IsNullOrWhiteSpace(updated.Brand))
-            {
-                error = "设备品牌不能为空";
-                return false;
-            }
+            var isIo = string.Equals(updated.HardwareName, "IO", StringComparison.OrdinalIgnoreCase);
+            updated.ProtocolType = isIo ? DeviceProtocolType.Io : protocol;
 
             if (string.IsNullOrWhiteSpace(updated.HardwareName))
             {
@@ -120,7 +189,36 @@ namespace WpfApp2.UI
                 return false;
             }
 
-            if (protocol == DeviceProtocolType.Serial)
+            if (isIo)
+            {
+                if (IoDeviceTypeComboBox.SelectedItem == null)
+                {
+                    error = "请选择IO设备型号";
+                    return false;
+                }
+
+                var selectedType = (System.Windows.Controls.ComboBoxItem)IoDeviceTypeComboBox.SelectedItem;
+                if (!(selectedType.Tag is IoDeviceProfile profile))
+                {
+                    error = "IO设备型号无效";
+                    return false;
+                }
+
+                if (!uint.TryParse(IoPortTextBox.Text, out var port) || port < 1 || port > 8)
+                {
+                    error = "端口号必须在 1-8 之间";
+                    return false;
+                }
+
+                updated.Io = new DeviceIoOptions
+                {
+                    DeviceType = profile.DeviceType,
+                    Port = port,
+                    BusType = profile.BusType
+                };
+                updated.Brand = profile.Brand;
+            }
+            else if (protocol == DeviceProtocolType.Serial)
             {
                 var portName = SerialPortTextBox.Text?.Trim();
                 if (string.IsNullOrWhiteSpace(portName))
@@ -198,6 +296,12 @@ namespace WpfApp2.UI
                 };
             }
 
+            if (string.IsNullOrWhiteSpace(updated.Brand))
+            {
+                error = "设备品牌不能为空";
+                return false;
+            }
+
             config = updated;
             return true;
         }
@@ -211,9 +315,10 @@ namespace WpfApp2.UI
 
             foreach (var item in comboBox.Items)
             {
-                if (item is ComboBoxItem comboItem && comboItem.Tag is string tag)
+                if (item is System.Windows.Controls.ComboBoxItem comboItem)
                 {
-                    if (string.Equals(tag, tagValue, StringComparison.OrdinalIgnoreCase))
+                    var tag = comboItem.Tag?.ToString();
+                    if (!string.IsNullOrWhiteSpace(tag) && string.Equals(tag, tagValue, StringComparison.OrdinalIgnoreCase))
                     {
                         comboBox.SelectedItem = comboItem;
                         return;
@@ -243,7 +348,7 @@ namespace WpfApp2.UI
 
             foreach (var item in comboBox.Items)
             {
-                if (item is ComboBoxItem comboItem)
+                if (item is System.Windows.Controls.ComboBoxItem comboItem)
                 {
                     var tagText = comboItem.Tag?.ToString() ?? comboItem.Content?.ToString();
                     if (string.Equals(tagText, text, StringComparison.OrdinalIgnoreCase))
@@ -266,7 +371,7 @@ namespace WpfApp2.UI
                 return false;
             }
 
-            if (comboBox.SelectedItem is ComboBoxItem comboItem)
+            if (comboBox.SelectedItem is System.Windows.Controls.ComboBoxItem comboItem)
             {
                 var tagValue = comboItem.Tag?.ToString();
                 if (!string.IsNullOrWhiteSpace(tagValue) && Enum.TryParse(tagValue, true, out value))
@@ -288,6 +393,97 @@ namespace WpfApp2.UI
             }
 
             return false;
+        }
+
+        private void InitializeIoOptions()
+        {
+            if (IoDeviceTypeComboBox == null)
+            {
+                return;
+            }
+
+            IoDeviceTypeComboBox.Items.Clear();
+            foreach (var profile in IoDeviceCatalog.GetProfiles())
+            {
+                IoDeviceTypeComboBox.Items.Add(new System.Windows.Controls.ComboBoxItem
+                {
+                    Content = profile.DisplayName,
+                    Tag = profile
+                });
+            }
+
+            IoDeviceTypeComboBox.SelectionChanged += IoDeviceTypeComboBox_SelectionChanged;
+            if (IoDeviceTypeComboBox.Items.Count > 0)
+            {
+                IoDeviceTypeComboBox.SelectedIndex = 0;
+            }
+        }
+
+        private void IoDeviceTypeComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            UpdateIoProfileFromSelection();
+        }
+
+        private void UpdateIoProfileFromSelection()
+        {
+            var isIo = string.Equals(HardwareComboBox?.Text?.Trim(), "IO", StringComparison.OrdinalIgnoreCase);
+            if (!isIo)
+            {
+                return;
+            }
+
+            var profile = GetSelectedIoProfile();
+            if (profile == null)
+            {
+                return;
+            }
+
+            if (BrandComboBox != null)
+            {
+                BrandComboBox.Text = profile.Brand;
+            }
+
+            if (IoBusTypeText != null)
+            {
+                IoBusTypeText.Text = IoDeviceCatalog.FormatBusType(profile.BusType);
+            }
+        }
+
+        private IoDeviceProfile GetSelectedIoProfile()
+        {
+            if (IoDeviceTypeComboBox?.SelectedItem is System.Windows.Controls.ComboBoxItem comboItem
+                && comboItem.Tag is IoDeviceProfile profile)
+            {
+                return profile;
+            }
+
+            return null;
+        }
+
+        private void SelectIoDeviceType(SMTGPIODeviceType deviceType)
+        {
+            if (IoDeviceTypeComboBox == null)
+            {
+                return;
+            }
+
+            foreach (var item in IoDeviceTypeComboBox.Items)
+            {
+                if (item is System.Windows.Controls.ComboBoxItem comboItem && comboItem.Tag is IoDeviceProfile profile)
+                {
+                    if (profile.DeviceType == deviceType)
+                    {
+                        IoDeviceTypeComboBox.SelectedItem = comboItem;
+                        UpdateIoProfileFromSelection();
+                        return;
+                    }
+                }
+            }
+
+            if (IoDeviceTypeComboBox.Items.Count > 0)
+            {
+                IoDeviceTypeComboBox.SelectedIndex = 0;
+            }
         }
     }
 }

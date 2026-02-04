@@ -33,11 +33,9 @@
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
                     <TextBlock Grid.Column="0" Text="设备品牌" Foreground="White" VerticalAlignment="Center"/>
-                    <ComboBox Grid.Column="1" x:Name="BrandComboBox" Height="28" IsEditable="True">
+                    <ComboBox Grid.Column="1" x:Name="BrandComboBox" Height="28" IsEditable="False">
                         <ComboBoxItem Content="Keyence" Tag="Keyence"/>
-                        <ComboBoxItem Content="Mitsubishi" Tag="Mitsubishi"/>
-                        <ComboBoxItem Content="Omron" Tag="Omron"/>
-                        <ComboBoxItem Content="Other" Tag="Other"/>
+                        <ComboBoxItem Content="OPT" Tag="OPT"/>
                     </ComboBox>
                 </Grid>
 
@@ -47,11 +45,10 @@
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
                     <TextBlock Grid.Column="0" Text="硬件名称" Foreground="White" VerticalAlignment="Center"/>
-                    <ComboBox Grid.Column="1" x:Name="HardwareComboBox" Height="28" IsEditable="True">
+                    <ComboBox Grid.Column="1" x:Name="HardwareComboBox" Height="28" IsEditable="False"
+                              SelectionChanged="HardwareComboBox_SelectionChanged">
                         <ComboBoxItem Content="PLC" Tag="PLC"/>
-                        <ComboBoxItem Content="Camera" Tag="Camera"/>
                         <ComboBoxItem Content="IO" Tag="IO"/>
-                        <ComboBoxItem Content="Custom" Tag="Custom"/>
                     </ComboBox>
                 </Grid>
 
@@ -60,12 +57,34 @@
                         <ColumnDefinition Width="120"/>
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
-                    <TextBlock Grid.Column="0" Text="协议类型" Foreground="White" VerticalAlignment="Center"/>
-                    <ComboBox Grid.Column="1" x:Name="ProtocolComboBox" Height="28" SelectionChanged="ProtocolComboBox_SelectionChanged" SelectedIndex="0">
+                    <TextBlock Grid.Column="0" x:Name="ProtocolLabel" Text="协议类型" Foreground="White" VerticalAlignment="Center"/>
+                    <ComboBox Grid.Column="1" x:Name="ProtocolComboBox" Height="28" SelectionChanged="ProtocolComboBox_SelectionChanged" SelectedIndex="0" IsEditable="False">
                         <ComboBoxItem Content="Serial" Tag="Serial"/>
-                        <ComboBoxItem Content="TCP/IP" Tag="TcpIp"/>
                     </ComboBox>
                 </Grid>
+
+                <GroupBox x:Name="IoGroup" Header="IO 参数" Foreground="White" Margin="0,0,0,12">
+                    <Grid Margin="10">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="120"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <TextBlock Grid.Row="0" Grid.Column="0" Text="设备型号" Foreground="White" VerticalAlignment="Center"/>
+                        <ComboBox Grid.Row="0" Grid.Column="1" x:Name="IoDeviceTypeComboBox" Height="26"/>
+
+                        <TextBlock Grid.Row="1" Grid.Column="0" Text="端口号" Foreground="White" VerticalAlignment="Center"/>
+                        <TextBox Grid.Row="1" Grid.Column="1" x:Name="IoPortTextBox" Height="26"/>
+
+                        <TextBlock Grid.Row="2" Grid.Column="0" Text="连接方式" Foreground="White" VerticalAlignment="Center"/>
+                        <TextBlock Grid.Row="2" Grid.Column="1" x:Name="IoBusTypeText" Foreground="#FFBDC3C7" VerticalAlignment="Center"/>
+                    </Grid>
+                </GroupBox>
 
                 <GroupBox x:Name="SerialGroup" Header="串口参数" Foreground="White" Margin="0,0,0,12">
                     <Grid Margin="10">
