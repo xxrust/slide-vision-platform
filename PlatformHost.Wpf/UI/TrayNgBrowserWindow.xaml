@@ -1,0 +1,49 @@
+<Window x:Class="WpfApp2.UI.TrayNgBrowserWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Tray NG Browser"
+        Width="900"
+        Height="600"
+        WindowStartupLocation="CenterOwner">
+    <Grid Margin="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,8">
+            <TextBlock Text="浏览模式:" VerticalAlignment="Center" Margin="0,0,6,0"/>
+            <ComboBox x:Name="ModeSelector" Width="160" SelectionChanged="ModeSelector_SelectionChanged"/>
+            <ComboBox x:Name="HistorySelector" Width="200" Margin="12,0,0,0"
+                      SelectionChanged="HistorySelector_SelectionChanged"/>
+        </StackPanel>
+
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+            <ItemsControl x:Name="ItemsList">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <WrapPanel IsItemsHost="True"/>
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Border BorderBrush="LightGray" BorderThickness="1" Margin="6" Padding="6"
+                                ToolTip="{Binding ImagePath}">
+                            <StackPanel Width="180">
+                                <Image Source="{Binding Image}" Height="120" Stretch="Uniform"/>
+                                <TextBlock Text="{Binding Title}" Margin="0,6,0,0" TextWrapping="Wrap"/>
+                            </StackPanel>
+                        </Border>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </ScrollViewer>
+
+        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,8,0,0">
+            <Button x:Name="PrevButton" Content="上一页" Width="80" Margin="6,0" Click="PrevButton_Click"/>
+            <TextBlock x:Name="PageIndicator" VerticalAlignment="Center" Margin="6,0"/>
+            <Button x:Name="NextButton" Content="下一页" Width="80" Margin="6,0" Click="NextButton_Click"/>
+        </StackPanel>
+    </Grid>
+</Window>

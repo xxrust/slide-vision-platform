@@ -75,3 +75,11 @@ Thread: https://ampcode.com/threads/$AMP_CURRENT_THREAD_ID
   - Viewer refresh hooks rely on UpdateCellInfo to keep image/details current.
   - dev-browser skill unavailable, so browser verification was skipped.
 ---
+## 2026-02-04 08:28:15 +0800 - US-011
+Thread: https://ampcode.com/threads/$AMP_CURRENT_THREAD_ID
+- Added NG browser window with mode selection (current/history/all), pagination, and image path tooltips.
+- Files changed: PlatformHost.Wpf/UI/TrayNgBrowserWindow.xaml; PlatformHost.Wpf/UI/TrayNgBrowserWindow.xaml.cs; prd.json
+- **Learnings for future iterations:**
+  - NG browser expects NG-only items to be supplied by the caller.
+  - dev-browser skill unavailable, so browser verification was skipped.
+---
