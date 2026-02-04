@@ -21,14 +21,9 @@
                     <TextBlock Text="设备管理" FontSize="20" FontWeight="Bold" Foreground="#FF3498DB"/>
                     <TextBlock Text="查看已配置设备与连接状态" FontSize="12" Foreground="#FFBDC3C7" Margin="0,4,0,0"/>
                 </StackPanel>
-                <StackPanel Grid.Column="1" Orientation="Horizontal">
-                    <Button x:Name="PlcConfigButton" Content="PLC串口设置" Width="120" Height="32" Margin="0,0,10,0"
-                            Background="#FF9B59B6" Foreground="White" FontWeight="Bold"
-                            Click="PlcConfigButton_Click"/>
-                    <Button x:Name="RefreshButton" Content="刷新" Width="90" Height="32"
-                            Background="#FF3498DB" Foreground="White" FontWeight="Bold"
-                            Click="RefreshButton_Click"/>
-                </StackPanel>
+                <Button x:Name="RefreshButton" Grid.Column="1" Content="刷新" Width="90" Height="32"
+                        Background="#FF3498DB" Foreground="White" FontWeight="Bold"
+                        Click="RefreshButton_Click"/>
             </Grid>
         </Border>
 
@@ -96,6 +91,9 @@
             <Button x:Name="DeleteButton" Content="删除" Width="90" Height="32" Margin="0,0,10,0"
                     Background="#FFE74C3C" Foreground="White" FontWeight="Bold"
                     Click="DeleteButton_Click"/>
+            <Button x:Name="TestButton" Content="测试" Width="90" Height="32" Margin="0,0,10,0"
+                    Background="#FF9B59B6" Foreground="White" FontWeight="Bold"
+                    Click="TestButton_Click"/>
             <Button x:Name="CloseButton" Content="关闭" Width="90" Height="32"
                     Background="#FF95A5A6" Foreground="White" FontWeight="Bold"
                     Click="CloseButton_Click"/>

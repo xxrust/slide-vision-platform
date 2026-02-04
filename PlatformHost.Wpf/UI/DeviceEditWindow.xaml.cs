@@ -68,6 +68,10 @@ namespace WpfApp2.UI
         private void UpdateProtocolVisibility()
         {
             var protocol = GetSelectedProtocol();
+            if (SerialGroup == null || TcpGroup == null)
+            {
+                return;
+            }
             SerialGroup.Visibility = protocol == DeviceProtocolType.Serial ? Visibility.Visible : Visibility.Collapsed;
             TcpGroup.Visibility = protocol == DeviceProtocolType.TcpIp ? Visibility.Visible : Visibility.Collapsed;
         }

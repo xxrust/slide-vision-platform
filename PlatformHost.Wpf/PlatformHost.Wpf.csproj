@@ -319,6 +319,9 @@
     <Compile Include="UI\DeviceEditWindow.xaml.cs">
       <DependentUpon>DeviceEditWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="UI\PlcSerialTestWindow.xaml.cs">
+      <DependentUpon>PlcSerialTestWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UI\SystemTestWindow.xaml.cs">
       <DependentUpon>SystemTestWindow.xaml</DependentUpon>
     </Compile>
@@ -497,6 +500,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="UI\DeviceEditWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\PlcSerialTestWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

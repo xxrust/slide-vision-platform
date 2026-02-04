@@ -16,12 +16,12 @@
 
         <Grid Background="#FFF5F5F5" Margin="20">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="400"/>
-                <ColumnDefinition Width="*"/>
+                <ColumnDefinition x:Name="ConfigColumn" Width="400"/>
+                <ColumnDefinition x:Name="TestColumn" Width="*"/>
             </Grid.ColumnDefinitions>
 
             <!-- 左侧面板 -->
-            <Grid Grid.Column="0">
+            <Grid x:Name="ConfigPanel" Grid.Column="0">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="*"/>

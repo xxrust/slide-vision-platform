@@ -16,6 +16,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Windows.Threading;
 using WpfApp2.SMTGPIO;
+using WpfApp2.UI.Models;
 using System.IO;
 using Newtonsoft.Json;
 using Path = System.IO.Path;
@@ -134,6 +135,8 @@ namespace WpfApp2.UI
     {
         #region 私有字段
 
+        private readonly bool _testOnly;
+        private DeviceConfig _selectedDeviceConfig;
         private DispatcherTimer _statusUpdateTimer;
         private DispatcherTimer _componentStatusTimer;
         private ObservableCollection<ComponentDebugItem> _componentItems;
@@ -143,11 +146,20 @@ namespace WpfApp2.UI
 
         #region 构造函数
 
-        public PLCSerialConfigPage()
+        public PLCSerialConfigPage() : this(false)
         {
+        }
+
+        public PLCSerialConfigPage(bool testOnly)
+        {
+            _testOnly = testOnly;
             InitializeComponent();
             InitializeTimer();
             InitializeComponentDebug();
+            if (_testOnly)
+            {
+                ApplyTestOnlyLayout();
+            }
         }
 
         #endregion
@@ -161,6 +173,11 @@ namespace WpfApp2.UI
             
             // 确保界面控件有默认值
             EnsureDefaultSettings();
+
+            if (_testOnly && _selectedDeviceConfig != null)
+            {
+                ApplyDeviceConfig(_selectedDeviceConfig, updateUi: true);
+            }
             
             UpdateConnectionStatus();
             
@@ -172,8 +189,23 @@ namespace WpfApp2.UI
                 plcController.LogMessageEvent += OnPLCLogMessage;
                 LogMessage("已连接到现有PLC实例，订阅日志事件");
             }
-            
 
+
+        }
+
+        public void SetDeviceConfig(DeviceConfig config)
+        {
+            if (config == null)
+            {
+                return;
+            }
+
+            _selectedDeviceConfig = config.Clone();
+
+            if (IsLoaded)
+            {
+                ApplyDeviceConfig(_selectedDeviceConfig, updateUi: true);
+            }
         }
 
         private void InitializeTimer()
@@ -221,6 +253,24 @@ namespace WpfApp2.UI
             _componentStatusTimer.Start();
         }
 
+        private void ApplyTestOnlyLayout()
+        {
+            if (ConfigPanel != null)
+            {
+                ConfigPanel.Visibility = Visibility.Collapsed;
+            }
+
+            if (ConfigColumn != null)
+            {
+                ConfigColumn.Width = new GridLength(0);
+            }
+
+            if (TestColumn != null)
+            {
+                TestColumn.Width = new GridLength(1, GridUnitType.Star);
+            }
+        }
+
         private void RefreshPortsList()
         {
             try
@@ -249,6 +299,51 @@ namespace WpfApp2.UI
             catch (Exception ex)
             {
                 LogMessage($"刷新串口列表失败: {ex.Message}");
+            }
+        }
+
+        private void ApplyDeviceConfig(DeviceConfig config, bool updateUi)
+        {
+            var serial = config?.Serial;
+            if (serial == null)
+            {
+                return;
+            }
+
+            var controller = PLCSerialController.Instance;
+            controller.PortName = serial.PortName;
+            controller.BaudRate = serial.BaudRate;
+            controller.Timeout = serial.ReadTimeout;
+            controller.WriteTimeout = serial.WriteTimeout;
+
+            if (!updateUi)
+            {
+                return;
+            }
+
+            if (!string.IsNullOrWhiteSpace(serial.PortName) && !PortComboBox.Items.Contains(serial.PortName))
+            {
+                PortComboBox.Items.Add(serial.PortName);
+            }
+
+            if (!string.IsNullOrWhiteSpace(serial.PortName))
+            {
+                PortComboBox.SelectedValue = serial.PortName;
+            }
+
+            var baudRateText = serial.BaudRate.ToString();
+            foreach (System.Windows.Controls.ComboBoxItem item in BaudRateComboBox.Items)
+            {
+                if (string.Equals(item.Content?.ToString(), baudRateText, StringComparison.Ordinal))
+                {
+                    BaudRateComboBox.SelectedItem = item;
+                    break;
+                }
+            }
+
+            if (serial.ReadTimeout > 0)
+            {
+                TimeoutTextBox.Text = serial.ReadTimeout.ToString();
             }
         }
 
