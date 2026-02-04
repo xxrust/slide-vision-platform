@@ -19,7 +19,7 @@ namespace WpfApp2.UI
 
         private readonly Page1 _page;
         private readonly TrayDataManager _trayManager;
-        private readonly TraySqliteRepository _trayRepository;
+        private readonly ITrayRepository _trayRepository;
         private readonly TrayComponent _trayComponent;
         private TrayNgBrowserWindow _ngBrowser;
         private int _fallbackIndex;
@@ -32,7 +32,7 @@ namespace WpfApp2.UI
 
             _page = page;
             _trayManager = new TrayDataManager();
-            _trayRepository = new TraySqliteRepository(BuildConnectionString());
+            _trayRepository = new TrayMemoryRepository();
             _trayComponent = new TrayComponent(_trayManager, _trayRepository);
 
             RowsBox.Text = DefaultRows.ToString(CultureInfo.InvariantCulture);
@@ -52,14 +52,6 @@ namespace WpfApp2.UI
 
             Closed += OnTrayWindowClosed;
             _isInitializing = false;
-        }
-
-        private static string BuildConnectionString()
-        {
-            var dataDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Data");
-            Directory.CreateDirectory(dataDir);
-            var dbPath = Path.Combine(dataDir, "tray.db");
-            return $"Data Source={dbPath}";
         }
 
         private static string ResolveDefaultIconFolder()

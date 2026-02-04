@@ -6,7 +6,7 @@ using Microsoft.Data.Sqlite;
 
 namespace Slide.Platform.Runtime.Tray
 {
-    public sealed class TraySqliteRepository
+    public sealed class TraySqliteRepository : ITrayRepository
     {
         private readonly string _connectionString;
 

@@ -6,10 +6,10 @@ namespace Slide.Platform.Runtime.Tray
     public sealed class TrayComponent
     {
         private readonly TrayDataManager _manager;
-        private readonly TraySqliteRepository _repository;
+        private readonly ITrayRepository _repository;
         private TrayResultEventArgs _lastResult;
 
-        public TrayComponent(TrayDataManager manager, TraySqliteRepository repository, TrayMappingMode mappingMode = TrayMappingMode.Snake)
+        public TrayComponent(TrayDataManager manager, ITrayRepository repository, TrayMappingMode mappingMode = TrayMappingMode.Snake)
         {
             _manager = manager ?? throw new ArgumentNullException(nameof(manager));
             _repository = repository ?? throw new ArgumentNullException(nameof(repository));
