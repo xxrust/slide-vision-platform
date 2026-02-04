@@ -12,6 +12,12 @@ namespace WpfApp2.UI.Controls
 {
     public partial class TrayGridControl : UserControl
     {
+        private static readonly Brush GridBorderBrush = new SolidColorBrush(Color.FromRgb(93, 109, 126));
+        private static readonly Brush GridHeaderForeground = new SolidColorBrush(Color.FromRgb(236, 240, 241));
+        private static readonly Brush EmptyCellBrush = new SolidColorBrush(Color.FromRgb(44, 62, 80));
+        private static readonly Brush HiddenOkBrush = new SolidColorBrush(Color.FromRgb(52, 73, 94));
+        private static readonly Brush UnknownStateBrush = new SolidColorBrush(Color.FromRgb(127, 140, 141));
+
         public static readonly DependencyProperty RowsProperty = DependencyProperty.Register(
             nameof(Rows),
             typeof(int),
@@ -56,8 +62,8 @@ namespace WpfApp2.UI.Controls
             InitializeComponent();
             DefectStates = new Dictionary<string, TrayDefectVisual>(StringComparer.OrdinalIgnoreCase)
             {
-                ["OK"] = new TrayDefectVisual("ok.png", Colors.LightGreen),
-                ["NG"] = new TrayDefectVisual("ng.png", Colors.IndianRed)
+                ["OK"] = new TrayDefectVisual("ok.png", Color.FromRgb(40, 167, 69)),
+                ["NG"] = new TrayDefectVisual("ng.png", Color.FromRgb(231, 76, 60))
             };
         }
 
@@ -201,7 +207,8 @@ namespace WpfApp2.UI.Controls
                     FontWeight = FontWeights.Bold,
                     HorizontalAlignment = HorizontalAlignment.Center,
                     VerticalAlignment = VerticalAlignment.Center,
-                    Margin = new Thickness(4)
+                    Margin = new Thickness(4),
+                    Foreground = GridHeaderForeground
                 };
 
                 Grid.SetRow(header, 0);
@@ -221,7 +228,8 @@ namespace WpfApp2.UI.Controls
                     FontWeight = FontWeights.Bold,
                     HorizontalAlignment = HorizontalAlignment.Center,
                     VerticalAlignment = VerticalAlignment.Center,
-                    Margin = new Thickness(4)
+                    Margin = new Thickness(4),
+                    Foreground = GridHeaderForeground
                 };
 
                 Grid.SetRow(header, row);
@@ -239,9 +247,9 @@ namespace WpfApp2.UI.Controls
                 {
                     var border = new Border
                     {
-                        BorderBrush = Brushes.LightGray,
-                        BorderThickness = new Thickness(0.5),
-                        Background = Brushes.White
+                        BorderBrush = GridBorderBrush,
+                        BorderThickness = new Thickness(1),
+                        Background = EmptyCellBrush
                     };
 
                     var image = new Image
@@ -343,7 +351,7 @@ namespace WpfApp2.UI.Controls
         {
             if (string.IsNullOrWhiteSpace(state))
             {
-                cell.Border.Background = Brushes.White;
+                cell.Border.Background = EmptyCellBrush;
                 cell.Image.Source = null;
                 cell.Image.Visibility = Visibility.Collapsed;
                 cell.Border.Opacity = 1;
@@ -353,17 +361,17 @@ namespace WpfApp2.UI.Controls
 
             if (!ShowOkCells && string.Equals(state, "OK", StringComparison.OrdinalIgnoreCase))
             {
-                cell.Border.Background = Brushes.LightGray;
+                cell.Border.Background = HiddenOkBrush;
                 cell.Image.Source = null;
                 cell.Image.Visibility = Visibility.Collapsed;
-                cell.Border.Opacity = 0.3;
+                cell.Border.Opacity = 0.4;
                 cell.Border.IsEnabled = false;
                 return;
             }
 
             if (!DefectStates.TryGetValue(state, out var visual))
             {
-                cell.Border.Background = Brushes.LightGray;
+                cell.Border.Background = UnknownStateBrush;
                 cell.Image.Source = null;
                 cell.Image.Visibility = Visibility.Collapsed;
                 cell.Border.Opacity = 1;

@@ -7,7 +7,8 @@
              d:DesignWidth="400"
              d:DesignHeight="300">
     <ScrollViewer HorizontalScrollBarVisibility="Auto"
-                  VerticalScrollBarVisibility="Auto">
-        <Grid x:Name="GridRoot" Background="White"/>
+                  VerticalScrollBarVisibility="Auto"
+                  Background="#FF34495E">
+        <Grid x:Name="GridRoot" Background="#FF2C3E50"/>
     </ScrollViewer>
 </UserControl>

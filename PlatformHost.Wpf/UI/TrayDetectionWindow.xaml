@@ -7,6 +7,34 @@
         Height="820"
         Background="#FF2C3E50"
         WindowStartupLocation="CenterOwner">
+    <Window.Resources>
+        <Style x:Key="TopBarButton" TargetType="Button">
+            <Setter Property="Height" Value="30"/>
+            <Setter Property="Margin" Value="3,0"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="FontSize" Value="11"/>
+            <Setter Property="Padding" Value="6,0"/>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Opacity" Value="0.9"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+        <Style x:Key="TopBarToggle" TargetType="ToggleButton">
+            <Setter Property="Height" Value="30"/>
+            <Setter Property="Margin" Value="3,0"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="FontSize" Value="11"/>
+            <Setter Property="Padding" Value="6,0"/>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Opacity" Value="0.9"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+    </Window.Resources>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="60"/>
@@ -48,7 +76,7 @@
                     </Border>
                 </StackPanel>
 
-                <WrapPanel Grid.Column="2" VerticalAlignment="Center" Margin="10,0">
+                <WrapPanel Grid.Column="2" VerticalAlignment="Center" Margin="10,0" Visibility="Collapsed">
                     <TextBlock Text="行" Foreground="White" Margin="0,0,4,0" VerticalAlignment="Center"/>
                     <TextBox x:Name="RowsBox" Width="50" Margin="0,0,8,0" Foreground="White"
                              Background="#FF2C3E50" BorderBrush="#FF5D6D7E" BorderThickness="1"/>
@@ -62,35 +90,26 @@
                     <TextBox x:Name="IconFolderBox" Width="180" Margin="0,0,6,0" Foreground="White"
                              Background="#FF2C3E50" BorderBrush="#FF5D6D7E" BorderThickness="1"/>
                     <Button x:Name="BrowseIconButton" Content="浏览" Width="60" Height="26" Margin="0,0,10,0"
-                            Background="#FF17A2B8" BorderThickness="0" Foreground="White"
+                            Background="#FF17A2B8" Style="{StaticResource TopBarButton}"
                             Click="BrowseIconButton_Click"/>
                 </WrapPanel>
 
                 <StackPanel Grid.Column="3" Orientation="Horizontal" VerticalAlignment="Center" Margin="10,0">
-                    <Button x:Name="StartButton" Width="70" Height="30" Margin="3,0"
-                            Background="#FF8E44AD" BorderThickness="0" Foreground="White" FontSize="11"
-                            Content="开始托盘" Click="StartButton_Click"/>
-                    <Button x:Name="CompleteButton" Width="70" Height="30" Margin="3,0"
-                            Background="#FF27AE60" BorderThickness="0" Foreground="White" FontSize="11"
-                            Content="完成托盘" Click="CompleteButton_Click"/>
-                    <Button x:Name="ResetButton" Width="60" Height="30" Margin="3,0"
-                            Background="#FFE67E22" BorderThickness="0" Foreground="White" FontSize="11"
-                            Content="重置" Click="ResetButton_Click"/>
                     <ToggleButton x:Name="RotateToggle" Width="70" Height="30" Margin="3,0"
-                                  Background="#FFF39C12" BorderThickness="0" Foreground="White" FontSize="11"
+                                  Background="#FFF39C12" Style="{StaticResource TopBarToggle}"
                                   Checked="RotateCheck_Changed" Unchecked="RotateCheck_Changed">
                         <TextBlock x:Name="RotateToggleText" Text="旋转90°" FontSize="10"/>
                     </ToggleButton>
                     <ToggleButton x:Name="ShowOkToggle" Width="70" Height="30" Margin="3,0"
-                                  Background="#FF27AE60" BorderThickness="0" Foreground="White" FontSize="11"
+                                  Background="#FF27AE60" Style="{StaticResource TopBarToggle}"
                                   IsChecked="True" Checked="ShowOkCheck_Changed" Unchecked="ShowOkCheck_Changed">
                         <TextBlock x:Name="ShowOkToggleText" Text="良品显示" FontSize="10"/>
                     </ToggleButton>
                     <Button x:Name="NgBrowserButton" Width="70" Height="30" Margin="3,0"
-                            Background="#FF3498DB" BorderThickness="0" Foreground="White" FontSize="11"
+                            Background="#FF3498DB" Style="{StaticResource TopBarButton}"
                             Content="NG浏览" Click="NgBrowserButton_Click"/>
                     <Button x:Name="HelpButton" Width="60" Height="30" Margin="3,0"
-                            Background="#FF5D6D7E" BorderThickness="0" Foreground="White" FontSize="11"
+                            Background="#FF5D6D7E" Style="{StaticResource TopBarButton}"
                             Content="说明" Click="HelpButton_Click"/>
                 </StackPanel>
 

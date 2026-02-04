@@ -183,6 +183,8 @@ namespace WpfApp2.UI
 
         private void ProcessAlgorithmResult(AlgorithmResult result)
         {
+            EnsureTrayStarted();
+
             if (_trayManager.CurrentTray == null)
             {
                 return;
@@ -360,6 +362,32 @@ namespace WpfApp2.UI
         private void UpdateRotateToggleText()
         {
             RotateToggleText.Text = RotateToggle.IsChecked == true ? "旋转90°" : "旋转0°";
+        }
+
+        private void EnsureTrayStarted()
+        {
+            if (_trayManager.CurrentTray != null)
+            {
+                return;
+            }
+
+            if (!TryGetLayout(out var rows, out var cols))
+            {
+                rows = DefaultRows;
+                cols = DefaultCols;
+                RowsBox.Text = rows.ToString(CultureInfo.InvariantCulture);
+                ColsBox.Text = cols.ToString(CultureInfo.InvariantCulture);
+            }
+
+            var batchName = BatchBox.Text?.Trim();
+            _trayComponent.StartTray(rows, cols, batchName);
+            TrayGrid.Rows = rows;
+            TrayGrid.Cols = cols;
+            TrayGrid.ClearCells();
+            _fallbackIndex = 0;
+            UpdateTrayInfoText();
+            UpdateStatistics();
+            UpdateStatus("托盘已自动开始");
         }
 
         private void UpdateStatus(string message)
