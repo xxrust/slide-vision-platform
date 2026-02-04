@@ -49,6 +49,8 @@ namespace WpfApp2.UI.Controls
         private TrayCellImageWindow _viewerWindow;
         private (int Row, int Col)? _viewerPosition;
 
+        public event EventHandler<TrayCellClickedEventArgs> CellClicked;
+
         public TrayGridControl()
         {
             InitializeComponent();
@@ -91,6 +93,8 @@ namespace WpfApp2.UI.Controls
 
         public IDictionary<string, TrayDefectVisual> DefectStates { get; }
 
+        public (int Row, int Col)? LastClickedPosition { get; private set; }
+
         public void SetCellStatus(int row, int col, string state)
         {
             if (!_cells.TryGetValue((row, col), out var cell))
@@ -108,6 +112,14 @@ namespace WpfApp2.UI.Controls
             _cellInfo[(row, col)] = info;
             SetCellStatus(row, col, result);
             RefreshViewerIfNeeded(info);
+        }
+
+        public void ClearCells()
+        {
+            _cellStates.Clear();
+            _cellInfo.Clear();
+            LastClickedPosition = null;
+            RefreshCellVisuals();
         }
 
         private static void OnLayoutChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
@@ -258,6 +270,8 @@ namespace WpfApp2.UI.Controls
             if (sender is Border border && border.Tag is (int Row, int Col) position)
             {
                 ShowViewer(position.Row, position.Col);
+                LastClickedPosition = position;
+                CellClicked?.Invoke(this, new TrayCellClickedEventArgs(position.Row, position.Col));
             }
         }
 
@@ -423,5 +437,17 @@ namespace WpfApp2.UI.Controls
             public Border Border { get; }
             public Image Image { get; }
         }
+    }
+
+    public sealed class TrayCellClickedEventArgs : EventArgs
+    {
+        public TrayCellClickedEventArgs(int row, int col)
+        {
+            Row = row;
+            Col = col;
+        }
+
+        public int Row { get; }
+        public int Col { get; }
     }
 }

@@ -83,10 +83,11 @@ namespace WpfApp2.UI
         private UnifiedDetectionManager _detectionManager;
 
         // 算法引擎结果缓存
-        private AlgorithmResult _lastAlgorithmResult;
-        private AlgorithmResult _lastRenderResult;
-        private TemplateParameters _templateOverride;
-        private ImageGroupSet _lastExecutedImageGroup;
+        private AlgorithmResult _lastAlgorithmResult;
+        private AlgorithmResult _lastRenderResult;
+        private TemplateParameters _templateOverride;
+        private ImageGroupSet _lastExecutedImageGroup;
+        private TrayDetectionWindow _trayDetectionWindow;
         private readonly List<RenderSelectionOption> _renderSelectionOptions = new List<RenderSelectionOption>();
         private string _renderMainSelectionKey;
         private string _renderStepSelectionKey;
@@ -8785,7 +8786,7 @@ namespace WpfApp2.UI
                     () =>
                     {
                         window.Close();
-                        ShowTrayHelpWindow();
+                        OpenTrayDetectionWindow();
                         return Task.CompletedTask;
                     })
             };
@@ -8839,7 +8840,7 @@ namespace WpfApp2.UI
             return window;
         }
 
-        private void ShowTrayHelpWindow()
+        public void ShowTrayHelpWindow()
         {
             var window = new Window
             {
@@ -8928,6 +8929,21 @@ namespace WpfApp2.UI
 
             window.Content = scrollViewer;
             window.ShowDialog();
+        }
+
+        private void OpenTrayDetectionWindow()
+        {
+            if (_trayDetectionWindow == null)
+            {
+                _trayDetectionWindow = new TrayDetectionWindow(this)
+                {
+                    Owner = Window.GetWindow(this)
+                };
+                _trayDetectionWindow.Closed += (_, __) => _trayDetectionWindow = null;
+            }
+
+            _trayDetectionWindow.Show();
+            _trayDetectionWindow.Activate();
         }
 
         /// <summary>
@@ -10748,12 +10764,13 @@ namespace WpfApp2.UI
                 });
             }
 
-            result.DebugInfo["TemplateName"] = CurrentTemplateName ?? string.Empty;
-            result.DebugInfo["LotNumber"] = CurrentLotValue ?? string.Empty;
-            result.DebugInfo["RequestedEngineId"] = requestedEngineId;
-
-            return result;
-        }
+            result.DebugInfo["TemplateName"] = CurrentTemplateName ?? string.Empty;
+            result.DebugInfo["LotNumber"] = CurrentLotValue ?? string.Empty;
+            result.DebugInfo["RequestedEngineId"] = requestedEngineId;
+            result.DebugInfo["ImageNumber"] = GetCurrentImageNumberForRecord() ?? string.Empty;
+
+            return result;
+        }
 
         private void PublishAlgorithmResult(AlgorithmResult result)
         {
@@ -11219,7 +11236,7 @@ namespace WpfApp2.UI
         /// 生产模式：复用TemplateConfigPage.GetCurrentImageNumber()
         /// 图片测试模式：从当前图片名提取纯数字序号
         /// </summary>
-        private string GetCurrentImageNumberForRecord()
+        public string GetCurrentImageNumberForRecord()
         {
             try
             {
@@ -11267,7 +11284,18 @@ namespace WpfApp2.UI
                 LogManager.Warning($"获取图片序号失败: {ex.Message}");
                 return "";
             }
-        }
+        }
+
+        public string GetCurrentTrayImagePath()
+        {
+            var group = ResolvePreviewImageGroup();
+            if (group == null)
+            {
+                return null;
+            }
+
+            return group.Source1Path ?? group.HeightImagePath ?? group.GrayImagePath;
+        }
 
         /// <summary>
         /// 当前LOT号（用于图片存储目录管理）
