@@ -1,10 +1,10 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
-  <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{C9F87A87-BE4C-4299-9BEF-68700E0624F3}</ProjectGuid>
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{C9F87A87-BE4C-4299-9BEF-68700E0624F3}</ProjectGuid>
     <OutputType>WinExe</OutputType>
     <RootNamespace>WpfApp2</RootNamespace>
     <AssemblyName>Slide</AssemblyName>
@@ -33,10 +33,14 @@
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <BootstrapperEnabled>true</BootstrapperEnabled>
-    <GenerateResourceMSBuildRuntime>CurrentRuntime</GenerateResourceMSBuildRuntime>
-    <GenerateResourceMSBuildArchitecture>CurrentArchitecture</GenerateResourceMSBuildArchitecture>
-    <IncludePackageReferencesDuringMarkupCompilation>false</IncludePackageReferencesDuringMarkupCompilation>
-  </PropertyGroup>
+    <GenerateResourceMSBuildRuntime>CurrentRuntime</GenerateResourceMSBuildRuntime>
+    <GenerateResourceMSBuildArchitecture>CurrentArchitecture</GenerateResourceMSBuildArchitecture>
+    <IncludePackageReferencesDuringMarkupCompilation>false</IncludePackageReferencesDuringMarkupCompilation>
+  </PropertyGroup>
+  <PropertyGroup>
+    <SQLitePclRawVersion>2.0.6</SQLitePclRawVersion>
+    <NuGetPackageRoot Condition="'$(NuGetPackageRoot)' == ''">$(UserProfile)\.nuget\packages\</NuGetPackageRoot>
+  </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
@@ -131,8 +135,8 @@
     <PackageReference Include="SkiaSharp.NativeAssets.Win32" Version="2.88.9" />
     <PackageReference Include="SkiaSharp.Views.Desktop.Common" Version="2.88.9" />
     <PackageReference Include="SkiaSharp.Views.WPF" Version="2.88.9" />
-    <PackageReference Include="SQLitePCLRaw.bundle_e_sqlite3" Version="2.0.6" />
-    <PackageReference Include="SQLitePCLRaw.lib.e_sqlite3" Version="2.0.6" />
+    <PackageReference Include="SQLitePCLRaw.bundle_e_sqlite3" Version="$(SQLitePclRawVersion)" />
+    <PackageReference Include="SQLitePCLRaw.lib.e_sqlite3" Version="$(SQLitePclRawVersion)" />
     <PackageReference Include="System.Buffers" Version="4.5.1" />
     <PackageReference Include="System.Drawing.Common" Version="4.7.3" />
     <PackageReference Include="System.IO.FileSystem.Primitives" Version="4.0.1" />
@@ -175,11 +179,11 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
-  <ItemGroup>
-    <ApplicationDefinition Include="App.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </ApplicationDefinition>
+  <ItemGroup>
+    <ApplicationDefinition Include="App.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </ApplicationDefinition>
     <Compile Include="AutoStartupManager.cs" />
     <Compile Include="defectData.cs" />
     <Compile Include="DefectType.cs" />
@@ -239,7 +243,7 @@
       <DependentUpon>Page1.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI\Page1.Cicd.cs" />
-    <Compile Include="UI\Page1.SingleSampleDynamicStatic.cs" />
+    <Compile Include="UI\Page1.SingleSampleDynamicStatic.cs" />
     <Compile Include="UI\Page2.xaml.cs">
       <DependentUpon>Page2.xaml</DependentUpon>
     </Compile>
@@ -633,19 +637,27 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
-  <ItemGroup>
-    <BootstrapperPackage Include=".NETFramework,Version=v4.8">
-      <Visible>False</Visible>
-      <ProductName>Microsoft .NET Framework 4.8 %28x86 和 x64%29</ProductName>
-      <Install>true</Install>
+  <ItemGroup>
+    <BootstrapperPackage Include=".NETFramework,Version=v4.8">
+      <Visible>False</Visible>
+      <ProductName>Microsoft .NET Framework 4.8 %28x86 和 x64%29</ProductName>
+      <Install>true</Install>
     </BootstrapperPackage>
     <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
       <Visible>False</Visible>
       <ProductName>.NET Framework 3.5 SP1</ProductName>
       <Install>false</Install>
-    </BootstrapperPackage>
-  </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+    </BootstrapperPackage>
+  </ItemGroup>
+  <Target Name="CopySqliteNative" AfterTargets="Build">
+    <PropertyGroup>
+      <_sqliteRid Condition="'$(PlatformTarget)' == 'x86' Or '$(Prefer32Bit)' == 'true'">win-x86</_sqliteRid>
+      <_sqliteRid Condition="'$(_sqliteRid)' == ''">win-x64</_sqliteRid>
+      <_sqliteNative>$(NuGetPackageRoot)sqlitepclraw.lib.e_sqlite3\$(SQLitePclRawVersion)\runtimes\$(_sqliteRid)\native\e_sqlite3.dll</_sqliteNative>
+    </PropertyGroup>
+    <Copy SourceFiles="$(_sqliteNative)" DestinationFolder="$(TargetDir)" SkipUnchangedFiles="true" Condition="Exists('$(_sqliteNative)')" />
+  </Target>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(MSBuildSDKsPath)\Microsoft.NET.Sdk.WindowsDesktop\targets\Microsoft.WinFX.targets" Condition="Exists('$(MSBuildSDKsPath)\Microsoft.NET.Sdk.WindowsDesktop\targets\Microsoft.WinFX.targets')" />
   <Import Project="$(SystemRoot)\Microsoft.NET\Framework\v4.0.30319\Microsoft.WinFx.targets" Condition="'$(MSBuildRuntimeType)' != 'Core' and Exists('$(SystemRoot)\Microsoft.NET\Framework\v4.0.30319\Microsoft.WinFx.targets')" />
 </Project>
