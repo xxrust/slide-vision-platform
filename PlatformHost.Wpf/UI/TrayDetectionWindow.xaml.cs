@@ -23,9 +23,11 @@ namespace WpfApp2.UI
         private readonly TrayComponent _trayComponent;
         private TrayNgBrowserWindow _ngBrowser;
         private int _fallbackIndex;
+        private bool _isInitializing;
 
         public TrayDetectionWindow(Page1 page)
         {
+            _isInitializing = true;
             InitializeComponent();
 
             _page = page;
@@ -49,6 +51,7 @@ namespace WpfApp2.UI
             }
 
             Closed += OnTrayWindowClosed;
+            _isInitializing = false;
         }
 
         private static string BuildConnectionString()
@@ -99,11 +102,21 @@ namespace WpfApp2.UI
 
         private void ShowOkCheck_Changed(object sender, RoutedEventArgs e)
         {
+            if (_isInitializing || TrayGrid == null)
+            {
+                return;
+            }
+
             TrayGrid.ShowOkCells = ShowOkCheck.IsChecked == true;
         }
 
         private void RotateCheck_Changed(object sender, RoutedEventArgs e)
         {
+            if (_isInitializing || TrayGrid == null)
+            {
+                return;
+            }
+
             TrayGrid.Rotate90 = RotateCheck.IsChecked == true;
         }
 
