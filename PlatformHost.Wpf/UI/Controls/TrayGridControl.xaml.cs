@@ -28,6 +28,12 @@ namespace WpfApp2.UI.Controls
             typeof(TrayGridControl),
             new PropertyMetadata(null, OnIconFolderChanged));
 
+        public static readonly DependencyProperty ShowOkCellsProperty = DependencyProperty.Register(
+            nameof(ShowOkCells),
+            typeof(bool),
+            typeof(TrayGridControl),
+            new PropertyMetadata(true, OnShowOkCellsChanged));
+
         private readonly Dictionary<(int Row, int Col), CellVisual> _cells = new Dictionary<(int Row, int Col), CellVisual>();
         private readonly Dictionary<(int Row, int Col), string> _cellStates = new Dictionary<(int Row, int Col), string>();
         private readonly Dictionary<string, ImageSource> _iconCache = new Dictionary<string, ImageSource>(StringComparer.OrdinalIgnoreCase);
@@ -60,6 +66,12 @@ namespace WpfApp2.UI.Controls
             set => SetValue(IconFolderProperty, value);
         }
 
+        public bool ShowOkCells
+        {
+            get => (bool)GetValue(ShowOkCellsProperty);
+            set => SetValue(ShowOkCellsProperty, value);
+        }
+
         public IDictionary<string, TrayDefectVisual> DefectStates { get; }
 
         public void SetCellStatus(int row, int col, string state)
@@ -86,6 +98,14 @@ namespace WpfApp2.UI.Controls
             if (d is TrayGridControl control)
             {
                 control._iconCache.Clear();
+                control.RefreshCellVisuals();
+            }
+        }
+
+        private static void OnShowOkCellsChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            if (d is TrayGridControl control)
+            {
                 control.RefreshCellVisuals();
             }
         }
@@ -215,6 +235,18 @@ namespace WpfApp2.UI.Controls
                 cell.Border.Background = Brushes.White;
                 cell.Image.Source = null;
                 cell.Image.Visibility = Visibility.Collapsed;
+                cell.Border.Opacity = 1;
+                cell.Border.IsEnabled = true;
+                return;
+            }
+
+            if (!ShowOkCells && string.Equals(state, "OK", StringComparison.OrdinalIgnoreCase))
+            {
+                cell.Border.Background = Brushes.LightGray;
+                cell.Image.Source = null;
+                cell.Image.Visibility = Visibility.Collapsed;
+                cell.Border.Opacity = 0.3;
+                cell.Border.IsEnabled = false;
                 return;
             }
 
@@ -223,10 +255,14 @@ namespace WpfApp2.UI.Controls
                 cell.Border.Background = Brushes.LightGray;
                 cell.Image.Source = null;
                 cell.Image.Visibility = Visibility.Collapsed;
+                cell.Border.Opacity = 1;
+                cell.Border.IsEnabled = true;
                 return;
             }
 
             cell.Border.Background = new SolidColorBrush(visual.FallbackColor);
+            cell.Border.Opacity = 1;
+            cell.Border.IsEnabled = true;
 
             var iconPath = ResolveIconPath(visual.IconFileName);
             if (string.IsNullOrWhiteSpace(iconPath) || !File.Exists(iconPath))

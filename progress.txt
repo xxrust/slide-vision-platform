@@ -51,3 +51,11 @@ Thread: https://ampcode.com/threads/$AMP_CURRENT_THREAD_ID
   - Tray grid stores logical row/col state to reapply visuals when layout changes.
   - dev-browser skill unavailable, so browser verification was skipped.
 ---
+## 2026-02-04 08:21:23 +0800 - US-008
+Thread: https://ampcode.com/threads/$AMP_CURRENT_THREAD_ID
+- Added ShowOkCells toggle to suppress OK visuals and visually subdue those cells.
+- Files changed: PlatformHost.Wpf/UI/Controls/TrayGridControl.xaml.cs; prd.json
+- **Learnings for future iterations:**
+  - OK suppression dims and disables the cell while keeping NG states visible.
+  - dev-browser skill unavailable, so browser verification was skipped.
+---
