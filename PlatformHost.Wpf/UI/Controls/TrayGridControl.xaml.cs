@@ -1,6 +1,10 @@
+using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
+using System.Windows.Media.Imaging;
 
 namespace WpfApp2.UI.Controls
 {
@@ -18,9 +22,24 @@ namespace WpfApp2.UI.Controls
             typeof(TrayGridControl),
             new PropertyMetadata(0, OnLayoutChanged));
 
+        public static readonly DependencyProperty IconFolderProperty = DependencyProperty.Register(
+            nameof(IconFolder),
+            typeof(string),
+            typeof(TrayGridControl),
+            new PropertyMetadata(null, OnIconFolderChanged));
+
+        private readonly Dictionary<(int Row, int Col), CellVisual> _cells = new Dictionary<(int Row, int Col), CellVisual>();
+        private readonly Dictionary<(int Row, int Col), string> _cellStates = new Dictionary<(int Row, int Col), string>();
+        private readonly Dictionary<string, ImageSource> _iconCache = new Dictionary<string, ImageSource>(StringComparer.OrdinalIgnoreCase);
+
         public TrayGridControl()
         {
             InitializeComponent();
+            DefectStates = new Dictionary<string, TrayDefectVisual>(StringComparer.OrdinalIgnoreCase)
+            {
+                ["OK"] = new TrayDefectVisual("ok.png", Colors.LightGreen),
+                ["NG"] = new TrayDefectVisual("ng.png", Colors.IndianRed)
+            };
         }
 
         public int Rows
@@ -35,11 +54,39 @@ namespace WpfApp2.UI.Controls
             set => SetValue(ColsProperty, value);
         }
 
+        public string IconFolder
+        {
+            get => (string)GetValue(IconFolderProperty);
+            set => SetValue(IconFolderProperty, value);
+        }
+
+        public IDictionary<string, TrayDefectVisual> DefectStates { get; }
+
+        public void SetCellStatus(int row, int col, string state)
+        {
+            if (!_cells.TryGetValue((row, col), out var cell))
+            {
+                return;
+            }
+
+            _cellStates[(row, col)] = state;
+            ApplyCellVisual(cell, state);
+        }
+
         private static void OnLayoutChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             if (d is TrayGridControl control)
             {
                 control.RebuildGrid();
+            }
+        }
+
+        private static void OnIconFolderChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            if (d is TrayGridControl control)
+            {
+                control._iconCache.Clear();
+                control.RefreshCellVisuals();
             }
         }
 
@@ -53,6 +100,7 @@ namespace WpfApp2.UI.Controls
             GridRoot.Children.Clear();
             GridRoot.RowDefinitions.Clear();
             GridRoot.ColumnDefinitions.Clear();
+            _cells.Clear();
 
             if (Rows <= 0 || Cols <= 0)
             {
@@ -74,6 +122,7 @@ namespace WpfApp2.UI.Controls
             AddColumnHeaders();
             AddRowHeaders();
             AddCells();
+            RefreshCellVisuals();
         }
 
         private void AddColumnHeaders()
@@ -129,21 +178,115 @@ namespace WpfApp2.UI.Controls
                         Background = Brushes.White
                     };
 
-                    var text = new TextBlock
+                    var image = new Image
                     {
-                        Text = $"{logicalRow},{col}",
-                        FontSize = 10,
-                        Foreground = Brushes.Gray,
+                        Stretch = Stretch.Uniform,
                         HorizontalAlignment = HorizontalAlignment.Center,
-                        VerticalAlignment = VerticalAlignment.Center
+                        VerticalAlignment = VerticalAlignment.Center,
+                        Visibility = Visibility.Collapsed
                     };
 
-                    border.Child = text;
+                    border.Child = image;
+                    border.ToolTip = $"{logicalRow},{col}";
                     Grid.SetRow(border, row);
                     Grid.SetColumn(border, col);
                     GridRoot.Children.Add(border);
+
+                    _cells[(logicalRow, col)] = new CellVisual(border, image);
                 }
             }
+        }
+
+        private void RefreshCellVisuals()
+        {
+            foreach (var kvp in _cellStates)
+            {
+                if (_cells.TryGetValue(kvp.Key, out var cell))
+                {
+                    ApplyCellVisual(cell, kvp.Value);
+                }
+            }
+        }
+
+        private void ApplyCellVisual(CellVisual cell, string state)
+        {
+            if (string.IsNullOrWhiteSpace(state))
+            {
+                cell.Border.Background = Brushes.White;
+                cell.Image.Source = null;
+                cell.Image.Visibility = Visibility.Collapsed;
+                return;
+            }
+
+            if (!DefectStates.TryGetValue(state, out var visual))
+            {
+                cell.Border.Background = Brushes.LightGray;
+                cell.Image.Source = null;
+                cell.Image.Visibility = Visibility.Collapsed;
+                return;
+            }
+
+            cell.Border.Background = new SolidColorBrush(visual.FallbackColor);
+
+            var iconPath = ResolveIconPath(visual.IconFileName);
+            if (string.IsNullOrWhiteSpace(iconPath) || !File.Exists(iconPath))
+            {
+                cell.Image.Source = null;
+                cell.Image.Visibility = Visibility.Collapsed;
+                return;
+            }
+
+            if (!_iconCache.TryGetValue(iconPath, out var image))
+            {
+                image = LoadIcon(iconPath);
+                if (image != null)
+                {
+                    _iconCache[iconPath] = image;
+                }
+            }
+
+            cell.Image.Source = image;
+            cell.Image.Visibility = image == null ? Visibility.Collapsed : Visibility.Visible;
+        }
+
+        private string ResolveIconPath(string iconFileName)
+        {
+            if (string.IsNullOrWhiteSpace(iconFileName) || string.IsNullOrWhiteSpace(IconFolder))
+            {
+                return null;
+            }
+
+            return Path.Combine(IconFolder, iconFileName);
+        }
+
+        private static ImageSource LoadIcon(string iconPath)
+        {
+            try
+            {
+                var bitmap = new BitmapImage();
+                bitmap.BeginInit();
+                bitmap.UriSource = new Uri(iconPath, UriKind.Absolute);
+                bitmap.CacheOption = BitmapCacheOption.OnLoad;
+                bitmap.EndInit();
+                bitmap.Freeze();
+                return bitmap;
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
+        private sealed class CellVisual
+        {
+            public CellVisual(Border border, Image image)
+            {
+                Border = border;
+                Image = image;
+            }
+
+            public Border Border { get; }
+            public Image Image { get; }
         }
     }
 }
