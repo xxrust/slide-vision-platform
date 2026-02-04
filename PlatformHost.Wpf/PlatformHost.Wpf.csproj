@@ -315,6 +315,9 @@
     <Compile Include="UI\DeviceManagementWindow.xaml.cs">
       <DependentUpon>DeviceManagementWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="UI\DeviceEditWindow.xaml.cs">
+      <DependentUpon>DeviceEditWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UI\SystemTestWindow.xaml.cs">
       <DependentUpon>SystemTestWindow.xaml</DependentUpon>
     </Compile>
@@ -489,6 +492,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="UI\DeviceManagementWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\DeviceEditWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

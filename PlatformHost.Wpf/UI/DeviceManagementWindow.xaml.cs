@@ -33,6 +33,73 @@ namespace WpfApp2.UI
             Close();
         }
 
+        private void AddButton_Click(object sender, RoutedEventArgs e)
+        {
+            var dialog = new DeviceEditWindow(new DeviceConfig(), false)
+            {
+                Owner = this
+            };
+
+            if (dialog.ShowDialog() == true)
+            {
+                if (!DeviceManager.Instance.AddDevice(dialog.ResultConfig, out var error))
+                {
+                    MessageBox.Show(error, "提示", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return;
+                }
+
+                RefreshDevices();
+            }
+        }
+
+        private void EditButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (!(DeviceGrid.SelectedItem is DeviceListItem selected))
+            {
+                MessageBox.Show("请先选择设备", "提示", MessageBoxButton.OK, MessageBoxImage.Information);
+                return;
+            }
+
+            var dialog = new DeviceEditWindow(selected.Config, true)
+            {
+                Owner = this
+            };
+
+            if (dialog.ShowDialog() == true)
+            {
+                if (!DeviceManager.Instance.UpdateDevice(dialog.ResultConfig, out var error))
+                {
+                    MessageBox.Show(error, "提示", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return;
+                }
+
+                RefreshDevices();
+            }
+        }
+
+        private void DeleteButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (!(DeviceGrid.SelectedItem is DeviceListItem selected))
+            {
+                MessageBox.Show("请先选择设备", "提示", MessageBoxButton.OK, MessageBoxImage.Information);
+                return;
+            }
+
+            var confirm = MessageBox.Show($"确定删除设备 \"{selected.Name}\" 吗？", "确认删除", MessageBoxButton.YesNo, MessageBoxImage.Warning);
+            if (confirm != MessageBoxResult.Yes)
+            {
+                return;
+            }
+
+            if (!DeviceManager.Instance.RemoveDevice(selected.Config.Id, out var error))
+            {
+                MessageBox.Show(error, "提示", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            RefreshDevices();
+        }
+
         private void RefreshDevices()
         {
             _items.Clear();
@@ -79,6 +146,7 @@ namespace WpfApp2.UI
 
             return new DeviceListItem
             {
+                Config = device.Clone(),
                 Name = device.Name,
                 Protocol = protocol,
                 Address = address,
@@ -120,6 +188,7 @@ namespace WpfApp2.UI
 
         private sealed class DeviceListItem
         {
+            public DeviceConfig Config { get; set; }
             public string Name { get; set; }
             public string Protocol { get; set; }
             public string Address { get; set; }

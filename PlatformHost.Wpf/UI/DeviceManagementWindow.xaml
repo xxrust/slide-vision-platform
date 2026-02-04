@@ -80,6 +80,15 @@
         </Grid>
 
         <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,15,0,0">
+            <Button x:Name="AddButton" Content="新增" Width="90" Height="32" Margin="0,0,10,0"
+                    Background="#FF27AE60" Foreground="White" FontWeight="Bold"
+                    Click="AddButton_Click"/>
+            <Button x:Name="EditButton" Content="编辑" Width="90" Height="32" Margin="0,0,10,0"
+                    Background="#FF3498DB" Foreground="White" FontWeight="Bold"
+                    Click="EditButton_Click"/>
+            <Button x:Name="DeleteButton" Content="删除" Width="90" Height="32" Margin="0,0,10,0"
+                    Background="#FFE74C3C" Foreground="White" FontWeight="Bold"
+                    Click="DeleteButton_Click"/>
             <Button x:Name="CloseButton" Content="关闭" Width="90" Height="32"
                     Background="#FF95A5A6" Foreground="White" FontWeight="Bold"
                     Click="CloseButton_Click"/>

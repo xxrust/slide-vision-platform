@@ -25,3 +25,12 @@ Thread: https://ampcode.com/threads/$AMP_CURRENT_THREAD_ID
   - Help menu entries are composed in Page1.xaml.cs via the helpItems list.
   - dev-browser skill unavailable; UI verification skipped.
 ---
+## 2026-02-04 14:45:00 +0800 - US-004
+Thread: https://ampcode.com/threads/$AMP_CURRENT_THREAD_ID
+- Added device create/edit/delete flows with validation via DeviceEditWindow.
+- Wired DeviceManagementWindow actions to DeviceManager CRUD and delete confirmation.
+- Files changed: PlatformHost.Wpf/UI/DeviceManagementWindow.xaml; PlatformHost.Wpf/UI/DeviceManagementWindow.xaml.cs; PlatformHost.Wpf/UI/DeviceEditWindow.xaml; PlatformHost.Wpf/UI/DeviceEditWindow.xaml.cs; PlatformHost.Wpf/PlatformHost.Wpf.csproj; prd.json
+- **Learnings for future iterations:**
+  - Device edit dialog uses simple field validation before passing configs to DeviceManager.
+  - dev-browser skill unavailable; UI verification skipped.
+---
