@@ -8766,18 +8766,29 @@ namespace WpfApp2.UI
                         OpenCicdAcceptanceCriteriaWindow();
                         return Task.CompletedTask;
                     }),
-                new HelpMenuItem(
-                    "📊",
-                    "CICD CSV 对比",
-                    new SolidColorBrush(Color.FromRgb(33, 150, 243)),
-                    Brushes.White,
-                    () =>
-                    {
-                        window.Close();
-                        ImportCicdTestCsvAndCompare();
-                        return Task.CompletedTask;
-                    })
-            };
+                new HelpMenuItem(
+                    "📊",
+                    "CICD CSV 对比",
+                    new SolidColorBrush(Color.FromRgb(33, 150, 243)),
+                    Brushes.White,
+                    () =>
+                    {
+                        window.Close();
+                        ImportCicdTestCsvAndCompare();
+                        return Task.CompletedTask;
+                    }),
+                new HelpMenuItem(
+                    "🧩",
+                    "Tray 检测组件",
+                    new SolidColorBrush(Color.FromRgb(26, 188, 156)),
+                    Brushes.White,
+                    () =>
+                    {
+                        window.Close();
+                        ShowTrayHelpWindow();
+                        return Task.CompletedTask;
+                    })
+            };
 
             const int pageSize = 25;
             int currentPage = 0;
@@ -8824,13 +8835,104 @@ namespace WpfApp2.UI
 
             RenderPage();
 
-            window.Content = mainGrid;
-            return window;
-        }
-
-        /// <summary>
-        /// 打开实时数据导出配置窗口
-        /// </summary>
+            window.Content = mainGrid;
+            return window;
+        }
+
+        private void ShowTrayHelpWindow()
+        {
+            var window = new Window
+            {
+                Title = "Tray 检测组件",
+                Width = 860,
+                Height = 700,
+                WindowStartupLocation = WindowStartupLocation.CenterOwner,
+                Owner = Window.GetWindow(this),
+                Background = Brushes.White
+            };
+
+            var scrollViewer = new ScrollViewer
+            {
+                VerticalScrollBarVisibility = ScrollBarVisibility.Auto
+            };
+
+            var panel = new StackPanel
+            {
+                Margin = new Thickness(24)
+            };
+
+            scrollViewer.Content = panel;
+
+            void AddTitle(string text)
+            {
+                panel.Children.Add(new TextBlock
+                {
+                    Text = text,
+                    FontSize = 18,
+                    FontWeight = FontWeights.Bold,
+                    Margin = new Thickness(0, 0, 0, 12)
+                });
+            }
+
+            void AddSection(string title, string content)
+            {
+                panel.Children.Add(new TextBlock
+                {
+                    Text = title,
+                    FontSize = 14,
+                    FontWeight = FontWeights.SemiBold,
+                    Margin = new Thickness(0, 12, 0, 6)
+                });
+
+                panel.Children.Add(new TextBlock
+                {
+                    Text = content,
+                    TextWrapping = TextWrapping.Wrap,
+                    LineHeight = 20
+                });
+            }
+
+            AddTitle("Tray 检测组件说明");
+
+            AddSection("接口 API",
+                "StartTray(rows, cols, batchName)\n" +
+                "UpdateResult(position, result, imagePath, time)\n" +
+                "CompleteTray()\n" +
+                "ResetCurrentTray()\n" +
+                "GetStatistics()\n" +
+                "GetHistory(limit)\n" +
+                "RequestManualRetest(position)");
+
+            AddSection("数据结构",
+                "TrayData: trayId、rows、cols、batchName、createdAt、completedAt、materials\n" +
+                "MaterialData: row、col、result、imagePath、detectionTime\n" +
+                "TrayStatistics: totalSlots、inspectedCount、okCount、ngCount、yieldRate、defectCounts\n" +
+                "TrayPosition: row/col 位置对象");
+
+            AddSection("坐标映射规则",
+                "默认蛇形映射：奇数行从左到右，偶数行从右到左。\n" +
+                "position 支持 \"row_col\" 或 index（0 基），转换规则通过 TrayCoordinateMapper 实现。\n" +
+                "UI 坐标以左下角为 (1,1)。");
+
+            AddSection("缺陷状态与图标",
+                "状态映射默认支持 OK / NG。\n" +
+                "图标文件名：ok.png、ng.png（可配置 IconFolder 路径）。\n" +
+                "若图标缺失，将使用备用颜色进行显示。");
+
+            AddSection("示例集成",
+                "var tray = trayComponent.StartTray(10, 9, \"Batch-001\");\n" +
+                "trayComponent.UpdateResult(\"1_1\", \"OK\", \"c:\\\\images\\\\ok.png\", DateTime.UtcNow);\n" +
+                "trayComponent.UpdateResult(\"2\", \"NG\", \"c:\\\\images\\\\ng.png\", DateTime.UtcNow);\n" +
+                "var stats = trayComponent.GetStatistics();\n" +
+                "var history = trayComponent.GetHistory(10);");
+
+            window.Content = scrollViewer;
+            window.ShowDialog();
+        }
+
+        /// <summary>
+        /// 打开实时数据导出配置窗口
+        /// </summary>
         private void OpenRealTimeDataExportConfigWindow()
         {
             try

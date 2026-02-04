@@ -90,3 +90,11 @@ Thread: https://ampcode.com/threads/$AMP_CURRENT_THREAD_ID
 - **Learnings for future iterations:**
   - Manual retest uses the same position parsing as UpdateResult for consistent mapping.
 ---
+## 2026-02-04 08:33:48 +0800 - US-013
+Thread: https://ampcode.com/threads/$AMP_CURRENT_THREAD_ID
+- Added Tray component documentation entry to the help menu with API, data structure, mapping, defect state, and integration notes.
+- Files changed: PlatformHost.Wpf/UI/Page1.xaml.cs; prd.json
+- **Learnings for future iterations:**
+  - Help menu items are defined in Page1.xaml.cs and rendered in a paged UniformGrid.
+  - dev-browser skill unavailable, so browser verification was skipped.
+---
