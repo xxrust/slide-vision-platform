@@ -17,3 +17,12 @@ Thread: https://ampcode.com/threads/$AMP_CURRENT_THREAD_ID
 - **Learnings for future iterations:**
   - Tray statistics treat any non-OK result as NG and include it in defect distribution.
 ---
+## 2026-02-04 08:10:26 +0800 - US-004
+Thread: https://ampcode.com/threads/$AMP_CURRENT_THREAD_ID
+- Added SQLite repository to persist tray headers and items, including completion updates.
+- Implemented loading of recent trays with their items.
+- Added xUnit coverage for persistence, updates, and ordering.
+- Files changed: src/Slide.Platform.Runtime/Tray/TraySqliteRepository.cs; tests/Slide.Platform.Runtime.Tests/Tray/TraySqliteRepositoryTests.cs; prd.json
+- **Learnings for future iterations:**
+  - Repository uses ISO-8601 round-trip format for SQLite datetime storage.
+---
