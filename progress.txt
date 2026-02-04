@@ -8,3 +8,11 @@ Thread: https://ampcode.com/threads/$AMP_CURRENT_THREAD_ID
 - **Learnings for future iterations:**
   - Device configs are persisted via JSON under AppDomain.CurrentDomain.BaseDirectory/Config.
 ---
+## 2026-02-04 14:33:56 +0800 - US-002
+Thread: https://ampcode.com/threads/$AMP_CURRENT_THREAD_ID
+- Added device manager interfaces and a singleton manager with lookup and logging.
+- Added a default device client stub that surfaces consistent errors for unimplemented operations.
+- Files changed: PlatformHost.Wpf/UI/Models/DeviceManager.cs; PlatformHost.Wpf/PlatformHost.Wpf.csproj; prd.json
+- **Learnings for future iterations:**
+  - Device manager resolves configs through DeviceConfigManager and caches clients by device ID.
+---
