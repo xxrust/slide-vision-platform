@@ -57,6 +57,8 @@ namespace WpfApp2.UI.Models
     {
         public string Id { get; set; } = Guid.NewGuid().ToString("N");
         public string Name { get; set; } = string.Empty;
+        public string Brand { get; set; } = string.Empty;
+        public string HardwareName { get; set; } = string.Empty;
         public DeviceProtocolType ProtocolType { get; set; } = DeviceProtocolType.Serial;
         public DeviceSerialOptions Serial { get; set; } = new DeviceSerialOptions();
         public DeviceTcpOptions Tcp { get; set; } = new DeviceTcpOptions();
@@ -86,6 +88,8 @@ namespace WpfApp2.UI.Models
             {
                 Id = Id,
                 Name = Name,
+                Brand = Brand,
+                HardwareName = HardwareName,
                 ProtocolType = ProtocolType,
                 Serial = Serial?.Clone() ?? new DeviceSerialOptions(),
                 Tcp = Tcp?.Clone() ?? new DeviceTcpOptions(),
@@ -312,6 +316,18 @@ namespace WpfApp2.UI.Models
             if (string.IsNullOrWhiteSpace(device.Name))
             {
                 error = "设备名称不能为空";
+                return false;
+            }
+
+            if (string.IsNullOrWhiteSpace(device.Brand))
+            {
+                error = "设备品牌不能为空";
+                return false;
+            }
+
+            if (string.IsNullOrWhiteSpace(device.HardwareName))
+            {
+                error = "硬件名称不能为空";
                 return false;
             }
 

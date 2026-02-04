@@ -44,6 +44,8 @@ namespace WpfApp2.UI
         private void LoadFromConfig(DeviceConfig config)
         {
             NameTextBox.Text = config.Name ?? string.Empty;
+            SetComboBoxText(BrandComboBox, config.Brand);
+            SetComboBoxText(HardwareComboBox, config.HardwareName);
 
             SelectComboBoxItem(ProtocolComboBox, config.ProtocolType.ToString());
 
@@ -98,7 +100,21 @@ namespace WpfApp2.UI
             var protocol = GetSelectedProtocol();
             var updated = _workingConfig.Clone();
             updated.Name = name;
+            updated.Brand = BrandComboBox.Text?.Trim();
+            updated.HardwareName = HardwareComboBox.Text?.Trim();
             updated.ProtocolType = protocol;
+
+            if (string.IsNullOrWhiteSpace(updated.Brand))
+            {
+                error = "设备品牌不能为空";
+                return false;
+            }
+
+            if (string.IsNullOrWhiteSpace(updated.HardwareName))
+            {
+                error = "硬件名称不能为空";
+                return false;
+            }
 
             if (protocol == DeviceProtocolType.Serial)
             {
@@ -207,12 +223,64 @@ namespace WpfApp2.UI
             }
         }
 
+        private static void SetComboBoxText(ComboBox comboBox, string value)
+        {
+            if (comboBox == null)
+            {
+                return;
+            }
+
+            var text = value ?? string.Empty;
+            if (string.IsNullOrWhiteSpace(text))
+            {
+                comboBox.SelectedIndex = comboBox.Items.Count > 0 ? 0 : -1;
+                return;
+            }
+
+            foreach (var item in comboBox.Items)
+            {
+                if (item is ComboBoxItem comboItem)
+                {
+                    var tagText = comboItem.Tag?.ToString() ?? comboItem.Content?.ToString();
+                    if (string.Equals(tagText, text, StringComparison.OrdinalIgnoreCase))
+                    {
+                        comboBox.SelectedItem = comboItem;
+                        comboBox.Text = comboItem.Content?.ToString() ?? text;
+                        return;
+                    }
+                }
+            }
+
+            comboBox.Text = text;
+        }
+
         private static bool TryParseEnum<TEnum>(ComboBox comboBox, out TEnum value) where TEnum : struct
         {
             value = default;
-            if (comboBox.SelectedItem is ComboBoxItem comboItem && comboItem.Tag is string tag)
+            if (comboBox == null)
             {
-                return Enum.TryParse(tag, out value);
+                return false;
+            }
+
+            if (comboBox.SelectedItem is ComboBoxItem comboItem)
+            {
+                var tagValue = comboItem.Tag?.ToString();
+                if (!string.IsNullOrWhiteSpace(tagValue) && Enum.TryParse(tagValue, true, out value))
+                {
+                    return true;
+                }
+
+                var contentValue = comboItem.Content?.ToString();
+                if (!string.IsNullOrWhiteSpace(contentValue) && Enum.TryParse(contentValue, true, out value))
+                {
+                    return true;
+                }
+            }
+
+            var text = comboBox.Text;
+            if (!string.IsNullOrWhiteSpace(text) && Enum.TryParse(text, true, out value))
+            {
+                return true;
             }
 
             return false;

@@ -170,6 +170,8 @@ namespace WpfApp2.UI
             {
                 Config = device.Clone(),
                 Name = device.Name,
+                Brand = device.Brand,
+                HardwareName = device.HardwareName,
                 Protocol = protocol,
                 Address = address,
                 StatusText = FormatStatus(status),
@@ -212,6 +214,8 @@ namespace WpfApp2.UI
         {
             public DeviceConfig Config { get; set; }
             public string Name { get; set; }
+            public string Brand { get; set; }
+            public string HardwareName { get; set; }
             public string Protocol { get; set; }
             public string Address { get; set; }
             public string StatusText { get; set; }

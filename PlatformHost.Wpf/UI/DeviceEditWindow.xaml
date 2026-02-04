@@ -32,8 +32,36 @@
                         <ColumnDefinition Width="120"/>
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Text="设备品牌" Foreground="White" VerticalAlignment="Center"/>
+                    <ComboBox Grid.Column="1" x:Name="BrandComboBox" Height="28" IsEditable="True">
+                        <ComboBoxItem Content="Keyence" Tag="Keyence"/>
+                        <ComboBoxItem Content="Mitsubishi" Tag="Mitsubishi"/>
+                        <ComboBoxItem Content="Omron" Tag="Omron"/>
+                        <ComboBoxItem Content="Other" Tag="Other"/>
+                    </ComboBox>
+                </Grid>
+
+                <Grid Margin="0,0,0,12">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="120"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Text="硬件名称" Foreground="White" VerticalAlignment="Center"/>
+                    <ComboBox Grid.Column="1" x:Name="HardwareComboBox" Height="28" IsEditable="True">
+                        <ComboBoxItem Content="PLC" Tag="PLC"/>
+                        <ComboBoxItem Content="Camera" Tag="Camera"/>
+                        <ComboBoxItem Content="IO" Tag="IO"/>
+                        <ComboBoxItem Content="Custom" Tag="Custom"/>
+                    </ComboBox>
+                </Grid>
+
+                <Grid Margin="0,0,0,12">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="120"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
                     <TextBlock Grid.Column="0" Text="协议类型" Foreground="White" VerticalAlignment="Center"/>
-                    <ComboBox Grid.Column="1" x:Name="ProtocolComboBox" Height="28" SelectionChanged="ProtocolComboBox_SelectionChanged">
+                    <ComboBox Grid.Column="1" x:Name="ProtocolComboBox" Height="28" SelectionChanged="ProtocolComboBox_SelectionChanged" SelectedIndex="0">
                         <ComboBoxItem Content="Serial" Tag="Serial"/>
                         <ComboBoxItem Content="TCP/IP" Tag="TcpIp"/>
                     </ComboBox>
@@ -64,14 +92,14 @@
                         <TextBox Grid.Row="2" Grid.Column="1" x:Name="DataBitsTextBox" Height="26"/>
 
                         <TextBlock Grid.Row="3" Grid.Column="0" Text="停止位" Foreground="White" VerticalAlignment="Center"/>
-                        <ComboBox Grid.Row="3" Grid.Column="1" x:Name="StopBitsComboBox" Height="26">
+                        <ComboBox Grid.Row="3" Grid.Column="1" x:Name="StopBitsComboBox" Height="26" SelectedIndex="0">
                             <ComboBoxItem Content="One" Tag="One"/>
                             <ComboBoxItem Content="OnePointFive" Tag="OnePointFive"/>
                             <ComboBoxItem Content="Two" Tag="Two"/>
                         </ComboBox>
 
                         <TextBlock Grid.Row="4" Grid.Column="0" Text="校验位" Foreground="White" VerticalAlignment="Center"/>
-                        <ComboBox Grid.Row="4" Grid.Column="1" x:Name="ParityComboBox" Height="26">
+                        <ComboBox Grid.Row="4" Grid.Column="1" x:Name="ParityComboBox" Height="26" SelectedIndex="0">
                             <ComboBoxItem Content="Even" Tag="Even"/>
                             <ComboBoxItem Content="Odd" Tag="Odd"/>
                             <ComboBoxItem Content="None" Tag="None"/>

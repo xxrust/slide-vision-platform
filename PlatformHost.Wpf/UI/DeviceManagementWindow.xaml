@@ -36,7 +36,8 @@
             <DataGrid x:Name="DeviceGrid" AutoGenerateColumns="False" CanUserAddRows="False"
                       HeadersVisibility="Column" IsReadOnly="True" RowHeight="38"
                       Background="#FF34495E" Foreground="White" GridLinesVisibility="None"
-                      BorderBrush="#FF2C3E50" BorderThickness="0" SelectionMode="Single">
+                      BorderBrush="#FF2C3E50" BorderThickness="0" SelectionMode="Single"
+                      AlternationCount="2">
                 <DataGrid.ColumnHeaderStyle>
                     <Style TargetType="DataGridColumnHeader">
                         <Setter Property="Background" Value="#FF2C3E50"/>
@@ -50,7 +51,6 @@
                         <Setter Property="Background" Value="#FF34495E"/>
                         <Setter Property="Foreground" Value="White"/>
                         <Setter Property="BorderThickness" Value="0"/>
-                        <Setter Property="AlternationIndex" Value="0"/>
                         <Style.Triggers>
                             <Trigger Property="AlternationIndex" Value="1">
                                 <Setter Property="Background" Value="#FF3B536B"/>
@@ -66,6 +66,8 @@
                 </DataGrid.Resources>
                 <DataGrid.Columns>
                     <DataGridTextColumn Header="名称" Binding="{Binding Name}" Width="2*"/>
+                    <DataGridTextColumn Header="品牌" Binding="{Binding Brand}" Width="*"/>
+                    <DataGridTextColumn Header="硬件" Binding="{Binding HardwareName}" Width="*"/>
                     <DataGridTextColumn Header="协议" Binding="{Binding Protocol}" Width="*"/>
                     <DataGridTextColumn Header="地址" Binding="{Binding Address}" Width="2*"/>
                     <DataGridTemplateColumn Header="状态" Width="*">
