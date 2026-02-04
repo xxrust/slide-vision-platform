@@ -34,3 +34,11 @@ Thread: https://ampcode.com/threads/$AMP_CURRENT_THREAD_ID
 - **Learnings for future iterations:**
   - Tray component parses position as either row/col (e.g. 1_2) or index (snake mapping by default).
 ---
+## 2026-02-04 08:17:30 +0800 - US-006
+Thread: https://ampcode.com/threads/$AMP_CURRENT_THREAD_ID
+- Added WPF tray grid control that renders row/column labels with origin at bottom-left and rebuilds on layout changes.
+- Files changed: PlatformHost.Wpf/UI/Controls/TrayGridControl.xaml; PlatformHost.Wpf/UI/Controls/TrayGridControl.xaml.cs; prd.json
+- **Learnings for future iterations:**
+  - Grid control renders logical rows in reverse to keep (1,1) at bottom-left.
+  - dev-browser skill unavailable, so browser verification was skipped.
+---
