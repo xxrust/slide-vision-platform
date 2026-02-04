@@ -38,10 +38,13 @@ namespace WpfApp2.UI
             RowsBox.Text = DefaultRows.ToString(CultureInfo.InvariantCulture);
             ColsBox.Text = DefaultCols.ToString(CultureInfo.InvariantCulture);
             BatchBox.Text = _page?.CurrentLotValue ?? string.Empty;
+            UpdateTrayInfoText();
 
             IconFolderBox.Text = ResolveDefaultIconFolder();
             TrayGrid.IconFolder = IconFolderBox.Text;
             TrayGrid.ShowOkCells = true;
+            UpdateShowOkToggleText();
+            UpdateRotateToggleText();
 
             _trayComponent.OnTrayCompleted += (_, __) => Dispatcher.BeginInvoke(new Action(UpdateStatistics));
 
@@ -52,6 +55,7 @@ namespace WpfApp2.UI
 
             Closed += OnTrayWindowClosed;
             _isInitializing = false;
+            UpdateTimestamp();
         }
 
         private static string ResolveDefaultIconFolder()
@@ -73,8 +77,10 @@ namespace WpfApp2.UI
             TrayGrid.Cols = cols;
             TrayGrid.ClearCells();
             _fallbackIndex = 0;
+            UpdateTrayInfoText();
             UpdateStatistics();
             RefreshNgBrowser();
+            UpdateStatus("托盘已开始");
         }
 
         private void CompleteButton_Click(object sender, RoutedEventArgs e)
@@ -82,6 +88,7 @@ namespace WpfApp2.UI
             _trayComponent.CompleteTray();
             UpdateStatistics();
             RefreshNgBrowser();
+            UpdateStatus("托盘已完成");
         }
 
         private void ResetButton_Click(object sender, RoutedEventArgs e)
@@ -90,6 +97,12 @@ namespace WpfApp2.UI
             TrayGrid.ClearCells();
             UpdateStatistics();
             RefreshNgBrowser();
+            UpdateStatus("托盘已重置");
+        }
+
+        private void CloseButton_Click(object sender, RoutedEventArgs e)
+        {
+            Close();
         }
 
         private void ShowOkCheck_Changed(object sender, RoutedEventArgs e)
@@ -99,7 +112,8 @@ namespace WpfApp2.UI
                 return;
             }
 
-            TrayGrid.ShowOkCells = ShowOkCheck.IsChecked == true;
+            TrayGrid.ShowOkCells = ShowOkToggle.IsChecked == true;
+            UpdateShowOkToggleText();
         }
 
         private void RotateCheck_Changed(object sender, RoutedEventArgs e)
@@ -109,7 +123,9 @@ namespace WpfApp2.UI
                 return;
             }
 
-            TrayGrid.Rotate90 = RotateCheck.IsChecked == true;
+            TrayGrid.Rotate90 = RotateToggle.IsChecked == true;
+            UpdateRotateToggleText();
+            UpdateStatus(TrayGrid.Rotate90 ? "托盘已顺时针旋转90°" : "托盘已复原到0°");
         }
 
         private void BrowseIconButton_Click(object sender, RoutedEventArgs e)
@@ -121,6 +137,7 @@ namespace WpfApp2.UI
                 {
                     IconFolderBox.Text = dialog.SelectedPath;
                     TrayGrid.IconFolder = dialog.SelectedPath;
+                    UpdateStatus("图标目录已更新");
                 }
             }
         }
@@ -186,6 +203,7 @@ namespace WpfApp2.UI
                 TrayGrid.UpdateCellInfo(row, col, resultLabel, imagePath, detectionTime);
                 UpdateStatistics();
                 RefreshNgBrowser();
+                UpdateStatus($"检测结果: ({row},{col}) {resultLabel}");
             }
             catch (Exception ex)
             {
@@ -281,10 +299,10 @@ namespace WpfApp2.UI
         private void UpdateStatistics()
         {
             var stats = _trayManager.GetStatistics();
-            TotalText.Text = stats.TotalSlots.ToString(CultureInfo.InvariantCulture);
-            OkText.Text = stats.OkCount.ToString(CultureInfo.InvariantCulture);
-            NgText.Text = stats.NgCount.ToString(CultureInfo.InvariantCulture);
-            YieldText.Text = stats.TotalSlots == 0
+            TotalCountText.Text = stats.TotalSlots.ToString(CultureInfo.InvariantCulture);
+            OKCountText.Text = stats.OkCount.ToString(CultureInfo.InvariantCulture);
+            NGCountText.Text = stats.NgCount.ToString(CultureInfo.InvariantCulture);
+            YieldRateText.Text = stats.TotalSlots == 0
                 ? "0%"
                 : string.Format(CultureInfo.InvariantCulture, "{0:P1}", stats.YieldRate);
         }
@@ -323,6 +341,36 @@ namespace WpfApp2.UI
         private static bool IsOkResult(string result)
         {
             return string.Equals(result, "OK", StringComparison.OrdinalIgnoreCase);
+        }
+
+        private void UpdateTrayInfoText()
+        {
+            var batch = BatchBox?.Text?.Trim();
+            var rowsText = RowsBox?.Text ?? "-";
+            var colsText = ColsBox?.Text ?? "-";
+            var batchDisplay = string.IsNullOrWhiteSpace(batch) ? "-" : batch;
+            TrayInfoText.Text = $"批次: {batchDisplay} | {rowsText}x{colsText}";
+        }
+
+        private void UpdateShowOkToggleText()
+        {
+            ShowOkToggleText.Text = ShowOkToggle.IsChecked == true ? "良品显示" : "良品隐藏";
+        }
+
+        private void UpdateRotateToggleText()
+        {
+            RotateToggleText.Text = RotateToggle.IsChecked == true ? "旋转90°" : "旋转0°";
+        }
+
+        private void UpdateStatus(string message)
+        {
+            StatusText.Text = message;
+            UpdateTimestamp();
+        }
+
+        private void UpdateTimestamp()
+        {
+            TimestampText.Text = DateTime.Now.ToString("MM/dd HH:mm:ss", CultureInfo.InvariantCulture);
         }
     }
 }

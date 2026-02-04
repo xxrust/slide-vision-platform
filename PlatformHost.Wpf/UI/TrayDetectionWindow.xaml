@@ -3,55 +3,147 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:controls="clr-namespace:WpfApp2.UI.Controls"
         Title="Tray 检测界面"
-        Width="1100"
-        Height="800"
+        Width="1200"
+        Height="820"
+        Background="#FF2C3E50"
         WindowStartupLocation="CenterOwner">
-    <Grid Margin="10">
+    <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="60"/>
             <RowDefinition Height="*"/>
-            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="30"/>
         </Grid.RowDefinitions>
 
-        <StackPanel Grid.Row="0" Orientation="Vertical" Margin="0,0,0,8">
-            <WrapPanel Margin="0,0,0,6" VerticalAlignment="Center">
-                <TextBlock Text="行数" Margin="0,0,6,0" VerticalAlignment="Center"/>
-                <TextBox x:Name="RowsBox" Width="60" Margin="0,0,12,0"/>
-                <TextBlock Text="列数" Margin="0,0,6,0" VerticalAlignment="Center"/>
-                <TextBox x:Name="ColsBox" Width="60" Margin="0,0,12,0"/>
-                <TextBlock Text="批次" Margin="0,0,6,0" VerticalAlignment="Center"/>
-                <TextBox x:Name="BatchBox" Width="180" Margin="0,0,12,0"/>
-                <Button x:Name="StartButton" Content="开始托盘" Width="90" Margin="0,0,6,0" Click="StartButton_Click"/>
-                <Button x:Name="CompleteButton" Content="完成托盘" Width="90" Margin="0,0,6,0" Click="CompleteButton_Click"/>
-                <Button x:Name="ResetButton" Content="重置" Width="70" Click="ResetButton_Click"/>
-            </WrapPanel>
+        <!-- 顶部导航栏 -->
+        <Border Grid.Row="0" Background="#FF34495E" BorderThickness="0,0,0,1" BorderBrush="#FF5D6D7E">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
 
-            <WrapPanel VerticalAlignment="Center">
-                <CheckBox x:Name="ShowOkCheck" Content="显示OK" IsChecked="True" Margin="0,0,12,0"
-                          Checked="ShowOkCheck_Changed" Unchecked="ShowOkCheck_Changed"/>
-                <CheckBox x:Name="RotateCheck" Content="旋转90°" Margin="0,0,12,0"
-                          Checked="RotateCheck_Changed" Unchecked="RotateCheck_Changed"/>
-                <TextBlock Text="图标目录" Margin="0,0,6,0" VerticalAlignment="Center"/>
-                <TextBox x:Name="IconFolderBox" Width="260" Margin="0,0,6,0"/>
-                <Button x:Name="BrowseIconButton" Content="浏览" Width="60" Margin="0,0,12,0"
-                        Click="BrowseIconButton_Click"/>
-                <Button x:Name="NgBrowserButton" Content="NG 浏览" Width="90" Margin="0,0,6,0"
-                        Click="NgBrowserButton_Click"/>
-                <Button x:Name="HelpButton" Content="说明" Width="70" Click="HelpButton_Click"/>
-            </WrapPanel>
-        </StackPanel>
+                <Button Grid.Column="0" x:Name="CloseButton" Content="← 返回" Width="80" Height="40"
+                        Margin="10,0" Background="#FF3498DB" BorderThickness="0" Foreground="White"
+                        FontSize="14" Click="CloseButton_Click">
+                    <Button.Style>
+                        <Style TargetType="Button">
+                            <Style.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter Property="Background" Value="#FF5DADE2"/>
+                                </Trigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Button.Style>
+                </Button>
 
-        <controls:TrayGridControl x:Name="TrayGrid" Grid.Row="1" />
+                <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center" Margin="10,0">
+                    <TextBlock x:Name="TitleText" Text="托盘检测" FontSize="20" FontWeight="Bold"
+                               Foreground="White" VerticalAlignment="Center"/>
+                    <Border Background="#FF3498DB" CornerRadius="3" Margin="15,0,0,0" Padding="8,3">
+                        <TextBlock x:Name="TrayInfoText" Text="批次: - | 10x9"
+                                   FontSize="12" Foreground="White"/>
+                    </Border>
+                </StackPanel>
 
-        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,8,0,0">
-            <TextBlock Text="总数:" Margin="0,0,4,0" VerticalAlignment="Center"/>
-            <TextBlock x:Name="TotalText" Width="50" VerticalAlignment="Center"/>
-            <TextBlock Text="OK:" Margin="8,0,4,0" VerticalAlignment="Center"/>
-            <TextBlock x:Name="OkText" Width="50" VerticalAlignment="Center"/>
-            <TextBlock Text="NG:" Margin="8,0,4,0" VerticalAlignment="Center"/>
-            <TextBlock x:Name="NgText" Width="50" VerticalAlignment="Center"/>
-            <TextBlock Text="良率:" Margin="8,0,4,0" VerticalAlignment="Center"/>
-            <TextBlock x:Name="YieldText" Width="80" VerticalAlignment="Center"/>
-        </StackPanel>
+                <WrapPanel Grid.Column="2" VerticalAlignment="Center" Margin="10,0">
+                    <TextBlock Text="行" Foreground="White" Margin="0,0,4,0" VerticalAlignment="Center"/>
+                    <TextBox x:Name="RowsBox" Width="50" Margin="0,0,8,0" Foreground="White"
+                             Background="#FF2C3E50" BorderBrush="#FF5D6D7E" BorderThickness="1"/>
+                    <TextBlock Text="列" Foreground="White" Margin="0,0,4,0" VerticalAlignment="Center"/>
+                    <TextBox x:Name="ColsBox" Width="50" Margin="0,0,8,0" Foreground="White"
+                             Background="#FF2C3E50" BorderBrush="#FF5D6D7E" BorderThickness="1"/>
+                    <TextBlock Text="批次" Foreground="White" Margin="0,0,4,0" VerticalAlignment="Center"/>
+                    <TextBox x:Name="BatchBox" Width="140" Margin="0,0,8,0" Foreground="White"
+                             Background="#FF2C3E50" BorderBrush="#FF5D6D7E" BorderThickness="1"/>
+                    <TextBlock Text="图标" Foreground="White" Margin="0,0,4,0" VerticalAlignment="Center"/>
+                    <TextBox x:Name="IconFolderBox" Width="180" Margin="0,0,6,0" Foreground="White"
+                             Background="#FF2C3E50" BorderBrush="#FF5D6D7E" BorderThickness="1"/>
+                    <Button x:Name="BrowseIconButton" Content="浏览" Width="60" Height="26" Margin="0,0,10,0"
+                            Background="#FF17A2B8" BorderThickness="0" Foreground="White"
+                            Click="BrowseIconButton_Click"/>
+                </WrapPanel>
+
+                <StackPanel Grid.Column="3" Orientation="Horizontal" VerticalAlignment="Center" Margin="10,0">
+                    <Button x:Name="StartButton" Width="70" Height="30" Margin="3,0"
+                            Background="#FF8E44AD" BorderThickness="0" Foreground="White" FontSize="11"
+                            Content="开始托盘" Click="StartButton_Click"/>
+                    <Button x:Name="CompleteButton" Width="70" Height="30" Margin="3,0"
+                            Background="#FF27AE60" BorderThickness="0" Foreground="White" FontSize="11"
+                            Content="完成托盘" Click="CompleteButton_Click"/>
+                    <Button x:Name="ResetButton" Width="60" Height="30" Margin="3,0"
+                            Background="#FFE67E22" BorderThickness="0" Foreground="White" FontSize="11"
+                            Content="重置" Click="ResetButton_Click"/>
+                    <ToggleButton x:Name="RotateToggle" Width="70" Height="30" Margin="3,0"
+                                  Background="#FFF39C12" BorderThickness="0" Foreground="White" FontSize="11"
+                                  Checked="RotateCheck_Changed" Unchecked="RotateCheck_Changed">
+                        <TextBlock x:Name="RotateToggleText" Text="旋转90°" FontSize="10"/>
+                    </ToggleButton>
+                    <ToggleButton x:Name="ShowOkToggle" Width="70" Height="30" Margin="3,0"
+                                  Background="#FF27AE60" BorderThickness="0" Foreground="White" FontSize="11"
+                                  IsChecked="True" Checked="ShowOkCheck_Changed" Unchecked="ShowOkCheck_Changed">
+                        <TextBlock x:Name="ShowOkToggleText" Text="良品显示" FontSize="10"/>
+                    </ToggleButton>
+                    <Button x:Name="NgBrowserButton" Width="70" Height="30" Margin="3,0"
+                            Background="#FF3498DB" BorderThickness="0" Foreground="White" FontSize="11"
+                            Content="NG浏览" Click="NgBrowserButton_Click"/>
+                    <Button x:Name="HelpButton" Width="60" Height="30" Margin="3,0"
+                            Background="#FF5D6D7E" BorderThickness="0" Foreground="White" FontSize="11"
+                            Content="说明" Click="HelpButton_Click"/>
+                </StackPanel>
+
+                <StackPanel Grid.Column="4" Orientation="Horizontal" VerticalAlignment="Center" Margin="10,0">
+                    <Border Background="#FF2C3E50" CornerRadius="5" Padding="12,4" Margin="3,0">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="总: " FontSize="12" Foreground="LightGray"/>
+                            <TextBlock x:Name="TotalCountText" Text="0" FontSize="12"
+                                       Foreground="White" FontWeight="Bold"/>
+                        </StackPanel>
+                    </Border>
+                    <Border Background="#FF27AE60" CornerRadius="5" Padding="12,4" Margin="3,0">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="良: " FontSize="12" Foreground="White"/>
+                            <TextBlock x:Name="OKCountText" Text="0" FontSize="12"
+                                       Foreground="White" FontWeight="Bold"/>
+                        </StackPanel>
+                    </Border>
+                    <Border Background="#FFE74C3C" CornerRadius="5" Padding="12,4" Margin="3,0">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="不良: " FontSize="12" Foreground="White"/>
+                            <TextBlock x:Name="NGCountText" Text="0" FontSize="12"
+                                       Foreground="White" FontWeight="Bold"/>
+                        </StackPanel>
+                    </Border>
+                    <Border Background="#FF3498DB" CornerRadius="5" Padding="12,4" Margin="3,0">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="率: " FontSize="12" Foreground="White"/>
+                            <TextBlock x:Name="YieldRateText" Text="0%" FontSize="12"
+                                       Foreground="White" FontWeight="Bold"/>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- 托盘显示区域 -->
+        <Border Grid.Row="1" Background="#FF34495E" Margin="5" CornerRadius="5">
+            <controls:TrayGridControl x:Name="TrayGrid" Margin="10"/>
+        </Border>
+
+        <!-- 状态栏 -->
+        <Border Grid.Row="2" Background="#FF34495E" BorderThickness="0,1,0,0" BorderBrush="#FF5D6D7E">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Column="0" x:Name="StatusText" Text="就绪" FontSize="12"
+                           Foreground="LightGray" VerticalAlignment="Center" Margin="10,0"/>
+                <TextBlock Grid.Column="1" x:Name="TimestampText" Text="" FontSize="12"
+                           Foreground="LightGray" VerticalAlignment="Center" Margin="10,0"/>
+            </Grid>
+        </Border>
     </Grid>
 </Window>
