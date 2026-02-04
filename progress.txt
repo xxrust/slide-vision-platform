@@ -1,0 +1,19 @@
+# Ralph Progress Log
+Started: Tue Feb  3 22:51:34 CST 2026
+---
+## 2026-02-03 23:09:28 +0800 - US-002
+Thread: https://ampcode.com/threads/$AMP_CURRENT_THREAD_ID
+- Implemented tray coordinate mapping utilities supporting snake and row-wise modes.
+- Added xUnit coverage for odd/even rows, boundaries, and invalid inputs.
+- Files changed: src/Slide.Platform.Runtime/Tray/TrayCoordinateMapper.cs; tests/Slide.Platform.Runtime.Tests/Slide.Platform.Runtime.Tests.csproj; tests/Slide.Platform.Runtime.Tests/Tray/TrayCoordinateMapperTests.cs; prd.json
+- **Learnings for future iterations:**
+  - dotnet SDK is not available in the current environment, so tests could not be executed here.
+---
+## 2026-02-04 00:08:56 +0800 - US-003
+Thread: https://ampcode.com/threads/$AMP_CURRENT_THREAD_ID
+- Implemented tray data models, statistics computation, and in-memory manager with history tracking.
+- Added xUnit coverage for creation, updates, auto-completion, reset, and bounds checks.
+- Files changed: src/Slide.Platform.Runtime/Tray/TrayModels.cs; src/Slide.Platform.Runtime/Tray/TrayDataManager.cs; tests/Slide.Platform.Runtime.Tests/Tray/TrayDataManagerTests.cs; prd.json
+- **Learnings for future iterations:**
+  - Tray statistics treat any non-OK result as NG and include it in defect distribution.
+---
