@@ -83,3 +83,10 @@ Thread: https://ampcode.com/threads/$AMP_CURRENT_THREAD_ID
   - NG browser expects NG-only items to be supplied by the caller.
   - dev-browser skill unavailable, so browser verification was skipped.
 ---
+## 2026-02-04 08:30:17 +0800 - US-012
+Thread: https://ampcode.com/threads/$AMP_CURRENT_THREAD_ID
+- Added manual retest event hook on TrayComponent with row/col parsing and tests.
+- Files changed: src/Slide.Platform.Runtime/Tray/TrayComponent.cs; src/Slide.Platform.Runtime/Tray/TrayEventArgs.cs; tests/Slide.Platform.Runtime.Tests/Tray/TrayComponentTests.cs; prd.json
+- **Learnings for future iterations:**
+  - Manual retest uses the same position parsing as UpdateResult for consistent mapping.
+---

@@ -39,4 +39,14 @@ namespace Slide.Platform.Runtime.Tray
 
         public Exception Error { get; }
     }
+
+    public sealed class TrayRetestEventArgs : EventArgs
+    {
+        public TrayRetestEventArgs(TrayPosition position)
+        {
+            Position = position;
+        }
+
+        public TrayPosition Position { get; }
+    }
 }

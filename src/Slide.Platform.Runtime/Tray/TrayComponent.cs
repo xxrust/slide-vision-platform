@@ -21,6 +21,7 @@ namespace Slide.Platform.Runtime.Tray
         public event EventHandler<TrayResultEventArgs> OnResultProcessed;
         public event EventHandler<TrayCompletedEventArgs> OnTrayCompleted;
         public event EventHandler<TrayErrorEventArgs> OnError;
+        public event EventHandler<TrayRetestEventArgs> OnManualRetestRequested;
 
         public TrayData StartTray(int rows, int cols, string batchName)
         {
@@ -123,6 +124,23 @@ namespace Slide.Platform.Runtime.Tray
         public IReadOnlyList<TrayData> GetHistory(int limit)
         {
             return _repository.LoadRecentTrays(limit);
+        }
+
+        public void RequestManualRetest(string position)
+        {
+            TrayPosition? resolvedPosition = null;
+
+            try
+            {
+                var activeTray = _manager.CurrentTray ?? throw new InvalidOperationException("No active tray. Call StartTray first.");
+                resolvedPosition = TrayPosition.Parse(position, activeTray.Rows, activeTray.Cols, MappingMode);
+                OnManualRetestRequested?.Invoke(this, new TrayRetestEventArgs(resolvedPosition.Value));
+            }
+            catch (Exception ex)
+            {
+                RaiseError(resolvedPosition, null, null, DateTime.UtcNow, ex);
+                throw;
+            }
         }
 
         private void RaiseError(TrayPosition? position, string result, string imagePath, DateTime detectionTime, Exception error)

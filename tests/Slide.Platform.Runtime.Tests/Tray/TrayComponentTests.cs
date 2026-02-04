@@ -73,6 +73,33 @@ namespace Slide.Platform.Runtime.Tests.Tray
             }
         }
 
+        [Fact]
+        public void RequestManualRetest_RaisesEvent()
+        {
+            var path = CreateTempDbPath();
+
+            try
+            {
+                var repo = new TraySqliteRepository($"Data Source={path}");
+                var manager = new TrayDataManager();
+                var component = new TrayComponent(manager, repo);
+                component.StartTray(2, 2, "batch-a");
+
+                TrayRetestEventArgs received = null;
+                component.OnManualRetestRequested += (_, args) => received = args;
+
+                component.RequestManualRetest("1_2");
+
+                Assert.NotNull(received);
+                Assert.Equal(1, received.Position.Row);
+                Assert.Equal(2, received.Position.Col);
+            }
+            finally
+            {
+                DeleteTempDb(path);
+            }
+        }
+
         private static string CreateTempDbPath()
         {
             return Path.Combine(Path.GetTempPath(), $"tray-{Guid.NewGuid():N}.db");
