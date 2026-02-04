@@ -8664,20 +8664,31 @@ namespace WpfApp2.UI
                         CameraConfigButton_Click(null, null);
                         return Task.CompletedTask;
                     }),
-                new HelpMenuItem(
-                    "⚙️",
-                    "硬件配置",
-                    new SolidColorBrush(Color.FromRgb(241, 196, 15)),
-                    Brushes.Black,
-                    () =>
-                    {
-                        window.Close();
-                        HardwareConfigButton_Click(null, null);
-                        return Task.CompletedTask;
-                    }),
-                new HelpMenuItem(
-                    "📊",
-                    "统计",
+                new HelpMenuItem(
+                    "⚙️",
+                    "硬件配置",
+                    new SolidColorBrush(Color.FromRgb(241, 196, 15)),
+                    Brushes.Black,
+                    () =>
+                    {
+                        window.Close();
+                        HardwareConfigButton_Click(null, null);
+                        return Task.CompletedTask;
+                    }),
+                new HelpMenuItem(
+                    "🧰",
+                    "设备管理",
+                    new SolidColorBrush(Color.FromRgb(52, 73, 94)),
+                    Brushes.White,
+                    () =>
+                    {
+                        window.Close();
+                        OpenDeviceManagementWindow();
+                        return Task.CompletedTask;
+                    }),
+                new HelpMenuItem(
+                    "📊",
+                    "统计",
                     new SolidColorBrush(Color.FromRgb(142, 68, 173)),
                     Brushes.White,
                     () =>
@@ -9133,20 +9144,38 @@ namespace WpfApp2.UI
         /// <summary>
         /// 打开系统测试窗口
         /// </summary>
-        private void OpenSystemTestWindow()
-        {
-            try
-            {
-                var testWindow = new SystemTestWindow();
-                testWindow.Show();
-                LogUpdate("已打开系统测试窗口");
-            }
-            catch (Exception ex)
-            {
-                LogUpdate($"打开系统测试窗口失败: {ex.Message}");
-                MessageBox.Show($"打开系统测试窗口失败: {ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
-        }
+        private void OpenSystemTestWindow()
+        {
+            try
+            {
+                var testWindow = new SystemTestWindow();
+                testWindow.Show();
+                LogUpdate("已打开系统测试窗口");
+            }
+            catch (Exception ex)
+            {
+                LogUpdate($"打开系统测试窗口失败: {ex.Message}");
+                MessageBox.Show($"打开系统测试窗口失败: {ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        /// <summary>
+        /// 打开设备管理窗口
+        /// </summary>
+        private void OpenDeviceManagementWindow()
+        {
+            try
+            {
+                var deviceWindow = new DeviceManagementWindow();
+                deviceWindow.Show();
+                LogUpdate("已打开设备管理窗口");
+            }
+            catch (Exception ex)
+            {
+                LogUpdate($"打开设备管理窗口失败: {ex.Message}");
+                MessageBox.Show($"打开设备管理窗口失败: {ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
 
         /// <summary>
         /// PLC初始化 - 置位MR011

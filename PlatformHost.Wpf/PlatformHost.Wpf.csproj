@@ -309,12 +309,15 @@
     <Compile Include="UI\ValidatorMachineParametersWindow.xaml.cs">
       <DependentUpon>ValidatorMachineParametersWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UI\ValidatorMachineResultsWindow.xaml.cs">
-      <DependentUpon>ValidatorMachineResultsWindow.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="UI\SystemTestWindow.xaml.cs">
-      <DependentUpon>SystemTestWindow.xaml</DependentUpon>
-    </Compile>
+    <Compile Include="UI\ValidatorMachineResultsWindow.xaml.cs">
+      <DependentUpon>ValidatorMachineResultsWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\DeviceManagementWindow.xaml.cs">
+      <DependentUpon>DeviceManagementWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\SystemTestWindow.xaml.cs">
+      <DependentUpon>SystemTestWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UI\MotorParameterSettingsWindow.xaml.cs">
       <DependentUpon>MotorParameterSettingsWindow.xaml</DependentUpon>
     </Compile>
@@ -481,14 +484,18 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="UI\ValidatorMachineResultsWindow.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="UI\SystemTestWindow.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
+    <Page Include="UI\ValidatorMachineResultsWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\DeviceManagementWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\SystemTestWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="UI\MotorParameterSettingsWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

@@ -16,3 +16,12 @@ Thread: https://ampcode.com/threads/$AMP_CURRENT_THREAD_ID
 - **Learnings for future iterations:**
   - Device manager resolves configs through DeviceConfigManager and caches clients by device ID.
 ---
+## 2026-02-04 14:41:45 +0800 - US-003
+Thread: https://ampcode.com/threads/$AMP_CURRENT_THREAD_ID
+- Added DeviceManagementWindow showing configured devices with protocol, address, and connection status.
+- Wired a help menu entry to open the device management list.
+- Files changed: PlatformHost.Wpf/UI/DeviceManagementWindow.xaml; PlatformHost.Wpf/UI/DeviceManagementWindow.xaml.cs; PlatformHost.Wpf/UI/Page1.xaml.cs; PlatformHost.Wpf/PlatformHost.Wpf.csproj; prd.json
+- **Learnings for future iterations:**
+  - Help menu entries are composed in Page1.xaml.cs via the helpItems list.
+  - dev-browser skill unavailable; UI verification skipped.
+---
