@@ -157,11 +157,15 @@
       <Project>{307C3AAA-1C9E-4AEA-B6D5-B7EC832FBC55}</Project>
       <Name>Slide.Algorithm.ONNX</Name>
     </ProjectReference>
-    <ProjectReference Include="ThreeD\Slide.ThreeD.Contracts\Slide.ThreeD.Contracts.csproj">
-      <Project>{F9389238-7474-4C8A-90C7-CA61999E9505}</Project>
-      <Name>Slide.ThreeD.Contracts</Name>
-    </ProjectReference>
-  </ItemGroup>
+    <ProjectReference Include="ThreeD\Slide.ThreeD.Contracts\Slide.ThreeD.Contracts.csproj">
+      <Project>{F9389238-7474-4C8A-90C7-CA61999E9505}</Project>
+      <Name>Slide.ThreeD.Contracts</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\src\Slide.Platform.Runtime\Slide.Platform.Runtime.csproj">
+      <Project>{9C574D84-FA95-425C-BDE3-A0BD0551F117}</Project>
+      <Name>Slide.Platform.Runtime</Name>
+    </ProjectReference>
+  </ItemGroup>
   <ItemGroup>
   </ItemGroup>
   <ItemGroup>
@@ -329,9 +333,19 @@
     <Compile Include="UI\SystemTestWindow.xaml.cs">
       <DependentUpon>SystemTestWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UI\MotorParameterSettingsWindow.xaml.cs">
-      <DependentUpon>MotorParameterSettingsWindow.xaml</DependentUpon>
-    </Compile>
+    <Compile Include="UI\TrayCellInfo.cs" />
+    <Compile Include="UI\TrayCellImageWindow.xaml.cs">
+      <DependentUpon>TrayCellImageWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\TrayDetectionWindow.xaml.cs">
+      <DependentUpon>TrayDetectionWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\TrayNgBrowserWindow.xaml.cs">
+      <DependentUpon>TrayNgBrowserWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\MotorParameterSettingsWindow.xaml.cs">
+      <DependentUpon>MotorParameterSettingsWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UI\Controls\SmartInputCard.xaml.cs">
       <DependentUpon>SmartInputCard.xaml</DependentUpon>
     </Compile>
@@ -372,9 +386,13 @@
     <Compile Include="UI\Controls\SmartAnalysisFocusPage.xaml.cs">
       <DependentUpon>SmartAnalysisFocusPage.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UI\Controls\GenericCameraConfigControl.xaml.cs">
-      <DependentUpon>GenericCameraConfigControl.xaml</DependentUpon>
-    </Compile>
+    <Compile Include="UI\Controls\GenericCameraConfigControl.xaml.cs">
+      <DependentUpon>GenericCameraConfigControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\Controls\TrayDefectVisual.cs" />
+    <Compile Include="UI\Controls\TrayGridControl.xaml.cs">
+      <DependentUpon>TrayGridControl.xaml</DependentUpon>
+    </Compile>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -519,10 +537,22 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="UI\MotorParameterSettingsWindow.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
+    <Page Include="UI\TrayCellImageWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\TrayDetectionWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\TrayNgBrowserWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\MotorParameterSettingsWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="UI\Controls\SmartInputCard.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -567,10 +597,14 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="UI\Controls\GenericCameraConfigControl.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
+    <Page Include="UI\Controls\GenericCameraConfigControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\Controls\TrayGridControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="UI\Controls\AlertSettingsDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

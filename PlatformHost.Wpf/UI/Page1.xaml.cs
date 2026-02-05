@@ -83,13 +83,14 @@ namespace WpfApp2.UI
         private UnifiedDetectionManager _detectionManager;
 
         // 算法引擎结果缓存
-        private AlgorithmResult _lastAlgorithmResult;
-        private AlgorithmResult _lastRenderResult;
-        private TemplateParameters _templateOverride;
-        private ImageGroupSet _lastExecutedImageGroup;
-        private readonly List<RenderSelectionOption> _renderSelectionOptions = new List<RenderSelectionOption>();
-        private string _renderMainSelectionKey;
-        private string _renderStepSelectionKey;
+        private AlgorithmResult _lastAlgorithmResult;
+        private AlgorithmResult _lastRenderResult;
+        private TemplateParameters _templateOverride;
+        private ImageGroupSet _lastExecutedImageGroup;
+        private TrayDetectionWindow _trayDetectionWindow;
+        private readonly List<RenderSelectionOption> _renderSelectionOptions = new List<RenderSelectionOption>();
+        private string _renderMainSelectionKey;
+        private string _renderStepSelectionKey;
 
         public event EventHandler<AlgorithmResultEventArgs> AlgorithmResultProduced;
 
@@ -8503,12 +8504,12 @@ namespace WpfApp2.UI
         /// <summary>
         /// 创建帮助菜单窗口
         /// </summary>
-        private Window CreateHelpMenuWindow()
-        {
-            var window = new Window
-            {
-                Title = "帮助菜单",
-                Width = 800,
+        private Window CreateHelpMenuWindow()
+        {
+            var window = new Window
+            {
+                Title = "帮助菜单",
+                Width = 800,
                 Height = 800,
                 WindowStartupLocation = WindowStartupLocation.CenterOwner,
                 Owner = Window.GetWindow(this),
@@ -8547,286 +8548,374 @@ namespace WpfApp2.UI
                 HorizontalAlignment = System.Windows.HorizontalAlignment.Center,
                 Margin = new Thickness(0, 0, 0, 15)
             };
-            Grid.SetRow(descBlock, 1);
-            mainGrid.Children.Add(descBlock);
-
-            var helpGrid = new System.Windows.Controls.Primitives.UniformGrid
-            {
-                Rows = 5,
-                Columns = 5,
-                Margin = new Thickness(0, 0, 0, 10)
-            };
-            Grid.SetRow(helpGrid, 2);
-            mainGrid.Children.Add(helpGrid);
-
-            var footerPanel = new Grid
-            {
-                Margin = new Thickness(0, 10, 0, 0)
-            };
-            footerPanel.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
-            footerPanel.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
-            footerPanel.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
-            footerPanel.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
-
-            var prevPageButton = new Button
-            {
-                Content = "上一页",
-                MinWidth = 80,
-                Height = 32,
-                Background = new SolidColorBrush(Color.FromRgb(99, 110, 114)),
-                Foreground = Brushes.White,
-                Margin = new Thickness(0, 0, 10, 0)
-            };
-            Grid.SetColumn(prevPageButton, 0);
-            footerPanel.Children.Add(prevPageButton);
-
-            var pageIndicator = new TextBlock
-            {
-                Foreground = Brushes.White,
-                FontSize = 12,
-                VerticalAlignment = System.Windows.VerticalAlignment.Center,
-                HorizontalAlignment = System.Windows.HorizontalAlignment.Center
-            };
-            Grid.SetColumn(pageIndicator, 1);
-            footerPanel.Children.Add(pageIndicator);
-
-            var nextPageButton = new Button
-            {
-                Content = "下一页",
-                MinWidth = 80,
-                Height = 32,
-                Background = new SolidColorBrush(Color.FromRgb(99, 110, 114)),
-                Foreground = Brushes.White,
-                Margin = new Thickness(10, 0, 0, 0)
-            };
-            Grid.SetColumn(nextPageButton, 2);
-            footerPanel.Children.Add(nextPageButton);
-
-            var closeButton = new Button
-            {
-                Content = "关闭",
-                MinWidth = 90,
-                Height = 32,
-                Background = new SolidColorBrush(Color.FromRgb(231, 76, 60)),
-                Foreground = Brushes.White,
-                Margin = new Thickness(15, 0, 0, 0)
-            };
-            closeButton.Click += (s, e) => window.Close();
-            Grid.SetColumn(closeButton, 3);
-            footerPanel.Children.Add(closeButton);
-
-            Grid.SetRow(footerPanel, 3);
-            mainGrid.Children.Add(footerPanel);
-
-            var helpItems = new List<HelpMenuItem>
-            {
-                new HelpMenuItem(
-                    "📋",
-                    "系统版本信息",
-                    new SolidColorBrush(Color.FromRgb(52, 152, 219)),
-                    Brushes.White,
-                    () =>
-                    {
-                        window.Close();
-                        ShowVersionInfo();
-                        return Task.CompletedTask;
-                    }),
-                new HelpMenuItem(
-                    "🚀",
-                    "开机启动设置",
-                    new SolidColorBrush(Color.FromRgb(46, 204, 113)),
-                    Brushes.White,
-                    () =>
-                    {
-                        window.Close();
-                        AutoStartupManager.ManageAutoStartupSetting();
-                        return Task.CompletedTask;
-                    }),
-                new HelpMenuItem(
-                    "🔬",
-                    "系统测试",
-                    new SolidColorBrush(Color.FromRgb(155, 89, 182)),
-                    Brushes.White,
-                    () =>
-                    {
-                        window.Close();
-                        OpenSystemTestWindow();
-                        return Task.CompletedTask;
-                    }),
-                new HelpMenuItem(
-                    "📷",
-                    "相机参数配置",
-                    new SolidColorBrush(Color.FromRgb(108, 92, 231)),
-                    Brushes.White,
-                    () =>
-                    {
-                        window.Close();
-                        CameraConfigButton_Click(null, null);
-                        return Task.CompletedTask;
-                    }),
-                new HelpMenuItem(
-                    "⚙️",
-                    "硬件配置",
-                    new SolidColorBrush(Color.FromRgb(241, 196, 15)),
-                    Brushes.Black,
-                    () =>
-                    {
-                        window.Close();
-                        HardwareConfigButton_Click(null, null);
-                        return Task.CompletedTask;
-                    }),
-                new HelpMenuItem(
-                    "🧰",
-                    "设备管理",
-                    new SolidColorBrush(Color.FromRgb(52, 73, 94)),
-                    Brushes.White,
-                    () =>
-                    {
-                        window.Close();
-                        OpenDeviceManagementWindow();
-                        return Task.CompletedTask;
-                    }),
-                new HelpMenuItem(
-                    "📊",
-                    "统计",
-                    new SolidColorBrush(Color.FromRgb(142, 68, 173)),
-                    Brushes.White,
-                    () =>
-                    {
-                        window.Close();
-                        DataAnalysisButton_Click(null, null);
-                        return Task.CompletedTask;
-                    }),
-                new HelpMenuItem(
-                    "📸",
-                    "定拍测试",
-                    new SolidColorBrush(Color.FromRgb(241, 196, 15)),
-                    Brushes.Black,
-                    () =>
-                    {
-                        window.Close();
-                        var fixedShotWindow = new FixedShotTestWindow(this)
-                        {
-                            Owner = window.Owner
-                        };
-                        fixedShotWindow.ShowDialog();
-                        return Task.CompletedTask;
-                    }),
-                new HelpMenuItem(
-                    "🗑️",
-                    "自动删图配置",
-                    new SolidColorBrush(Color.FromRgb(255, 193, 7)),
-                    Brushes.Black,
-                    () =>
-                    {
-                        window.Close();
-                        OpenAutoDeleteImageWindow();
-                        return Task.CompletedTask;
-                    }),
-                new HelpMenuItem(
-                    "🔄",
-                    "PLC 初始化",
-                    new SolidColorBrush(Color.FromRgb(67, 56, 202)),
-                    Brushes.White,
-                    async () =>
-                    {
-                        window.Close();
-                        await InitializePLC();
-                    }),
-                new HelpMenuItem(
-                    "🔗",
-                    "模板与 LOT 来源",
-                    new SolidColorBrush(Color.FromRgb(0, 150, 136)),
-                    Brushes.White,
-                    () =>
-                    {
-                        window.Close();
-                        OpenRemoteSourceSettingWindow();
-                        return Task.CompletedTask;
-                    }),
-                new HelpMenuItem(
-                    "📤",
-                    "实时数据导出",
-                    new SolidColorBrush(Color.FromRgb(96, 125, 139)),
-                    Brushes.White,
-                    () =>
-                    {
-                        window.Close();
-                        OpenRealTimeDataExportConfigWindow();
-                        return Task.CompletedTask;
-                    }),
-                new HelpMenuItem(
-                    "📑",
-                    "验收标准与 CICD",
-                    new SolidColorBrush(Color.FromRgb(63, 81, 181)),
-                    Brushes.White,
-                    () =>
-                    {
-                        window.Close();
-                        OpenCicdAcceptanceCriteriaWindow();
-                        return Task.CompletedTask;
-                    }),
-                new HelpMenuItem(
-                    "📊",
-                    "CICD CSV 对比",
-                    new SolidColorBrush(Color.FromRgb(33, 150, 243)),
-                    Brushes.White,
-                    () =>
-                    {
-                        window.Close();
-                        ImportCicdTestCsvAndCompare();
-                        return Task.CompletedTask;
-                    })
-            };
-
-            const int pageSize = 25;
-            int currentPage = 0;
-            int totalPages = Math.Max(1, (int)Math.Ceiling(helpItems.Count / (double)pageSize));
-
-            void RenderPage()
-            {
-                helpGrid.Children.Clear();
-
-                int startIndex = currentPage * pageSize;
-                int endIndex = Math.Min(startIndex + pageSize, helpItems.Count);
-                for (int i = startIndex; i < endIndex; i++)
-                {
-                    var item = helpItems[i];
-                    helpGrid.Children.Add(CreateHelpMenuButton(item));
-                }
-
-                pageIndicator.Text = $"第 {currentPage + 1}/{totalPages} 页";
-                prevPageButton.IsEnabled = currentPage > 0;
-                nextPageButton.IsEnabled = currentPage < totalPages - 1;
-                var pagerVisibility = totalPages > 1 ? Visibility.Visible : Visibility.Collapsed;
-                prevPageButton.Visibility = pagerVisibility;
-                nextPageButton.Visibility = pagerVisibility;
-                pageIndicator.Visibility = pagerVisibility;
-            }
-
-            prevPageButton.Click += (s, e) =>
-            {
-                if (currentPage > 0)
-                {
-                    currentPage--;
-                    RenderPage();
-                }
-            };
-
-            nextPageButton.Click += (s, e) =>
-            {
-                if (currentPage < totalPages - 1)
-                {
-                    currentPage++;
-                    RenderPage();
-                }
-            };
-
-            RenderPage();
-
-            window.Content = mainGrid;
-            return window;
-        }
+            Grid.SetRow(descBlock, 1);
+            mainGrid.Children.Add(descBlock);
+
+            var helpScrollViewer = new ScrollViewer
+            {
+                VerticalScrollBarVisibility = ScrollBarVisibility.Auto,
+                HorizontalScrollBarVisibility = ScrollBarVisibility.Disabled,
+                Margin = new Thickness(0, 0, 0, 10)
+            };
+            Grid.SetRow(helpScrollViewer, 2);
+            mainGrid.Children.Add(helpScrollViewer);
+
+            var helpGroupPanel = new StackPanel();
+            helpScrollViewer.Content = helpGroupPanel;
+
+            var footerPanel = new Grid
+            {
+                Margin = new Thickness(0, 10, 0, 0)
+            };
+            footerPanel.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+            footerPanel.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+
+            var closeButton = new Button
+            {
+                Content = "关闭",
+                MinWidth = 90,
+                Height = 32,
+                Background = new SolidColorBrush(Color.FromRgb(231, 76, 60)),
+                Foreground = Brushes.White,
+                Margin = new Thickness(15, 0, 0, 0)
+            };
+            closeButton.Click += (s, e) => window.Close();
+            Grid.SetColumn(closeButton, 1);
+            footerPanel.Children.Add(closeButton);
+
+            Grid.SetRow(footerPanel, 3);
+            mainGrid.Children.Add(footerPanel);
+
+            var helpGroups = new List<(string Title, List<HelpMenuItem> Items)>
+            {
+                ("硬件连接与配置", new List<HelpMenuItem>
+                {
+                    new HelpMenuItem(
+                        "📷",
+                        "相机参数配置",
+                        new SolidColorBrush(Color.FromRgb(108, 92, 231)),
+                        Brushes.White,
+                        () =>
+                        {
+                            window.Close();
+                            CameraConfigButton_Click(null, null);
+                            return Task.CompletedTask;
+                        }),
+                    new HelpMenuItem(
+                        "⚙️",
+                        "硬件配置",
+                        new SolidColorBrush(Color.FromRgb(241, 196, 15)),
+                        Brushes.Black,
+                        () =>
+                        {
+                            window.Close();
+                            HardwareConfigButton_Click(null, null);
+                            return Task.CompletedTask;
+                        }),
+                    new HelpMenuItem(
+                        "🧰",
+                        "设备管理",
+                        new SolidColorBrush(Color.FromRgb(52, 73, 94)),
+                        Brushes.White,
+                        () =>
+                        {
+                            window.Close();
+                            OpenDeviceManagementWindow();
+                            return Task.CompletedTask;
+                        }),
+                    new HelpMenuItem(
+                        "🔄",
+                        "PLC 初始化",
+                        new SolidColorBrush(Color.FromRgb(67, 56, 202)),
+                        Brushes.White,
+                        async () =>
+                        {
+                            window.Close();
+                            await InitializePLC();
+                        }),
+                    new HelpMenuItem(
+                        "🔌",
+                        "PLC 串口配置",
+                        new SolidColorBrush(Color.FromRgb(52, 152, 219)),
+                        Brushes.White,
+                        () =>
+                        {
+                            window.Close();
+                            OpenPlcSerialConfigWindow();
+                            return Task.CompletedTask;
+                        })
+                }),
+                ("数据分析", new List<HelpMenuItem>
+                {
+                    new HelpMenuItem(
+                        "📊",
+                        "统计",
+                        new SolidColorBrush(Color.FromRgb(142, 68, 173)),
+                        Brushes.White,
+                        () =>
+                        {
+                            window.Close();
+                            DataAnalysisButton_Click(null, null);
+                            return Task.CompletedTask;
+                        }),
+                    new HelpMenuItem(
+                        "📤",
+                        "实时数据导出",
+                        new SolidColorBrush(Color.FromRgb(96, 125, 139)),
+                        Brushes.White,
+                        () =>
+                        {
+                            window.Close();
+                            OpenRealTimeDataExportConfigWindow();
+                            return Task.CompletedTask;
+                        }),
+                    new HelpMenuItem(
+                        "📑",
+                        "验收标准与 CICD",
+                        new SolidColorBrush(Color.FromRgb(63, 81, 181)),
+                        Brushes.White,
+                        () =>
+                        {
+                            window.Close();
+                            OpenCicdAcceptanceCriteriaWindow();
+                            return Task.CompletedTask;
+                        }),
+                    new HelpMenuItem(
+                        "📊",
+                        "CICD CSV 对比",
+                        new SolidColorBrush(Color.FromRgb(33, 150, 243)),
+                        Brushes.White,
+                        () =>
+                        {
+                            window.Close();
+                            ImportCicdTestCsvAndCompare();
+                            return Task.CompletedTask;
+                        })
+                }),
+                ("拓展组件", new List<HelpMenuItem>
+                {
+                    new HelpMenuItem(
+                        "📸",
+                        "定拍测试",
+                        new SolidColorBrush(Color.FromRgb(241, 196, 15)),
+                        Brushes.Black,
+                        () =>
+                        {
+                            window.Close();
+                            var fixedShotWindow = new FixedShotTestWindow(this)
+                            {
+                                Owner = window.Owner
+                            };
+                            fixedShotWindow.ShowDialog();
+                            return Task.CompletedTask;
+                        }),
+                    new HelpMenuItem(
+                        "🗑️",
+                        "自动删图配置",
+                        new SolidColorBrush(Color.FromRgb(255, 193, 7)),
+                        Brushes.Black,
+                        () =>
+                        {
+                            window.Close();
+                            OpenAutoDeleteImageWindow();
+                            return Task.CompletedTask;
+                        }),
+                    new HelpMenuItem(
+                        "🔗",
+                        "模板与 LOT 来源",
+                        new SolidColorBrush(Color.FromRgb(0, 150, 136)),
+                        Brushes.White,
+                        () =>
+                        {
+                            window.Close();
+                            OpenRemoteSourceSettingWindow();
+                            return Task.CompletedTask;
+                        }),
+                    new HelpMenuItem(
+                        "🧩",
+                        "Tray 检测组件",
+                        new SolidColorBrush(Color.FromRgb(26, 188, 156)),
+                        Brushes.White,
+                        () =>
+                        {
+                            window.Close();
+                            OpenTrayDetectionWindow();
+                            return Task.CompletedTask;
+                        })
+                }),
+                ("平台信息与帮助", new List<HelpMenuItem>
+                {
+                    new HelpMenuItem(
+                        "📋",
+                        "系统版本信息",
+                        new SolidColorBrush(Color.FromRgb(52, 152, 219)),
+                        Brushes.White,
+                        () =>
+                        {
+                            window.Close();
+                            ShowVersionInfo();
+                            return Task.CompletedTask;
+                        }),
+                    new HelpMenuItem(
+                        "🚀",
+                        "开机启动设置",
+                        new SolidColorBrush(Color.FromRgb(46, 204, 113)),
+                        Brushes.White,
+                        () =>
+                        {
+                            window.Close();
+                            AutoStartupManager.ManageAutoStartupSetting();
+                            return Task.CompletedTask;
+                        }),
+                    new HelpMenuItem(
+                        "🔬",
+                        "系统测试",
+                        new SolidColorBrush(Color.FromRgb(155, 89, 182)),
+                        Brushes.White,
+                        () =>
+                        {
+                            window.Close();
+                            OpenSystemTestWindow();
+                            return Task.CompletedTask;
+                        })
+                })
+            };
+
+            foreach (var group in helpGroups)
+            {
+                var groupTitleBlock = new TextBlock
+                {
+                    Text = group.Title,
+                    FontSize = 13,
+                    FontWeight = FontWeights.Bold,
+                    Foreground = Brushes.White,
+                    Margin = new Thickness(0, 10, 0, 6)
+                };
+                helpGroupPanel.Children.Add(groupTitleBlock);
+
+                var groupGrid = new System.Windows.Controls.Primitives.UniformGrid
+                {
+                    Columns = 4,
+                    Margin = new Thickness(0, 0, 0, 12)
+                };
+
+                foreach (var item in group.Items)
+                {
+                    groupGrid.Children.Add(CreateHelpMenuButton(item));
+                }
+
+                helpGroupPanel.Children.Add(groupGrid);
+            }
+
+            window.Content = mainGrid;
+            return window;
+        }
+
+        public void ShowTrayHelpWindow()
+        {
+            var window = new Window
+            {
+                Title = "Tray 检测组件",
+                Width = 860,
+                Height = 700,
+                WindowStartupLocation = WindowStartupLocation.CenterOwner,
+                Owner = Window.GetWindow(this),
+                Background = Brushes.White
+            };
+
+            var scrollViewer = new ScrollViewer
+            {
+                VerticalScrollBarVisibility = ScrollBarVisibility.Auto
+            };
+
+            var panel = new StackPanel
+            {
+                Margin = new Thickness(24)
+            };
+
+            scrollViewer.Content = panel;
+
+            void AddTitle(string text)
+            {
+                panel.Children.Add(new TextBlock
+                {
+                    Text = text,
+                    FontSize = 18,
+                    FontWeight = FontWeights.Bold,
+                    Margin = new Thickness(0, 0, 0, 12)
+                });
+            }
+
+            void AddSection(string title, string content)
+            {
+                panel.Children.Add(new TextBlock
+                {
+                    Text = title,
+                    FontSize = 14,
+                    FontWeight = FontWeights.SemiBold,
+                    Margin = new Thickness(0, 12, 0, 6)
+                });
+
+                panel.Children.Add(new TextBlock
+                {
+                    Text = content,
+                    TextWrapping = TextWrapping.Wrap,
+                    LineHeight = 20
+                });
+            }
+
+            AddTitle("Tray 检测组件说明");
+
+            AddSection("接口 API",
+                "StartTray(rows, cols, batchName)\n" +
+                "UpdateResult(position, result, imagePath, time)\n" +
+                "CompleteTray()\n" +
+                "ResetCurrentTray()\n" +
+                "GetStatistics()\n" +
+                "GetHistory(limit)\n" +
+                "RequestManualRetest(position)");
+
+            AddSection("数据结构",
+                "TrayData: trayId、rows、cols、batchName、createdAt、completedAt、materials\n" +
+                "MaterialData: row、col、result、imagePath、detectionTime\n" +
+                "TrayStatistics: totalSlots、inspectedCount、okCount、ngCount、yieldRate、defectCounts\n" +
+                "TrayPosition: row/col 位置对象");
+
+            AddSection("坐标映射规则",
+                "默认蛇形映射：奇数行从左到右，偶数行从右到左。\n" +
+                "position 支持 \"row_col\" 或 index（0 基），转换规则通过 TrayCoordinateMapper 实现。\n" +
+                "UI 坐标以左下角为 (1,1)。");
+
+            AddSection("缺陷状态与图标",
+                "状态映射默认支持 OK / NG。\n" +
+                "图标文件名：ok.png、ng.png（可配置 IconFolder 路径）。\n" +
+                "若图标缺失，将使用备用颜色进行显示。");
+
+            AddSection("示例集成",
+                "var tray = trayComponent.StartTray(10, 9, \"Batch-001\");\n" +
+                "trayComponent.UpdateResult(\"1_1\", \"OK\", \"c:\\\\images\\\\ok.png\", DateTime.UtcNow);\n" +
+                "trayComponent.UpdateResult(\"2\", \"NG\", \"c:\\\\images\\\\ng.png\", DateTime.UtcNow);\n" +
+                "var stats = trayComponent.GetStatistics();\n" +
+                "var history = trayComponent.GetHistory(10);");
+
+            window.Content = scrollViewer;
+            window.ShowDialog();
+        }
+
+        private void OpenTrayDetectionWindow()
+        {
+            if (_trayDetectionWindow == null)
+            {
+                _trayDetectionWindow = new TrayDetectionWindow(this)
+                {
+                    Owner = Window.GetWindow(this)
+                };
+                _trayDetectionWindow.Closed += (_, __) => _trayDetectionWindow = null;
+            }
+
+            _trayDetectionWindow.Show();
+            _trayDetectionWindow.Activate();
+        }
 
         /// <summary>
         /// 打开实时数据导出配置窗口
@@ -11135,8 +11224,8 @@ namespace WpfApp2.UI
         /// 生产模式：复用TemplateConfigPage.GetCurrentImageNumber()
         /// 图片测试模式：从当前图片名提取纯数字序号
         /// </summary>
-        private string GetCurrentImageNumberForRecord()
-        {
+        public string GetCurrentImageNumberForRecord()
+        {
             try
             {
                 // 生产模式：复用现有的GetCurrentImageNumber方法
@@ -11180,14 +11269,25 @@ namespace WpfApp2.UI
             }
             catch (Exception ex)
             {
-                LogManager.Warning($"获取图片序号失败: {ex.Message}");
-                return "";
-            }
-        }
-
-        /// <summary>
-        /// 当前LOT号（用于图片存储目录管理）
-        /// </summary>
+                LogManager.Warning($"获取图片序号失败: {ex.Message}");
+                return "";
+            }
+        }
+
+        public string GetCurrentTrayImagePath()
+        {
+            var group = ResolvePreviewImageGroup();
+            if (group == null)
+            {
+                return null;
+            }
+
+            return group.Source1Path ?? group.HeightImagePath ?? group.GrayImagePath;
+        }
+
+        /// <summary>
+        /// 当前LOT号（用于图片存储目录管理）
+        /// </summary>
         public string CurrentLOTNumber
         {
             get
