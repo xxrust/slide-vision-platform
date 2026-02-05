@@ -1,66 +1,137 @@
 {
-  "project": "Platform Repo Multi-Agent Architecture Analysis",
+  "project": "Platform 项目框架分析（多 Agent）",
   "status": "draft",
-  "version": "0.1",
-  "description": "使用多 agent 并行分析项目框架，输出分组、框架图、模块职责与耦合问题清单。",
-  "background": "项目规模大且结构复杂，单一阅读成本高，需并行化分析并结构化汇总。",
+  "version": "1.0",
+  "branchName": "master",
+  "description": "输出模块关系、数据流与耦合风险，帮助使用者快速理解并安全修改。",
+  "background": "项目规模大、模块多且职责交织，单次阅读成本高，需要结构化分析与并行分工。",
   "goals": [
-    "完成项目结构与模块划分",
-    "输出框架图与模块职责说明",
-    "识别高内聚低耦合不足点",
-    "产出可复用分析流程 PRD"
+    "识别并清晰划分项目模块边界与职责",
+    "给出平台插件体系与宿主算法体系的关系与差异",
+    "输出关键数据流与依赖图，方便定位修改入口",
+    "列出耦合与修改风险，降低回归成本",
+    "提供可复用的多 Agent 分工与汇总模板"
   ],
   "nonGoals": [
-    "不修改代码",
-    "不执行构建/测试",
-    "不进行重构或性能优化"
+    "不进行代码重构或功能新增",
+    "不替换现有硬件/3D 依赖栈",
+    "不执行构建、测试或发布流程"
   ],
-  "personas": [
-    {
-      "id": "P-REQ",
-      "name": "需求方",
-      "goals": ["获取框架图", "获取耦合问题分析", "获取 PRD"],
-      "painPoints": ["上下文过大", "信息分散"]
-    },
-    {
-      "id": "P-AGENT",
-      "name": "分析执行者（多 agent）",
-      "goals": ["并行阅读", "输出结构化记录"],
-      "painPoints": ["模块边界不清", "结论不一致"]
-    }
-  ],
+  "scope": {
+    "modules": [
+      "平台核心（插件接口 + 运行时加载）",
+      "插件实现（OpenCV/ONNX/示例插件）",
+      "示例宿主（控制台演示）",
+      "WPF 宿主（UI/模板/引擎/渲染/硬件/3D）",
+      "配置与文档",
+      "生成物与外部依赖（bin/obj/packages/out）"
+    ]
+  },
+  "architecture": {
+    "diagramText": "[Platform Core] -> [Algorithm Plugins] -> [Sample Host]; [WPF Host] consumes TemplateHierarchy.json and Algorithm Engines with Rendering/Hardware/3D services.",
+    "dataFlows": [
+      "插件流：扫描目录 -> 实例化插件 -> 注册 -> 创建会话 -> Run 输入输出",
+      "宿主检测流：选图 -> 构建 AlgorithmInput -> 选引擎 -> 执行 -> 渲染/3D 并行",
+      "模板流：TemplateHierarchy.json -> Profile -> ImageSources -> 输入路径映射"
+    ]
+  },
   "deliverables": [
-    "文件分组与分组理由",
-    "多 agent 分工记录",
-    "框架图（文本/ASCII）",
-    "模块职责说明",
-    "耦合问题清单",
-    "PRD（本文件）"
-  ],
-  "process": [
-    "统计文件数量（含/不含生成物）",
-    "分组并记录理由",
-    "多 agent 并行阅读并记录",
-    "汇总框架图与模块职责",
-    "输出耦合问题清单",
-    "输出 PRD"
-  ],
-  "successCriteria": [
-    "框架图覆盖平台核心、宿主层、插件、示例与配置",
-    "每个模块都有职责说明",
-    "至少 5 条耦合或低内聚问题",
-    "PRD 包含目标/范围/交付物/验收标准"
+    "模块分组清单与分组理由",
+    "多 Agent 阅读范围与关键发现记录",
+    "架构关系图（文本/ASCII）",
+    "关键数据流说明",
+    "耦合问题与修改风险清单",
+    "PRD 文档（prd.md/prd.json）"
   ],
   "risks": [
-    { "id": "R-001", "risk": "模块边界不清导致重复阅读", "mitigation": "先分组并明确 agent 边界" },
-    { "id": "R-002", "risk": "生成物过多导致上下文爆炸", "mitigation": "剔除 bin/obj/packages/out" },
-    { "id": "R-003", "risk": "多 agent 结论不一致", "mitigation": "统一汇总口径与输出格式" }
+    {
+      "id": "R-001",
+      "risk": "平台插件契约与宿主算法契约并存，统一成本高",
+      "mitigation": "明确边界与桥接策略，避免重复模型"
+    },
+    {
+      "id": "R-002",
+      "risk": "Page1 多职责导致修改回归风险高",
+      "mitigation": "变更前先定位数据流与依赖"
+    },
+    {
+      "id": "R-003",
+      "risk": "模板 Profile 与图像源配置修改影响检测输入",
+      "mitigation": "变更模板配置时同步验证输入构建逻辑"
+    },
+    {
+      "id": "R-004",
+      "risk": "3D IPC 启动/授权失败导致运行时错误",
+      "mitigation": "保留 IPC 兼容与错误回退路径"
+    },
+    {
+      "id": "R-005",
+      "risk": "配置文件分散导致默认值不一致",
+      "mitigation": "集中记录配置入口与默认值来源"
+    }
   ],
   "acceptanceCriteria": [
-    "提供分组清单与理由",
-    "提供多 agent 阅读记录",
-    "提供框架图与模块职责说明",
-    "提供耦合问题清单",
-    "PRD 可复用为后续项目分析模板"
+    "模块边界覆盖平台核心、宿主层、插件、示例、配置、外部依赖",
+    "至少 5 条耦合或低内聚风险说明",
+    "数据流清晰，能定位主要改动入口",
+    "PRD 可复用为后续项目框架分析模板"
+  ],
+  "parallelization": {
+    "agents": [
+      {
+        "name": "Agent A",
+        "focus": "平台核心 + 插件体系（接口/加载/示例宿主）"
+      },
+      {
+        "name": "Agent B",
+        "focus": "WPF 宿主主流程（Page1 + 输入/输出链路）"
+      },
+      {
+        "name": "Agent C",
+        "focus": "模板与配置系统（Profile/参数/配置页）"
+      },
+      {
+        "name": "Agent D",
+        "focus": "算法引擎 + 渲染系统（Contracts/Engines/Renderer）"
+      },
+      {
+        "name": "Agent E",
+        "focus": "3D/硬件/外设（NamedPipe 3D + Camera/PLC/GPIO）"
+      }
+    ]
+  },
+  "stories": [
+    {
+      "id": "US-ARCH-001",
+      "title": "模块分组与架构关系梳理",
+      "priority": "P0",
+      "description": "完成模块分组、依赖关系与文本架构图输出。",
+      "acceptanceCriteria": [
+        "模块分组清晰且可追溯",
+        "提供文本/ASCII 架构图"
+      ],
+      "passes": true
+    },
+    {
+      "id": "US-ARCH-002",
+      "title": "关键数据流与耦合风险清单",
+      "priority": "P0",
+      "description": "输出平台插件流、宿主检测流与模板流，并列出耦合风险。",
+      "acceptanceCriteria": [
+        "至少 3 条关键数据流",
+        "至少 5 条耦合或修改风险"
+      ],
+      "passes": true
+    },
+    {
+      "id": "US-ARCH-003",
+      "title": "PRD 文档落地（md/json）",
+      "priority": "P1",
+      "description": "形成 prd.md 与 prd.json 交付物。",
+      "acceptanceCriteria": [
+        "prd.md 与 prd.json 均存在且内容一致"
+      ],
+      "passes": true
+    }
   ]
 }
