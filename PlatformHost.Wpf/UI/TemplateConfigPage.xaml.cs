@@ -1806,7 +1806,7 @@ namespace WpfApp2.UI
             currentTemplate.AlgorithmEngineId = AlgorithmEngineSettingsManager.PreferredEngineId;
             return;
 
-            AlgorithmEngineRegistry.EnsureInitialized(PageManager.Page1Instance);
+            AlgorithmEngineRegistry.EnsureInitialized();
 
             var panel = new StackPanel
             {
