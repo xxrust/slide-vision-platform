@@ -76,29 +76,39 @@
 
 ### P0-3: 从 Page1 抽取 DetectionOrchestrator 服务 ✅
 
-**状态**：
-- `UnifiedDetectionManager` 已存在并承担检测编排职责
-- 该类已经实现了 2D/3D 检测编排和统一判定逻辑
-- Page1 通过 `_detectionManager` 字段使用该服务
+**问题**：
+- `UnifiedDetectionManager` 嵌套在 Page1.xaml.cs 中（567 行代码）
+- 虽然职责已分离，但物理位置仍在 UI 文件中
+- 不利于代码维护和复用
 
-**现有架构**：
+**解决方案**：
+- 将 `UnifiedDetectionManager` 移到独立文件 `UnifiedDetectionManager.cs`
+- 同时移出 `DetectionMode` 和 `SystemDetectionState` 枚举
+- Page1.xaml.cs 减少 567 行代码
+
+**新增文件**：
+- `PlatformHost.Wpf/UI/UnifiedDetectionManager.cs` (567 行)
+  - `UnifiedDetectionManager` 类
+  - `DetectionMode` 枚举
+  - `SystemDetectionState` 枚举
+
+**架构改进**：
 ```
-Page1
-  └─ UnifiedDetectionManager (检测编排器)
+PlatformHost.Wpf/UI/
+  ├─ Page1.xaml.cs (UI 层，11689 行)
+  │   └─ 使用 _detectionManager
+  └─ UnifiedDetectionManager.cs (服务层，567 行)
       ├─ StartDetectionCycle()
       ├─ Mark2DCompleted()
       ├─ Mark3DCompleted()
       └─ CheckAndExecuteUnifiedJudgement()
 ```
 
-**评估**：
-- 检测编排逻辑已经从 Page1 中分离
-- Page1 只保留 UI 事件分发和回调处理
-- 架构符合单一职责原则
-
-**建议**：
-- 未来可考虑将 `UnifiedDetectionManager` 移到独立文件
-- 当前嵌套在 Page1.xaml.cs 中，但职责已清晰分离
+**收益**：
+- 物理分离，代码组织更清晰
+- Page1.xaml.cs 从 12256 行减少到 11689 行
+- 检测编排逻辑独立可复用
+- 符合单一职责原则
 
 ---
 
@@ -156,7 +166,7 @@ PlatformHost.Wpf
 ## 后续建议
 
 ### 短期优化
-1. 将 `UnifiedDetectionManager` 移到独立文件
+1. ~~将 `UnifiedDetectionManager` 移到独立文件~~ ✅ 已完成
 2. 为硬件控制器接口添加单元测试
 3. 考虑为 `AlgorithmEngineRegistry` 添加接口
 
@@ -172,13 +182,38 @@ PlatformHost.Wpf
 ### 已清理
 - ✅ Page1 ↔ AlgorithmEngineRegistry 循环依赖
 - ✅ 硬件层静态调用
+- ✅ UnifiedDetectionManager 已移到独立文件
 
 ### 待清理
-- ⏳ UnifiedDetectionManager 仍嵌套在 Page1.xaml.cs 中
 - ⏳ PageManager.Page1Instance 静态单例模式
+- ⏳ 部分 UI 组件仍使用静态访问模式
+
+---
+
+## 文件变更统计
+
+### 新增文件 (8 个)
+1. `PlatformHost.Wpf/SMTGPIO/IIoController.cs` - IO 控制器接口
+2. `PlatformHost.Wpf/SMTGPIO/IPlcController.cs` - PLC 控制器接口
+3. `PlatformHost.Wpf/SMTGPIO/IoControllerAdapter.cs` - IO 适配器
+4. `PlatformHost.Wpf/SMTGPIO/PlcControllerAdapter.cs` - PLC 适配器
+5. `PlatformHost.Wpf/SMTGPIO/NullIoController.cs` - IO 空实现
+6. `PlatformHost.Wpf/SMTGPIO/NullPlcController.cs` - PLC 空实现
+7. `PlatformHost.Wpf/SMTGPIO/HardwareControllerFactory.cs` - 硬件工厂
+8. `PlatformHost.Wpf/UI/UnifiedDetectionManager.cs` - 检测编排器
+
+### 修改文件 (3 个)
+1. `PlatformHost.Wpf/Algorithms/AlgorithmEngineRegistry.cs` - 移除 Page1 依赖
+2. `PlatformHost.Wpf/UI/Page1.xaml.cs` - 使用接口 + 移除嵌套类 (减少 567 行)
+3. `REFACTORING_SUMMARY.md` - 重构总结文档
+
+### 代码行数变化
+- Page1.xaml.cs: 12256 → 11689 行 (-567 行, -4.6%)
+- 新增代码: ~1200 行（硬件抽象层 + 检测编排器）
+- 净增加: ~633 行
 
 ---
 
 **重构完成时间**: 2026-02-09
 **重构分支**: `refactor/decouple-architecture`
-**影响范围**: 算法引擎层、硬件抽象层、UI 层
+**影响范围**: 算法引擎层、硬件抽象层、检测编排层、UI 层
