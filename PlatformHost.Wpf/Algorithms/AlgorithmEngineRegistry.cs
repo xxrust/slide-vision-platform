@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using Slide.Algorithm.Contracts;
 using Slide.Algorithm.ONNX;
 using Slide.Algorithm.OpenCV;
-using WpfApp2.UI;
 
 namespace WpfApp2.Algorithms
 {
@@ -12,7 +11,7 @@ namespace WpfApp2.Algorithms
         private static readonly Dictionary<string, IAlgorithmEngine> Engines = new Dictionary<string, IAlgorithmEngine>(StringComparer.OrdinalIgnoreCase);
         private static bool _initialized;
 
-        public static void Initialize(Page1 page1)
+        public static void Initialize()
         {
             if (!_initialized)
             {
@@ -27,11 +26,11 @@ namespace WpfApp2.Algorithms
             }
         }
 
-        public static void EnsureInitialized(Page1 page1)
+        public static void EnsureInitialized()
         {
             if (!_initialized)
             {
-                Initialize(page1);
+                Initialize();
                 return;
             }
 
@@ -39,7 +38,7 @@ namespace WpfApp2.Algorithms
 
         public static IAlgorithmEngine ResolveEngine(string preferredEngineId)
         {
-            EnsureInitialized(Page1.PageManager.Page1Instance);
+            EnsureInitialized();
 
             if (string.IsNullOrWhiteSpace(preferredEngineId))
             {
@@ -67,7 +66,7 @@ namespace WpfApp2.Algorithms
 
         public static IReadOnlyList<AlgorithmEngineDescriptor> GetDescriptors()
         {
-            EnsureInitialized(Page1.PageManager.Page1Instance);
+            EnsureInitialized();
 
             var descriptors = new List<AlgorithmEngineDescriptor>();
             foreach (var engine in Engines.Values)
