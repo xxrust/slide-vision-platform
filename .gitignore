@@ -19,3 +19,8 @@ TestResults/
 *.db-shm
 *.db-wal
 *.vsidx
+
+# Work files
+ralph/
+tasks/
+nul
