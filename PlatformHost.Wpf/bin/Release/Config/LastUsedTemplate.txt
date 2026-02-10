@@ -1,1 +1,0 @@
-E:\posen_project\点胶检测\上位机程序\WpfApp2\Platform\PlatformHost.Wpf\bin\Release\Templates\Template-Standard.json
