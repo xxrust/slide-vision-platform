@@ -8640,17 +8640,6 @@ namespace WpfApp2.UI
                         {
                             window.Close();
                             await InitializePLC();
-                        }),
-                    new HelpMenuItem(
-                        "🔌",
-                        "PLC 串口配置",
-                        new SolidColorBrush(Color.FromRgb(52, 152, 219)),
-                        Brushes.White,
-                        () =>
-                        {
-                            window.Close();
-                            OpenPlcSerialConfigWindow();
-                            return Task.CompletedTask;
                         })
                 }),
                 ("数据分析", new List<HelpMenuItem>
@@ -9785,34 +9774,6 @@ namespace WpfApp2.UI
                 MessageBox.Show($"操作失败: {ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
-
-        /// <summary>
-        /// 打开PLC串口配置窗口
-        /// </summary>
-        private void OpenPlcSerialConfigWindow()
-        {
-            try
-            {
-                var plcConfigWindow = new Window
-                {
-                    Title = "PLC串口配置与测试",
-                    Width = 1200,
-                    Height = 800,
-                    WindowStartupLocation = WindowStartupLocation.CenterOwner,
-                    Owner = Window.GetWindow(this),
-                    Content = new PLCSerialConfigPage()
-                };
-
-                plcConfigWindow.ShowDialog();
-                LogUpdate("已打开PLC串口配置窗口");
-            }
-            catch (Exception ex)
-            {
-                LogUpdate($"打开PLC串口配置窗口失败: {ex.Message}");
-                MessageBox.Show($"打开PLC串口配置窗口失败: {ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
-        }
-
 
         #region 显示模式切换相关方法
 

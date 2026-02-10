@@ -714,38 +714,6 @@ namespace WpfApp2.UI
         }
 
         /// <summary>
-        /// PLC串口配置按钮点击事件
-        /// </summary>
-        private void PLCConfigButton_Click(object sender, RoutedEventArgs e)
-        {
-            try
-            {
-                LogMessage("正在打开PLC串口配置窗口...");
-                
-                // 创建PLC配置窗口
-                var plcConfigWindow = new Window
-                {
-                    Title = "PLC串口配置与测试",
-                    Width = 1200,
-                    Height = 800,
-                    WindowStartupLocation = WindowStartupLocation.CenterOwner,
-                    Owner = Application.Current.MainWindow,
-                    Content = new PLCSerialConfigPage()
-                };
-                
-                // 显示模态对话框
-                plcConfigWindow.ShowDialog();
-                
-                LogMessage("PLC串口配置窗口已关闭");
-            }
-            catch (Exception ex)
-            {
-                LogMessage($"打开PLC串口配置窗口时出错: {ex.Message}", LogLevel.Error);
-                MessageBox.Show($"打开PLC串口配置窗口失败: {ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
-        }
-
-        /// <summary>
         /// 3D配置按钮点击事件
         /// </summary>
         private void ThreeDConfigButton_Click(object sender, RoutedEventArgs e)
