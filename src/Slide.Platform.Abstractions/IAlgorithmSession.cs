@@ -4,6 +4,6 @@ namespace Slide.Platform.Abstractions
 {
     public interface IAlgorithmSession : IDisposable
     {
-        AlgorithmResult Run(AlgorithmInput input);
+        SimpleAlgorithmResult Run(SimpleAlgorithmInput input);
     }
 }

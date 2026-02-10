@@ -24,9 +24,9 @@ namespace Slide.Algorithm.OpenCv
 
         private sealed class OpenCvAlgorithmSession : IAlgorithmSession
         {
-            public AlgorithmResult Run(AlgorithmInput input)
+            public SimpleAlgorithmResult Run(SimpleAlgorithmInput input)
             {
-                var result = new AlgorithmResult();
+                var result = new SimpleAlgorithmResult();
                 if (input == null || string.IsNullOrWhiteSpace(input.ImagePath))
                 {
                     result.Success = false;

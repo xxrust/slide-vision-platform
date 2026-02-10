@@ -161,6 +161,10 @@
       <Project>{F9389238-7474-4C8A-90C7-CA61999E9505}</Project>
       <Name>Slide.ThreeD.Contracts</Name>
     </ProjectReference>
+    <ProjectReference Include="..\src\Slide.Platform.Abstractions\Slide.Platform.Abstractions.csproj">
+      <Project>{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}</Project>
+      <Name>Slide.Platform.Abstractions</Name>
+    </ProjectReference>
     <ProjectReference Include="..\src\Slide.Platform.Runtime\Slide.Platform.Runtime.csproj">
       <Project>{9C574D84-FA95-425C-BDE3-A0BD0551F117}</Project>
       <Name>Slide.Platform.Runtime</Name>

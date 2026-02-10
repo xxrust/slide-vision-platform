@@ -1,5 +1,5 @@
 ﻿using System;
-using Slide.Algorithm.Contracts;
+using Slide.Platform.Abstractions;
 
 namespace WpfApp2.Algorithms
 {

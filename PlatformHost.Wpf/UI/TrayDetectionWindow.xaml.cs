@@ -4,7 +4,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Windows;
-using Slide.Algorithm.Contracts;
+using Slide.Platform.Abstractions;
 using Slide.Platform.Runtime.Tray;
 using WpfApp2.Algorithms;
 using WpfApp2.UI.Controls;

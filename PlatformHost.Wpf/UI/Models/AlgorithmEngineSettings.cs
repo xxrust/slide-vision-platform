@@ -1,6 +1,6 @@
 ﻿using System;
 using System.IO;
-using Slide.Algorithm.Contracts;
+using Slide.Platform.Abstractions;
 using Newtonsoft.Json;
 
 namespace WpfApp2.UI.Models

@@ -1,6 +1,6 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
-using Slide.Algorithm.Contracts;
+using Slide.Platform.Abstractions;
 
 namespace Slide.Algorithm.ONNX
 {

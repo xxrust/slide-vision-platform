@@ -22,7 +22,7 @@ using WpfApp2.UI.Controls;
 using WpfApp2.SMTGPIO;
 using WpfApp2.ThreeD;
 using System;
-using Slide.Algorithm.Contracts;
+using Slide.Platform.Abstractions;
 using WpfApp2.Algorithms;
 using WpfApp2.Rendering;
 

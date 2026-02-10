@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using Slide.Algorithm.Contracts;
+using Slide.Platform.Abstractions;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 

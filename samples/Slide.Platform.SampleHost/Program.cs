@@ -56,7 +56,7 @@ namespace Slide.Platform.SampleHost
 
             using (var session = plugin.CreateSession())
             {
-                var input = new AlgorithmInput { ImagePath = inputPath };
+                var input = new SimpleAlgorithmInput { ImagePath = inputPath };
                 if (!string.IsNullOrWhiteSpace(modelPath))
                 {
                     input.Parameters["ModelPath"] = modelPath;
@@ -67,7 +67,7 @@ namespace Slide.Platform.SampleHost
             }
         }
 
-        private static void PrintResult(IAlgorithmPlugin plugin, AlgorithmResult result)
+        private static void PrintResult(IAlgorithmPlugin plugin, SimpleAlgorithmResult result)
         {
             Console.WriteLine();
             Console.WriteLine($"Plugin: {plugin.Descriptor.Id} - {plugin.Descriptor.Name}");

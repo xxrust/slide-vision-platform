@@ -29,9 +29,9 @@ namespace Slide.Algorithm.Onnx
         {
             private InferenceSession _session;
 
-            public AlgorithmResult Run(AlgorithmInput input)
+            public SimpleAlgorithmResult Run(SimpleAlgorithmInput input)
             {
-                var result = new AlgorithmResult();
+                var result = new SimpleAlgorithmResult();
                 var modelPath = ResolveModelPath(input);
                 if (string.IsNullOrWhiteSpace(modelPath) || !File.Exists(modelPath))
                 {
@@ -72,7 +72,7 @@ namespace Slide.Algorithm.Onnx
                 return result;
             }
 
-            private static string ResolveModelPath(AlgorithmInput input)
+            private static string ResolveModelPath(SimpleAlgorithmInput input)
             {
                 if (input?.Parameters != null && input.Parameters.TryGetValue("ModelPath", out var pathObj))
                 {

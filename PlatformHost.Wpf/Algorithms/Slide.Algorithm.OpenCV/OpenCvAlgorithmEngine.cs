@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
-using Slide.Algorithm.Contracts;
+using Slide.Platform.Abstractions;
 using OpenCvSharp;
 
 namespace Slide.Algorithm.OpenCV
 {
-    public sealed class OpenCvAlgorithmEngine : IAlgorithmEngine
+    public sealed class OpenCvAlgorithmEngine : IAlgorithmEngine, IAlgorithmEngineMetadata
     {
         private const string KeyImagePath = "\u56fe\u7247\u8def\u5f84";
         private const string KeyUseGray = "\u7070\u5ea6\u6a21\u5f0f";
@@ -491,6 +491,36 @@ namespace Slide.Algorithm.OpenCV
             }
 
             return fallback;
+        }
+
+        public IReadOnlyList<AlgorithmParameterSchema> GetParameterSchema()
+        {
+            return new List<AlgorithmParameterSchema>
+            {
+                new AlgorithmParameterSchema { Name = KeyImagePath, DisplayName = "图片路径", DataType = "string", IsRequired = true, Group = "输入" },
+                new AlgorithmParameterSchema { Name = KeyUseGray, DisplayName = "灰度模式", DataType = "bool", DefaultValue = "true", Group = "预处理" },
+                new AlgorithmParameterSchema { Name = KeyBlurKernel, DisplayName = "高斯核尺寸", DataType = "int", DefaultValue = "5", Group = "预处理" },
+                new AlgorithmParameterSchema { Name = KeyBlurSigma, DisplayName = "高斯σ", DataType = "double", DefaultValue = "1.2", Group = "预处理" },
+                new AlgorithmParameterSchema { Name = KeyCannyLow, DisplayName = "Canny低阈值", DataType = "double", DefaultValue = "60", Group = "边缘检测" },
+                new AlgorithmParameterSchema { Name = KeyCannyHigh, DisplayName = "Canny高阈值", DataType = "double", DefaultValue = "120", Group = "边缘检测" },
+                new AlgorithmParameterSchema { Name = KeyDilateIterations, DisplayName = "膨胀次数", DataType = "int", DefaultValue = "1", Group = "边缘检测" },
+                new AlgorithmParameterSchema { Name = KeyMeanMin, DisplayName = "灰度均值下限", DataType = "double", DefaultValue = "60", Group = "判定阈值" },
+                new AlgorithmParameterSchema { Name = KeyMeanMax, DisplayName = "灰度均值上限", DataType = "double", DefaultValue = "200", Group = "判定阈值" },
+                new AlgorithmParameterSchema { Name = KeyEdgeMin, DisplayName = "边缘像素数下限", DataType = "double", DefaultValue = "500", Group = "判定阈值" },
+                new AlgorithmParameterSchema { Name = KeyEdgeMax, DisplayName = "边缘像素数上限", DataType = "double", DefaultValue = "20000", Group = "判定阈值" },
+            };
+        }
+
+        public IReadOnlyList<AlgorithmOutputSchema> GetOutputSchema()
+        {
+            return new List<AlgorithmOutputSchema>
+            {
+                new AlgorithmOutputSchema { Name = "Mean", DisplayName = "灰度均值", Unit = "", HasLimits = true },
+                new AlgorithmOutputSchema { Name = "Std", DisplayName = "灰度标准差", Unit = "", HasLimits = false },
+                new AlgorithmOutputSchema { Name = "EdgeCount", DisplayName = "边缘像素数", Unit = "px", HasLimits = true },
+                new AlgorithmOutputSchema { Name = "Width", DisplayName = "图像宽度", Unit = "px", HasLimits = false },
+                new AlgorithmOutputSchema { Name = "Height", DisplayName = "图像高度", Unit = "px", HasLimits = false },
+            };
         }
     }
 }

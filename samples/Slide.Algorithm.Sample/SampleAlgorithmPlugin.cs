@@ -23,9 +23,9 @@ namespace Slide.Algorithm.Sample
 
         private sealed class SampleAlgorithmSession : IAlgorithmSession
         {
-            public AlgorithmResult Run(AlgorithmInput input)
+            public SimpleAlgorithmResult Run(SimpleAlgorithmInput input)
             {
-                var result = new AlgorithmResult { Success = true };
+                var result = new SimpleAlgorithmResult { Success = true };
                 var bytes = ResolveBytes(input);
 
                 if (bytes.Length == 0)
@@ -59,7 +59,7 @@ namespace Slide.Algorithm.Sample
                 return result;
             }
 
-            private static byte[] ResolveBytes(AlgorithmInput input)
+            private static byte[] ResolveBytes(SimpleAlgorithmInput input)
             {
                 if (input?.ImageBytes != null && input.ImageBytes.Length > 0)
                 {

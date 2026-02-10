@@ -1,16 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using Slide.Algorithm.Contracts;
-using Slide.Algorithm.ONNX;
-using Slide.Algorithm.OpenCV;
-
-namespace WpfApp2.Algorithms
-{
-    public static class AlgorithmEngineRegistry
-    {
-        private static readonly Dictionary<string, IAlgorithmEngine> Engines = new Dictionary<string, IAlgorithmEngine>(StringComparer.OrdinalIgnoreCase);
+﻿using System;
+using System.Collections.Generic;
+using Slide.Platform.Abstractions;
+using Slide.Algorithm.ONNX;
+using Slide.Algorithm.OpenCV;
+
+namespace WpfApp2.Algorithms
+{
+    public static class AlgorithmEngineRegistry
+    {
+        private static readonly Dictionary<string, IAlgorithmEngine> Engines = new Dictionary<string, IAlgorithmEngine>(StringComparer.OrdinalIgnoreCase);
         private static bool _initialized;
-
+
         public static void Initialize()
         {
             if (!_initialized)
@@ -25,17 +25,42 @@ namespace WpfApp2.Algorithms
                 return;
             }
         }
-
-        public static void EnsureInitialized()
-        {
-            if (!_initialized)
-            {
-                Initialize();
-                return;
-            }
-
+
+        public static void EnsureInitialized()
+        {
+            if (!_initialized)
+            {
+                Initialize();
+                return;
+            }
         }
-
+
+        public static void Register(IAlgorithmEngine engine)
+        {
+            if (engine == null) throw new ArgumentNullException(nameof(engine));
+            EnsureInitialized();
+            Engines[engine.EngineId] = engine;
+        }
+
+        public static void RegisterRange(IEnumerable<IAlgorithmEngine> engines)
+        {
+            if (engines == null) return;
+            EnsureInitialized();
+            foreach (var engine in engines)
+            {
+                if (engine != null)
+                {
+                    Engines[engine.EngineId] = engine;
+                }
+            }
+        }
+
+        public static bool Unregister(string engineId)
+        {
+            if (string.IsNullOrWhiteSpace(engineId)) return false;
+            return Engines.Remove(engineId);
+        }
+
         public static IAlgorithmEngine ResolveEngine(string preferredEngineId)
         {
             EnsureInitialized();
@@ -63,32 +88,32 @@ namespace WpfApp2.Algorithms
                 ? compositeEngine
                 : Engines.TryGetValue(AlgorithmEngineIds.OpenCv, out var openCvEngine) ? openCvEngine : preferredEngine;
         }
-
-        public static IReadOnlyList<AlgorithmEngineDescriptor> GetDescriptors()
-        {
-            EnsureInitialized();
-
-            var descriptors = new List<AlgorithmEngineDescriptor>();
-            foreach (var engine in Engines.Values)
-            {
-                if (engine == null)
-                {
-                    continue;
-                }
-
-                descriptors.Add(new AlgorithmEngineDescriptor
-                {
-                    EngineId = engine.EngineId,
-                    EngineName = engine.EngineName,
-                    EngineVersion = engine.EngineVersion,
-                    IsAvailable = engine.IsAvailable,
-                    Description = GetDefaultDescription(engine.EngineId)
-                });
-            }
-
-            return descriptors;
-        }
-
+
+        public static IReadOnlyList<AlgorithmEngineDescriptor> GetDescriptors()
+        {
+            EnsureInitialized();
+
+            var descriptors = new List<AlgorithmEngineDescriptor>();
+            foreach (var engine in Engines.Values)
+            {
+                if (engine == null)
+                {
+                    continue;
+                }
+
+                descriptors.Add(new AlgorithmEngineDescriptor
+                {
+                    EngineId = engine.EngineId,
+                    EngineName = engine.EngineName,
+                    EngineVersion = engine.EngineVersion,
+                    IsAvailable = engine.IsAvailable,
+                    Description = GetDefaultDescription(engine.EngineId)
+                });
+            }
+
+            return descriptors;
+        }
+
         private static string GetDefaultDescription(string engineId)
         {
             if (string.Equals(engineId, AlgorithmEngineIds.OpenCvOnnx, StringComparison.OrdinalIgnoreCase))
@@ -109,4 +134,4 @@ namespace WpfApp2.Algorithms
             return string.Empty;
         }
     }
-}
+}

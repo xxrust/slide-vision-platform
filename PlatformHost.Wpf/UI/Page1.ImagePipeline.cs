@@ -5,8 +5,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
-using Slide.Algorithm.Contracts;
-using ContractsAlgorithmInput = Slide.Algorithm.Contracts.AlgorithmInput;
+using Slide.Platform.Abstractions;
 using Microsoft.Win32;
 using WpfApp2.Models;
 using WpfApp2.Algorithms;
@@ -92,9 +91,9 @@ namespace WpfApp2.UI
             await Task.WhenAll(tasks);
         }
 
-        private ContractsAlgorithmInput BuildAlgorithmInput(ImageGroupSet imageGroup, TemplateParameters template)
+        private AlgorithmInput BuildAlgorithmInput(ImageGroupSet imageGroup, TemplateParameters template)
         {
-            var input = new ContractsAlgorithmInput
+            var input = new AlgorithmInput
             {
                 TemplateName = template?.TemplateName ?? CurrentTemplateName ?? string.Empty,
                 LotNumber = CurrentLotValue ?? string.Empty,

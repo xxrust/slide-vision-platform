@@ -54,6 +54,10 @@
       <Project>{581F1D8B-ABD7-44E4-A474-2D8FE3BC393F}</Project>
       <Name>Slide.Algorithm.Contracts</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\..\src\Slide.Platform.Abstractions\Slide.Platform.Abstractions.csproj">
+      <Project>{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}</Project>
+      <Name>Slide.Platform.Abstractions</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="OpenCvSharp4" Version="4.10.0.20240616" />

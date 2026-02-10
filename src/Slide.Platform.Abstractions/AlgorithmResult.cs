@@ -1,12 +1,20 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace Slide.Platform.Abstractions
 {
     public sealed class AlgorithmResult
     {
-        public bool Success { get; set; }
-        public string Message { get; set; }
-        public IDictionary<string, double> Metrics { get; } = new Dictionary<string, double>();
-        public IDictionary<string, string> Tags { get; } = new Dictionary<string, string>();
+        public string EngineId { get; set; }
+        public string EngineVersion { get; set; }
+        public AlgorithmExecutionStatus Status { get; set; }
+        public bool IsOk { get; set; }
+        public string DefectType { get; set; }
+        public string Description { get; set; }
+        public string ErrorMessage { get; set; }
+        public DateTime Timestamp { get; set; } = DateTime.Now;
+        public List<AlgorithmMeasurement> Measurements { get; set; } = new List<AlgorithmMeasurement>();
+        public Dictionary<string, string> DebugInfo { get; set; } = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        public Dictionary<string, byte[]> RenderImages { get; set; } = new Dictionary<string, byte[]>(StringComparer.OrdinalIgnoreCase);
     }
 }

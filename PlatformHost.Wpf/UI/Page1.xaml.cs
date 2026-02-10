@@ -24,7 +24,7 @@ using Path = System.IO.Path;
 using Microsoft.Win32;
 using System.Text.RegularExpressions;
 using Slide.ThreeD.Contracts;
-using Slide.Algorithm.Contracts;
+using Slide.Platform.Abstractions;
 using WpfApp2.ThreeD;
 using WpfApp2.Algorithms;
 using System.Windows.Media.Animation;
